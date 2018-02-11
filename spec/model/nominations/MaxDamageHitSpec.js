@@ -14,6 +14,13 @@ describe("MaxDamageHit", function() {
         expect(nomination.getCondition()(match, 0)).toBe(100500);
     });
 
+    it("should return max_hit value as score", function() {
+        nomination.addPoints(0, 100);
+        nomination.addPoints(0, 200);
+        nomination.addPoints(0, 100500);
+        expect(nomination.getScore()).toBe(100500);
+    });
+
     it("should be added to nominations list", () => {
         expect(require('../../../model/NominationsList').create().find(nom => nom.getName() === nomination.getName())).toBeDefined();
     });

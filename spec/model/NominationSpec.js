@@ -1,9 +1,10 @@
 describe("Nomination", function () {
     const Nomination = require('../../model/Nomination');
+    const Point = require('../../model/Point');
     let nomination;
 
     beforeEach(() => {
-        nomination = new Nomination('name', val => val, 'message');
+        nomination = new Nomination('name', match => match.point, 10, 'message');
     });
 
     it("should be constructed properly", function () {
@@ -13,20 +14,20 @@ describe("Nomination", function () {
     });
 
     it("should be able to score match points", function () {
-        nomination.scoreMatch(0);
-        nomination.scoreMatch(1);
+        nomination.scoreMatch({match_id: 1, point: 0});
+        nomination.scoreMatch({match_id: 2, point: 1});
         expect(nomination.getScore()).toBe(1);
     });
 
     it("should be corrupted if all points are null", function () {
-        nomination.scoreMatch(null);
-        nomination.scoreMatch(null);
+        nomination.scoreMatch({match_id: 1, point: null});
+        nomination.scoreMatch({match_id: 2, point: null});
         expect(nomination.isCorrupted()).toBeTruthy();
     });
 
     it("should be fine if some points are null", function () {
-        nomination.scoreMatch(0);
-        nomination.scoreMatch(null);
+        nomination.scoreMatch({match_id: 1, point: 0});
+        nomination.scoreMatch({match_id: 1, point: null});
         expect(nomination.isCorrupted()).toBeFalsy();
     });
 });

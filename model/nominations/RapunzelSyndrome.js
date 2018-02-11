@@ -16,5 +16,5 @@ function isAngryWithTowers(match, player_slot) {
 }
 
 module.exports = {
-    create: () => new Nomination('Синдром Рапунзель', isAngryWithTowers, 'Вежу ліпше знести ніж в ній сидіти')
+    create: () => new Nomination('Синдром Рапунзель', isAngryWithTowers, 1, 'Вежу ліпше знести ніж в ній сидіти')
 }

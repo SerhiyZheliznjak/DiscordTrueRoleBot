@@ -1,8 +1,40 @@
 const fs = require('fs');
-const constants = require('constants');
+const constants = require('../constants');
 
 function saveMatch(match) {
-    fs.readFile(constants.MATCHES_PATH(), 'utf8', function readFileCallback(err, data) {
+    fs.readFile(constants.MATCHES_PATH(), 'utf8', (err, data) => {        
+        let matches;
+        if (err) {
+            if (err.errno === -4058) {
+                fs.mkdirSync(constants.MATCHES_PATH().replace('/matches.json', ''));
+                matches = { table: [] };
+            }
+        } else {
+            matches = JSON.parse(data);
+        }
+        const exists = matches.table.find(m => match.match_id === m.match_id);
+        if (!exists) {
+            matches.table.push(match);
+            if (matches.length > 80) {
+                matches.pop();
+            }
+            const json = JSON.stringify(matches);
+            fs.writeFile(constants.MATCHES_PATH(), json, 'utf8');
+        }
+    });
+}
+
+function getPlayerScore() {
+    return JSON.parse(fs.readFileSync(constants.PLAYERS_PATH(), 'utf8'));
+}
+
+
+function getMatches() {
+    return JSON.parse(fs.readFileSync(constants.MATCHES_PATH(), 'utf8'));
+}
+
+function savePlayerScore(player_id, matches) {
+    fs.readFile(constants.MATCHES_PATH(), 'utf8', (err, data) => {
         if (err) {
             console.log(err);
         } else {
@@ -21,22 +53,9 @@ function saveMatch(match) {
     });
 }
 
-function getPlayers() {
-    return players;
-}
-
-
-function getMatches() {
-    return matches;
-}
-
-function saveRecentPlayerMatches(player_id, matches) {
-
-}
-
 module.exports = {
     saveMatch: saveMatch,
-    saveRecentPlayerMatches: saveRecentPlayerMatches,
-    getPlayers: getPlayers,
+    savePlayerScore: savePlayerScore,
+    getPlayerScore: getPlayerScore,
     getMatches: getMatches
 };

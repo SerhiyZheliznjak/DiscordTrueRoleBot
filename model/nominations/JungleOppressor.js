@@ -22,5 +22,5 @@ function isJungleOppressor(match, player_slot) {
 }
 
 module.exports = {
-    create: () => new Nomination('Гнобитель Джунглів', isJungleOppressor, 'Пацани не шарю що ви там робите, але я тут цілі джунглі пресую')
+    create: () => new Nomination('Гнобитель Джунглів', isJungleOppressor, 1, 'Пацани не шарю що ви там робите, але я тут цілі джунглі пресую')
 }
