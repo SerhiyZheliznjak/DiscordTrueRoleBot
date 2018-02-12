@@ -1,56 +1,57 @@
+const Rx = require('rxjs');
 const fs = require('fs');
-const constants = require('../constants');
+const CONST = require('../constants');
+
+function saveToFile(data, filePath, identify) {
+    const rfObservable = Rx.Observable.bindCallback(fs.readFile);
+    const eObservable = Rx.Observable.bindCallback(fs.exists);
+    eObservable(filePath).subscribe(
+        exists => {
+            if (!exists) {
+                const mkdirp = require('mkdirp');
+                const pathToCreate = filePath.split('/');
+                pathToCreate.pop();
+                mkdirp(pathToCreate.join('/'));
+            }
+            rfObservable(filePath).subscribe(updateFileData);
+        }
+    );
+
+    function updateFileData(err, existingData) {
+        if (err) {
+            data = { table: [] };
+        } else {
+            data = JSON.parse(existingData);
+        }
+        const exists = data.table.find(m => identify(existingData) === identify(match_id));
+        if (!exists) {
+            data.table.push(existingData);
+            if (data.length > 80) {
+                data.pop();
+            }
+            fs.writeFile(filePath, JSON.stringify(data), 'utf8', err => console.log(err));
+        }
+    }
+}
 
 function saveMatch(match) {
-    fs.readFile(constants.MATCHES_PATH(), 'utf8', (err, data) => {        
-        let matches;
-        if (err) {
-            if (err.errno === -4058) {
-                fs.mkdirSync(constants.MATCHES_PATH().replace('/matches.json', ''));
-                matches = { table: [] };
-            }
-        } else {
-            matches = JSON.parse(data);
-        }
-        const exists = matches.table.find(m => match.match_id === m.match_id);
-        if (!exists) {
-            matches.table.push(match);
-            if (matches.length > 80) {
-                matches.pop();
-            }
-            const json = JSON.stringify(matches);
-            fs.writeFile(constants.MATCHES_PATH(), json, 'utf8');
-        }
-    });
+    saveToFile(match, CONST.MATCHES_FILE_PATH(), m => m.match_id);
+}
+
+function savePlayerScore(palyerScore) {
+    saveToFile(palyerScore, CONST.PLAYERS_FILE_PATH(), p => p.player_id);
+}
+
+function readFileToObject(filePath) {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8', err=>console.dir(err)));
 }
 
 function getPlayerScore() {
-    return JSON.parse(fs.readFileSync(constants.PLAYERS_PATH(), 'utf8'));
+    return readFileToObject(CONST.PLAYERS_FILE_PATH());
 }
-
 
 function getMatches() {
-    return JSON.parse(fs.readFileSync(constants.MATCHES_PATH(), 'utf8'));
-}
-
-function savePlayerScore(player_id, matches) {
-    fs.readFile(constants.MATCHES_PATH(), 'utf8', (err, data) => {
-        if (err) {
-            console.log(err);
-        } else {
-            const matches = JSON.parse(data);
-            const exists = obj.table.find(m => match.match_id === m.match_id);
-            if (!exists) {
-                matches.table.push(match);
-                if (matches.length > 80) {
-                    matches.pop();
-                }
-                const json = JSON.stringify(matches); //convert it back to json
-                fs.writeFile(constants.MATCHES_PATH(), json, 'utf8'); // write it back 
-            }
-
-        }
-    });
+    return readFileToObject(CONST.MATCHES_FILE_PATH());
 }
 
 module.exports = {
