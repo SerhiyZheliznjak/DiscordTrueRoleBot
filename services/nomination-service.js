@@ -15,18 +15,24 @@ function getNominationsForPlayer(matches, player_slot) {
 
 function observePlayers(accountIds) {
   return Rx.Observable.create(observer => {
-    //15*60*1000
-    Rx.Observable.interval(5 * 1000).subscribe(() => {
+    const getRecentGamesObserver = {
+      next: () => {
         nominatedScores = DataStore.getPlayersScore();
         accountIds.forEach(account_id => {
           let playerScore = nominatedScores.find(p => p.account_id === account_id);
           playerScore = !!playerScore ? playerScore : new PlayerScore(account_id);
-          DotaApi.getRecentMatches(account_id).subscribe(matches => {
-            matches.filter(match => !playerScore.getNominations().find(nomination => nomination.match_id === match.match_id))
-              .forEach();
+          DotaApi.getRecentMatches(account_id).subscribe(recentMatches => {
+            const storedMatcheIds = DataStore.getMatches().map(m => m.match_id);
+            const notStoredMatches = recentMatches.map(m => m.match_id).filter(match_id => !storedMatcheIds.find(mid => mid === match_id));
+            DotaApi.getFullMatches(notStoredMatches).subscribe(m => {
+              DataStore.addMatches(m)
+            });
           });
         });
-      });
+      }
+    }
+    Rx.Observable.interval(15 * 60 * 1000).subscribe(getRecentGamesObserver);
+    getRecentGamesObserver.next();
   });
 }
 

@@ -2,67 +2,68 @@ const Rx = require('rxjs');
 const fs = require('fs');
 const CONST = require('../constants');
 
-function saveToFile(data, filePath, identify) {
+function saveToFile(dataToWrite, filePath, identify) {
+    if (!dataToWrite || !dataToWrite.length) {
+        console.log('write empty array yourself');
+        return;
+    }
     const rfObservable = Rx.Observable.bindCallback(fs.readFile);
-    const eObservable = Rx.Observable.bindCallback(fs.exists);
-    eObservable(filePath).subscribe(
-        exists => {
-            if (!exists) {
-                const mkdirp = require('mkdirp');
-                const pathToCreate = filePath.split('/');
-                pathToCreate.pop();
-                mkdirp(pathToCreate.join('/'));
-            }
-            rfObservable(filePath).subscribe(updateFileData);
-        }
-    );
 
-    function updateFileData(err, newData) {
-        if (err) {
-            data = { table: [] };
-        } else {
-            data = JSON.parse(newData);
+    exists(filePath);
+    rfObservable(filePath).subscribe(updateFileData);
+
+    function updateFileData(err, fileContents) {
+        fileContents = !err ? JSON.parse(fileContents) : { table: [] };
+        fileContents.table = fileContents.table.filter(fc => !dataToWrite.find(dtw => identify(fc) === identify(dtw)));
+        fileContents.table.push(...dataToWrite);
+        while (fileContents.table.length > CONST.GetMaxMatches()) {
+            fileContents.table.shift();
         }
-        const exists = data.table.find(m => identify(newData) === identify(match_id));
-        if (!exists) {
-            data.table.push(newData);
-            if (data.length > 80) {
-                data.pop();
-            }
-        } else {
-            for(let p in exists) {
-                if(exists.hasOwnProperty(p)) {
-                    exists[p] = newData[p];
-                }
-            }
-        }
-        fs.writeFile(filePath, JSON.stringify(data), 'utf8', err => console.log(err));
+        const writeString = JSON.stringify(fileContents);
+        fs.writeFile(filePath, writeString, 'utf8', err => !!err ? console.log('error writing ', writeString, err) : console.log('Saved successfully'));
     }
 }
 
-function saveMatch(match) {
-    saveToFile(match, CONST.MATCHES_FILE_PATH(), m => m.match_id);
+function exists(filePath) {
+    const doesExist = fs.existsSync(filePath);
+    if (!doesExist) {
+        const mkdirp = require('mkdirp');
+        const pathToCreate = filePath.split('/');
+        pathToCreate.pop();
+        mkdirp(pathToCreate.join('/'));
+    }
+    return doesExist;
 }
 
-function savePlayerScore(palyerScore) {
-    saveToFile(palyerScore, CONST.PLAYERS_FILE_PATH(), p => p.account_id);
+function saveMatches(matches) {
+    saveToFile(matches, CONST.MATCHES_FILE_PATH(), m => m.match_id);
+}
+
+function savePlayersScores(palyersScores) {
+    saveToFile(palyersScores, CONST.PLAYERS_FILE_PATH(), p => p.account_id);
 }
 
 function readFileToObject(filePath) {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8', err=>console.dir(err)));
+    return JSON.parse(fs.readFileSync(filePath, 'utf8', err => console.dir(err)));
 }
 
 function getPlayerScore() {
+    if (!exists(CONST.PLAYERS_FILE_PATH())) {
+        return [];
+    }
     return readFileToObject(CONST.PLAYERS_FILE_PATH()).table;
 }
 
 function getMatches() {
+    if (!exists(CONST.MATCHES_FILE_PATH())) {
+        return [];
+    }
     return readFileToObject(CONST.MATCHES_FILE_PATH()).table;
 }
 
 module.exports = {
-    saveMatch: saveMatch,
-    savePlayerScore: savePlayerScore,
+    saveMatches: saveMatches,
+    savePlayersScores: savePlayersScores,
     getPlayerScore: getPlayerScore,
     getMatches: getMatches
 };

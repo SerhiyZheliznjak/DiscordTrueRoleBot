@@ -8,14 +8,15 @@ Rx.Observable.interval(400).subscribe(
   () => {
     if (queue.length > 0) {
       const nextRequest = queue.shift();
-      RxHttpRequest.get(nextRequest.url).subscribe(
-        data => {
-          nextRequest.observer.next((JSON.parse(data.body)));
-          nextRequest.observer.complete();
-        },
-        err => console.dir(err),
-        () => console.log(nextRequest.url + ': complete')
-      );
+      RxHttpRequest.get(nextRequest.url).
+        map(data => JSON.parse(data.body)).subscribe(
+          obj => {
+            nextRequest.observer.next(obj);
+            nextRequest.observer.complete();
+          },
+          err => console.log(nextRequest.url, err),
+          () => console.log(nextRequest.url, ': complete')
+        );
     }
   },
   err => console.dir(err),
@@ -39,12 +40,15 @@ function getRecentMatches(account_id) {
   return queueRequest(util.format('https://api.opendota.com/api/players/%s/recentMatches', account_id));
 }
 
-function getFullMatchDetails(match_id) {
-  return queueRequest(util.format('https://api.opendota.com/api/matches/%s', match_id));
+function getFullMatches(matcheIds) {
+  const formatedUrls = matcheIds.map(match_id => util.format('https://api.opendota.com/api/matches/%s', match_id));
+  return Rx.Observable.forkJoin(formatedUrls.map(url => queueRequest(url)));
 };
 
 const DotaApi = {
-  getRecentMatches: getRecentMatches
+  getPlayer: getPlayer,
+  getRecentMatches: getRecentMatches,
+  getFullMatches: getFullMatches
 };
 
 module.exports = DotaApi

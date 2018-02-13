@@ -17,7 +17,8 @@
   },
   "devDependencies": {
     "eslint": "^4.17.0",
-    "jasmine": "^3.0.0"
+    "jasmine": "^3.0.0",
+    "mock-require": "^3.0.1"
   },
   "keywords": [],
   "description": ""
