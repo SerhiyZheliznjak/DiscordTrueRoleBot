@@ -62,7 +62,7 @@ function getMatches() {
 
 function addMatches(matchesToAdd) {
     if (!matchesCache) {
-        matchesCache = getMatches();
+        getMatches();
     }
     matchesToAdd = matchesToAdd.filter(mta => !matchesCache.find(mc => mc.match_id === mta.match_id));
     matchesCache.push(...matchesToAdd);
@@ -71,10 +71,18 @@ function addMatches(matchesToAdd) {
     }
 }
 
+function getMatch(match_id) {
+    if (!matchesCache) {
+        getMatches();
+    }
+    return matchesCache.find(m => m.match_id === match_id);
+}
+
 module.exports = {
     getPlayersScores: getPlayersScores,
     updatePlayerScores: updatePlayerScores,
     savePlayersScores: savePlayersScores,
     getMatches: getMatches,
+    getMatch: getMatch,
     addMatches: addMatches
 }

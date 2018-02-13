@@ -1,9 +1,10 @@
 const NominationsList = require('./NominationsList');
 
 class PlayerScore {
-    constructor(account_id) {
+    constructor(account_id, recentMatchesIds) {
         this._account_id = account_id;
         this._nominations = NominationsList.create();
+        this.recentMatchesIds = recentMatchesIds;
     }
     getAccountId() {
         return this._account_id

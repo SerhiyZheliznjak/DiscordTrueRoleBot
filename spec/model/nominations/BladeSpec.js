@@ -17,5 +17,11 @@ describe("Blade", function() {
     it("should return 1 value if claimed first blood", function() {
         expect(nomination.getCondition()(match, 0)).toBe(1);
     });
+
+    // it("should be able to score match points", function () {
+    //     nomination.scoreMatch({match_id: 1, point: 0});
+    //     nomination.scoreMatch({match_id: 2, point: 1});
+    //     expect(nomination.getScore()).toBe(1);
+    // });
   });
   
