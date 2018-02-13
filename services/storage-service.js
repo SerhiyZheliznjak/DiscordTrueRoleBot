@@ -17,20 +17,26 @@ function saveToFile(data, filePath, identify) {
         }
     );
 
-    function updateFileData(err, existingData) {
+    function updateFileData(err, newData) {
         if (err) {
             data = { table: [] };
         } else {
-            data = JSON.parse(existingData);
+            data = JSON.parse(newData);
         }
-        const exists = data.table.find(m => identify(existingData) === identify(match_id));
+        const exists = data.table.find(m => identify(newData) === identify(match_id));
         if (!exists) {
-            data.table.push(existingData);
+            data.table.push(newData);
             if (data.length > 80) {
                 data.pop();
             }
-            fs.writeFile(filePath, JSON.stringify(data), 'utf8', err => console.log(err));
+        } else {
+            for(let p in exists) {
+                if(exists.hasOwnProperty(p)) {
+                    exists[p] = newData[p];
+                }
+            }
         }
+        fs.writeFile(filePath, JSON.stringify(data), 'utf8', err => console.log(err));
     }
 }
 
@@ -39,7 +45,7 @@ function saveMatch(match) {
 }
 
 function savePlayerScore(palyerScore) {
-    saveToFile(palyerScore, CONST.PLAYERS_FILE_PATH(), p => p.player_id);
+    saveToFile(palyerScore, CONST.PLAYERS_FILE_PATH(), p => p.account_id);
 }
 
 function readFileToObject(filePath) {
@@ -47,11 +53,11 @@ function readFileToObject(filePath) {
 }
 
 function getPlayerScore() {
-    return readFileToObject(CONST.PLAYERS_FILE_PATH());
+    return readFileToObject(CONST.PLAYERS_FILE_PATH()).table;
 }
 
 function getMatches() {
-    return readFileToObject(CONST.MATCHES_FILE_PATH());
+    return readFileToObject(CONST.MATCHES_FILE_PATH()).table;
 }
 
 module.exports = {
