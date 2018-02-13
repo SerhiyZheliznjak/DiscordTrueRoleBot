@@ -13,7 +13,6 @@ client.on('ready', () => {
     '118778147', '62484741', '298134653'
   ];
   CONST.setPlayersBeingObserved(playersObserved.length);
-  // ['118778147']
   NominationService.observe(playersObserved).subscribe(winners => console.dir(winners));
 });
 

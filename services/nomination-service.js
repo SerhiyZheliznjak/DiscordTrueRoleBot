@@ -21,18 +21,24 @@ function observePlayers(accountIds) {
         accountIds.forEach(account_id => {
           let playerScore = nominatedScores.find(p => p.account_id === account_id);
           playerScore = !!playerScore ? playerScore : new PlayerScore(account_id);
-          DotaApi.getRecentMatches(account_id).subscribe(recentMatches => {
-            const storedMatcheIds = DataStore.getMatches().map(m => m.match_id);
-            const notStoredMatches = recentMatches.map(m => m.match_id).filter(match_id => !storedMatcheIds.find(mid => mid === match_id));
-            DotaApi.getFullMatches(notStoredMatches).subscribe(m => {
-              DataStore.addMatches(m)
-            });
-          });
+          getAndStoreRecentMatches(account_id);
         });
       }
     }
     Rx.Observable.interval(15 * 60 * 1000).subscribe(getRecentGamesObserver);
     getRecentGamesObserver.next();
+  });
+}
+
+function getAndStoreRecentMatches(account_id) {
+  DotaApi.getRecentMatches(account_id).subscribe(recentMatches => {
+    const storedMatcheIds = DataStore.getMatches().map(m => m.match_id);
+    const newMatches = recentMatches.map(m => m.match_id).filter(match_id => !storedMatcheIds.find(mid => mid === match_id));
+    if(newMatches.length > 0) {
+      DotaApi.getFullMatches(newMatches).subscribe(fullMatches => {
+        DataStore.addMatches(fullMatches);
+      });
+    }
   });
 }
 

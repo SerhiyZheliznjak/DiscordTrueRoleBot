@@ -15,9 +15,9 @@ describe("MaxDamageHit", function() {
     });
 
     it("should return max_hit value as score", function() {
-        nomination.addPoints(0, 100);
-        nomination.addPoints(0, 200);
-        nomination.addPoints(0, 100500);
+        nomination.addPoint(0, 100);
+        nomination.addPoint(0, 200);
+        nomination.addPoint(0, 100500);
         expect(nomination.getScore()).toBe(100500);
     });
 

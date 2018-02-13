@@ -1,9 +1,9 @@
+const NominationsList = require('./NominationsList');
+
 class PlayerScore {
-    constructor(account_id, recentMatches, playerScore) {
+    constructor(account_id) {
         this._account_id = account_id;
-        this.recentMatches = !!recentMatches ? recentMatches : [];
-        this.playerScore = !!playerScore ? playerScore : [];
-        this._nominations = [];
+        this._nominations = NominationsList.create();
     }
     getAccountId() {
         return this._account_id
@@ -11,22 +11,16 @@ class PlayerScore {
     getNominations() {
         return this._nominations;
     }
-    setNominations(nominations) {
+    updateNominations(nominations) {
         this._nominations = nominations;
     }
-    addNominationScore(nomination) {
-        const existing = this._nominations.find(n => n.name === nomination.getName());
-        if(!!existing) {
-            existing.points = nomination.getPoints();
-        } else {
-            this._nominations.push({name: nomination.getName(), points: nomination.getPoints()});
-        }
-    }
-    toJSON() {
-        return JSON.stringify({
-            account_id: this._account_id,
-            nominations: this.nominations
-        })
+    setPointsFromJsonObject(jsonNominations) {
+        this._nominations.forEach(nomination => {
+            const jsonN = jsonNominations.find(n=> n._name === nomination.getName());
+            if(!!jsonN) {
+                nomination.getPoints().push(...jsonN._points);
+            }
+        });
     }
 }
 

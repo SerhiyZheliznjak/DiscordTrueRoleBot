@@ -10,8 +10,8 @@ describe("Nomination list", function() {
 
   it("should be able create new lsists", function() {
     const newList = Nominations.create();
-    nominationsList.forEach(n => n.addPoints(1));
-    newList.forEach(n => n.addPoints(null));
+    nominationsList.forEach(n => n.addPoint(1));
+    newList.forEach(n => n.addPoint(null));
     expect(nominationsList).not.toEqual(newList);
   });
 

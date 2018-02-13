@@ -1,11 +1,11 @@
 const Point = require('./Point');
 
 class Nomination {
-    constructor(name, condition, minCount, msg) {
+    constructor(name, condition, minCount, msg, points) {
         this._name = name;
         this._condition = condition;
         this._msg = msg;
-        this._points = [];
+        this._points = !points ? [] : points;
         this._minScore = minCount;
     }
     getName() {
@@ -15,9 +15,9 @@ class Nomination {
         return this._condition;
     }
     scoreMatch(match, player_slot) {
-        this.addPoints(match.match_id, this._condition(match, player_slot));
+        this.addPoint(match.match_id, this._condition(match, player_slot));
     }
-    addPoints(match_id, val) {
+    addPoint(match_id, val) {
         this._points.push(new Point(match_id, val));
     }
     getPoints() {

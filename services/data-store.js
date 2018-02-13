@@ -1,35 +1,61 @@
 const StorageService = require('./storage-service');
 const PlayerScore = require('../model/PlayerScore');
+const Nomination = require('../model/Nomination');
 const CONST = require('../constants');
 
 let playerScoreCache;
 let matchesCache;
 
-function getPlayersScore() {
+function initPlayersScoresCache() {
     if (!playerScoreCache) {
-        const psFromStorage = StorageService.getPlayerScore().map(ps => new PlayerScore(ps.account_id, ps.nominations));
-        playerScoreCache = !!psFromStorage ? psFromStorage : [];
+        playerScoreCache = convertToPlayersScores(StorageService.getPlayersScores());
+    }
+}
+
+function getPlayersScores() {
+    if (!playerScoreCache) {
+        initPlayersScoresCache();
     }
     return playerScoreCache;
 }
 
-function updatePlayerScore(playerScore) {
+function convertToPlayersScores(storedObject) {
+    const playersScores = [];
+    if (!!storedObject) {
+        for (account_id in storedObject) {
+            if (storedObject.hasOwnProperty(account_id)) {
+                const ps = new PlayerScore(account_id);
+                ps.setPointsFromJsonObject(storedObject[account_id]);
+                playersScores.push(ps);
+            }
+        }
+    }
+    return playersScores;
+}
+
+function updatePlayerScores(playerScore) {
+    if (!playerScoreCache) {
+        initPlayersScoresCache();
+    }
     if (!!playerScore) {
-        playerScoreCache = getPlayerScore();
         const existing = playerScoreCache.find(ps => ps.account_id === playerScore.account_id);
         if (!existing) {
             playerScoreCache.push(playerScore);
         } else {
-            existing.nominations = playerScore.nominations;
+            existing.updateNominations(playerScore.getNominations());
         }
-        StorageService.savePlayerScore(playerScore.toJSON())
+    }
+}
+
+function savePlayersScores() {
+    if (!!playerScoreCache) {
+        StorageService.savePlayersScores(playerScoreCache)
     }
 }
 
 function getMatches() {
     if (!matchesCache) {
-        const matchesFromStorage = matchesCache = StorageService.getMatches();
-        matchesCache = !!matchesFromStorage ? matchesFromStorage : [];
+        matchesCache = [];
     }
     return matchesCache;
 }
@@ -40,15 +66,15 @@ function addMatches(matchesToAdd) {
     }
     matchesToAdd = matchesToAdd.filter(mta => !matchesCache.find(mc => mc.match_id === mta.match_id));
     matchesCache.push(...matchesToAdd);
-    while(matchesCache.length > CONST.GetMaxMatches()) {
+    while (matchesCache.length > CONST.GetMaxMatches()) {
         matchesCache.shift();
     }
-    StorageService.saveMatches(matchesToAdd);
 }
 
 module.exports = {
-    getPlayersScore: getPlayersScore,
-    updatePlayerScore: updatePlayerScore,
+    getPlayersScores: getPlayersScores,
+    updatePlayerScores: updatePlayerScores,
+    savePlayersScores: savePlayersScores,
     getMatches: getMatches,
     addMatches: addMatches
 }
