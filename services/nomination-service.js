@@ -14,42 +14,57 @@ function getNominationsForPlayer(matches, player_slot) {
 }
 
 function observePlayers(accountIds) {
-  //FIgure out with observables
   return Rx.Observable.create(observer => {
     const getRecentGamesObserver = {
       next: () => {
         nominatedScores = DataStore.getPlayersScores();
-        Rx.Observable.forkJoin(accountIds.map(account_id => getAndStoreRecentMatches(account_id, nominatedScores)));
+        subscriptionChain(accountIds.map(account_id => getPlayerScoreForRecentMatches(account_id, nominatedScores)));
+
+        function subscriptionChain(observables) {
+          const nextObservable = observables.shift();
+          if (nextObservable) {
+            nextObservable.subscribe(playerScores => {
+              DataStore.updatePlayerScores(playerScores);
+              subscriptionChain(observables);
+            });
+          } else {
+            console.log('Finished a run');
+            DataStore.savePlayersScores();
+            observer.next(DataStore.getPlayersScores());
+          }
+        }
       }
     }
-    Rx.Observable.interval(15 * 60 * 1000).subscribe(getRecentGamesObserver);
+    Rx.Observable.interval(5 * 60 * 1000).subscribe(getRecentGamesObserver);
     getRecentGamesObserver.next();
   });
 }
 
-function getAndStoreRecentMatches(account_id, nominatedScores) {
-  //FIgure out with observables
+function getPlayerScoreForRecentMatches(account_id, nominatedScores) {
   return Rx.Observable.create(observer => {
-    let playerScore = nominatedScores.find(p => p.account_id === account_id);
+    let playerScore = nominatedScores.find(p => p.getAccountId() === account_id);
     playerScore = !!playerScore ? playerScore : new PlayerScore(account_id);
     DotaApi.getRecentMatches(account_id).subscribe(recentMatches => {
       const recentMatchesIds = recentMatches.map(m => m.match_id);
-      const newMatches = recentMatchesIds.filter(match_id => !DataStore.getMatches().map(m => m.match_id).find(mid => mid === match_id));
-      if (newMatches.length > 0) {
-        DotaApi.getFullMatches(newMatches).subscribe(fullMatches => {
-          DataStore.addMatches(fullMatches);
-          if (playerScore.recentMatchesIds[playerScore.recentMatchesIds.length - 1] !== recentMatchesIds[recentMatchesIds.length - 1]) {
-            playerScore.recentMatchesIds = recentMatchesIds;
-            recentMatches.forEach(rm => {
-              playerScore.getNominations().forEach(nomination=>{
-                nomination.scoreMatch(DataStore.getMatch(rm.match_id), rm.player_slot);
-              });
-            });
-            observer.next(playerScore);
-          }
-        });
-      } else {
-        observer.next(playerScore);
+      const unnominatedMatchesIds = playerScore.getUnnominatedMatches(recentMatchesIds);
+
+      subscriptionChain(unnominatedMatchesIds.map(match_id => DataStore.getMatch(match_id)));
+
+      function subscriptionChain(observables) {
+        const nextObservable = observables.shift();
+        if (nextObservable) {
+          nextObservable.subscribe(fullMatch => {
+            playerScore.getNominations().forEach(
+              nomination => nomination.scoreMatch(fullMatch, recentMatches.find(rm => rm.match_id === fullMatch.match_id).player_slot)
+            );
+            subscriptionChain(observables);
+          });
+        } else {
+          playerScore.recentMatchesIds = recentMatchesIds;
+          console.log('Finished scoring player ', account_id);
+          observer.next(playerScore);
+          observer.complete();
+        }
       }
     });
   });

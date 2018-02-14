@@ -15,13 +15,13 @@ describe('StorageService', () => {
     it('should save player score', () => {
         const scores = [new PlayerScore('huy')];
         StorageService.savePlayersScores(scores);
-        expect(readPlayersScoreFile()).toEqual(JSON.stringify({ huy: scores[0].getNominations() }));
+        expect(readPlayersScoreFile()).toEqual(JSON.stringify({ huy: {recentMatchesIds:scores[0].recentMatchesIds, nominations:scores[0].getNominations() }}));
     });
 
     it('should read saved player score', () => {
         const scores = [new PlayerScore('huy')];
         StorageService.savePlayersScores(scores);
-        expect(StorageService.getPlayersScores()).toEqual(JSON.parse(JSON.stringify({ huy: scores[0].getNominations() })));
+        expect(StorageService.getPlayersScores()).toEqual(JSON.parse(JSON.stringify({ huy: {recentMatchesIds:scores[0].recentMatchesIds, nominations:scores[0].getNominations() }})));
     });
 
     function readPlayersScoreFile() {

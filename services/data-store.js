@@ -27,7 +27,8 @@ function convertToPlayersScores(storedObject) {
         for (account_id in storedObject) {
             if (storedObject.hasOwnProperty(account_id)) {
                 const ps = new PlayerScore(account_id);
-                ps.setPointsFromJsonObject(storedObject[account_id]);
+                ps.setPointsFromJsonObject(storedObject[account_id].nominations);
+                ps.recentMatchesIds = storedObject[account_id].recentMatchesIds;
                 playersScores.push(ps);
             }
         }
@@ -40,7 +41,7 @@ function updatePlayerScores(playerScore) {
         initPlayersScoresCache();
     }
     if (!!playerScore) {
-        const existing = playerScoreCache.find(ps => ps.account_id === playerScore.account_id);
+        const existing = playerScoreCache.find(ps => ps.getAccountId() === playerScore.getAccountId());
         if (!existing) {
             playerScoreCache.push(playerScore);
         } else {
@@ -59,7 +60,7 @@ function getMatches() {
     if (!matchesCache) {
         matchesCache = [];
     }
-    
+
     return matchesCache;
 }
 
@@ -80,20 +81,27 @@ function getMatch(match_id) {
             getMatches();
         }
         let match = matchesCache.find(m => m.match_id === match_id);
-        if(!match) {
-            DotaApi.getMatch(match_id).subscribe(m=>observer.next(m)); 
+        if (!match) {
+            DotaApi.getMatch(match_id).subscribe(m => {
+                matchesCache.push(m);
+                observer.next(m);
+                observer.complete();
+            });
         } else {
+            console.log('returning match from storage', match_id);
             observer.next(match);
+            observer.complete();
         }
     });
-    
 }
 
-module.exports = {
+const DataStore = {
     getPlayersScores: getPlayersScores,
     updatePlayerScores: updatePlayerScores,
     savePlayersScores: savePlayersScores,
     getMatches: getMatches,
     getMatch: getMatch,
     addMatches: addMatches
-}
+};
+
+module.exports = DataStore;

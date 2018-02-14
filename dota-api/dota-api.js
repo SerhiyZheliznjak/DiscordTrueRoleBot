@@ -4,7 +4,7 @@ const util = require('util');
 
 const queue = [];
 
-Rx.Observable.interval(400).subscribe(
+Rx.Observable.interval(340).subscribe(
   () => {
     if (queue.length > 0) {
       const nextRequest = queue.shift();
@@ -14,7 +14,11 @@ Rx.Observable.interval(400).subscribe(
             nextRequest.observer.next(obj);
             nextRequest.observer.complete();
           },
-          err => console.log(nextRequest.url, err),
+          err => {
+            console.log(nextRequest.url, err);
+            nextRequest.observer.next({});
+            nextRequest.observer.complete();
+          },
           () => console.log(nextRequest.url, ': complete')
         );
     }

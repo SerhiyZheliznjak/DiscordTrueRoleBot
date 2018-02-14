@@ -19,7 +19,10 @@ function savePlayersScores(palyersScores) {
     }
     createPathIfNeeded(CONST.PLAYERS_FILE_PATH());
     const reducedObject = palyersScores.reduce((fileContents, ps) => {
-        fileContents[ps._account_id] = ps.getNominations();
+        fileContents[ps._account_id] = {
+            recentMatchesIds: ps.recentMatchesIds,
+            nominations: ps.getNominations()
+        };
         return fileContents;
     }, {});
     fs.writeFileSync(CONST.PLAYERS_FILE_PATH(),
