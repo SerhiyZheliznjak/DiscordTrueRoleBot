@@ -47,7 +47,6 @@ function getPlayerScoreForRecentMatches(account_id, nominatedScores) {
     DotaApi.getRecentMatches(account_id).subscribe(recentMatches => {
       const recentMatchesIds = recentMatches.map(m => m.match_id);
       const unnominatedMatchesIds = playerScore.getUnnominatedMatches(recentMatchesIds);
-
       subscriptionChain(unnominatedMatchesIds.map(match_id => DataStore.getMatch(match_id)));
 
       function subscriptionChain(observables) {

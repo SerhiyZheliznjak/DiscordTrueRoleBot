@@ -28,7 +28,7 @@ function generateMessages(nominationsWinners) {
         subscriptionChain(nominationsWinners.map(nominationWinner => DataStore.getPlayer(nominationWinner.account_id)),
             player => {
                 DataStore.updatePlayer(player);
-                const nominationWon = nominationWinner.nomination;
+                const nominationWon = nominationsWinners.find(nw => +nw.account_id === +player.account_id).nomination;
                 messagesObserver.next({
                     title: player.personaname + ' ' + nominationWon.getName(),
                     description: nominationWon.getMessage(),
@@ -46,7 +46,7 @@ function subscriptionChain(observables, next, complete) {
     if (nextObservable) {
         nextObservable.subscribe(result => {
             next(result);
-            subscriptionChain(observables);
+            subscriptionChain(observables, next, complete);
         });
     } else {
         complete();
