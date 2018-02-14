@@ -45,10 +45,15 @@ function getFullMatches(matcheIds) {
   return Rx.Observable.forkJoin(formatedUrls.map(url => queueRequest(url)));
 };
 
+function getMatch(match_id) {
+  return queueRequest(util.format('https://api.opendota.com/api/matches/%s', match_id));
+}
+
 const DotaApi = {
   getPlayer: getPlayer,
   getRecentMatches: getRecentMatches,
-  getFullMatches: getFullMatches
+  getFullMatches: getFullMatches,
+  getMatch: getMatch
 };
 
 module.exports = DotaApi

@@ -2,6 +2,8 @@ const StorageService = require('./storage-service');
 const PlayerScore = require('../model/PlayerScore');
 const Nomination = require('../model/Nomination');
 const CONST = require('../constants');
+const DotaApi = require('../dota-api/dota-api');
+const Rx = require('rxjs');
 
 let playerScoreCache;
 let matchesCache;
@@ -57,6 +59,7 @@ function getMatches() {
     if (!matchesCache) {
         matchesCache = [];
     }
+    
     return matchesCache;
 }
 
@@ -72,10 +75,18 @@ function addMatches(matchesToAdd) {
 }
 
 function getMatch(match_id) {
-    if (!matchesCache) {
-        getMatches();
-    }
-    return matchesCache.find(m => m.match_id === match_id);
+    return Rx.Observable.create(observer => {
+        if (!matchesCache) {
+            getMatches();
+        }
+        let match = matchesCache.find(m => m.match_id === match_id);
+        if(!match) {
+            DotaApi.getMatch(match_id).subscribe(m=>observer.next(m)); 
+        } else {
+            observer.next(match);
+        }
+    });
+    
 }
 
 module.exports = {

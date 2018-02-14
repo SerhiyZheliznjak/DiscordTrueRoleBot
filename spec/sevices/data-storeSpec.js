@@ -3,11 +3,16 @@ const CONST = require('../../constants');
 const PlayerScore = require('../../model/PlayerScore');
 let DataStore;
 let StorageServiceMock;
+let DotaApiMock;
 
 describe('StorageService', () => {
     beforeEach(() => {
         StorageServiceMock = jasmine.createSpyObj('StorageServiceMock', ['getPlayersScores', 'savePlayersScores']);
-        DataStore = Proxyquire('../../services/data-store', { './storage-service': StorageServiceMock });
+        DotaApiMock = jasmine.createSpyObj('DotaApiMock', ['getMatch']);
+        DataStore = Proxyquire('../../services/data-store', { 
+            './storage-service': StorageServiceMock,
+        '../dota-api/dota-api': DotaApiMock
+     });
     });
 
     it('should set players cashe to empty array if nothing stored', () => {
