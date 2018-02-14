@@ -19,7 +19,7 @@ Rx.Observable.interval(340).subscribe(
             nextRequest.observer.next({});
             nextRequest.observer.complete();
           },
-          () => console.log(nextRequest.url, ': complete')
+          () => {}
         );
     }
   },
@@ -53,11 +53,17 @@ function getMatch(match_id) {
   return queueRequest(util.format('https://api.opendota.com/api/matches/%s', match_id));
 }
 
+function getPlayer(account_id) {
+  return queueRequest(util.format('https://api.opendota.com/api/players/%s', account_id));
+}
+
 const DotaApi = {
   getPlayer: getPlayer,
   getRecentMatches: getRecentMatches,
   getFullMatches: getFullMatches,
-  getMatch: getMatch
+  getMatch: getMatch,
+  getPlayer: getPlayer
+
 };
 
 module.exports = DotaApi

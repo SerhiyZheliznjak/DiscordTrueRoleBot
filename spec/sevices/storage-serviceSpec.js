@@ -25,12 +25,12 @@ describe('StorageService', () => {
     });
 
     function readPlayersScoreFile() {
-        return fs.readFileSync(CONST.PLAYERS_FILE_PATH(), 'utf8', err => console.dir(err));
+        return fs.readFileSync(CONST.PLAYERS_SCORES_FILE_PATH(), 'utf8', err => console.dir(err));
     }
 
     function cleanUp() {
-        if (fs.existsSync(CONST.PLAYERS_FILE_PATH())) {
-            fs.unlinkSync(CONST.PLAYERS_FILE_PATH());
+        if (fs.existsSync(CONST.PLAYERS_SCORES_FILE_PATH())) {
+            fs.unlinkSync(CONST.PLAYERS_SCORES_FILE_PATH());
         }
     }
 });

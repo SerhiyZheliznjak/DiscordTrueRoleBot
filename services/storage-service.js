@@ -17,7 +17,7 @@ function savePlayersScores(palyersScores) {
         console.log('write empty array yourself');
         return;
     }
-    createPathIfNeeded(CONST.PLAYERS_FILE_PATH());
+    createPathIfNeeded(CONST.PLAYERS_SCORES_FILE_PATH());
     const reducedObject = palyersScores.reduce((fileContents, ps) => {
         fileContents[ps._account_id] = {
             recentMatchesIds: ps.recentMatchesIds,
@@ -25,7 +25,7 @@ function savePlayersScores(palyersScores) {
         };
         return fileContents;
     }, {});
-    fs.writeFileSync(CONST.PLAYERS_FILE_PATH(),
+    fs.writeFileSync(CONST.PLAYERS_SCORES_FILE_PATH(),
         JSON.stringify(reducedObject),
         'utf8',
         err => console.log('error writing ', writeString, err));
@@ -36,13 +36,23 @@ function readFileToObject(filePath) {
 }
 
 function getPlayersScores() {
-    if (!createPathIfNeeded(CONST.PLAYERS_FILE_PATH())) {
+    if (!createPathIfNeeded(CONST.PLAYERS_SCORES_FILE_PATH())) {
         return [];
     }
-    return readFileToObject(CONST.PLAYERS_FILE_PATH());
+    return readFileToObject(CONST.PLAYERS_SCORES_FILE_PATH());
+}
+
+function getPlayers() {
+    return [];
+}
+
+function getPlayer() {
+    return null;
 }
 
 module.exports = {
     savePlayersScores: savePlayersScores,
-    getPlayersScores: getPlayersScores
+    getPlayersScores: getPlayersScores,
+    getPlayer:getPlayer,
+    getPlayers: getPlayers
 };

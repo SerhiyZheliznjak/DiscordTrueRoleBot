@@ -88,11 +88,40 @@ function getMatch(match_id) {
                 observer.complete();
             });
         } else {
-            console.log('returning match from storage', match_id);
             observer.next(match);
             observer.complete();
         }
     });
+}
+
+let playersInfoCache;
+function getPlayer(account_id) {
+    return Rx.Observable.create(playerObserver => {
+        if (!playersInfoCache) {
+            playersInfoCache = StorageService.getPlayers();
+        }
+        let player = playersInfoCache.find(p => p.account_id === account_id);
+        if (!player) {
+            DotaApi.getPlayer(account_id)
+            .map(p => p.profile)
+            .subscribe(p => {
+                playersInfoCache.push(p);
+                playerObserver.next(p);
+                playerObserver.complete();
+            });
+        } else {
+            playerObserver.next(player);
+            playerObserver.complete();
+        }
+    });
+}
+
+function updatePlayer(player) {
+
+}
+
+function getPlayers() {
+    return !!playersInfoCache ? playersInfoCache : [];
 }
 
 const DataStore = {
@@ -101,7 +130,9 @@ const DataStore = {
     savePlayersScores: savePlayersScores,
     getMatches: getMatches,
     getMatch: getMatch,
-    addMatches: addMatches
+    addMatches: addMatches,
+    getPlayer: getPlayer,
+    updatePlayer: updatePlayer
 };
 
 module.exports = DataStore;

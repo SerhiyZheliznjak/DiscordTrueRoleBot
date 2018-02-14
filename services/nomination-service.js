@@ -14,7 +14,7 @@ function getNominationsForPlayer(matches, player_slot) {
 }
 
 function observePlayers(accountIds) {
-  return Rx.Observable.create(observer => {
+  return Rx.Observable.create(playersObserver => {
     const getRecentGamesObserver = {
       next: () => {
         nominatedScores = DataStore.getPlayersScores();
@@ -30,7 +30,7 @@ function observePlayers(accountIds) {
           } else {
             console.log('Finished a run');
             DataStore.savePlayersScores();
-            observer.next(DataStore.getPlayersScores());
+            playersObserver.next(DataStore.getPlayersScores());
           }
         }
       }

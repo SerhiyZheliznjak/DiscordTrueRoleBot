@@ -1,4 +1,5 @@
 const Point = require('./Point');
+const util = require('util');
 
 class Nomination {
     constructor(name, condition, minCount, msg, points) {
@@ -28,8 +29,8 @@ class Nomination {
             return p != null ? r + p.point : r;
         }, 0);
     }
-    getMessage() {
-        return this._msg;
+    getMessage() {        
+        return util.format(this._msg, this.getScore());
     }
     isCorrupted() {
         return this._points.every(point => point.point === null);
