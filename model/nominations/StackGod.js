@@ -6,7 +6,7 @@ class StackGod extends Nomination {
 
 function getStackCount(match, player_slot) {
     const player = DotaParser.getPlayerInfo(match, player_slot);
-    return !!player && !!player.camps_stacked ? player.camps_stacked : null;
+    return !!player && player.camps_stacked !== null ? player.camps_stacked : null;
 }
 
 module.exports = {

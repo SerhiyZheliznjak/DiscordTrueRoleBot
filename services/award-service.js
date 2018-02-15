@@ -11,6 +11,7 @@ function getNominationsWinners(playerScores) {
 }
 
 function generateMessages(claimedNominations) {
+    console.dir(claimedNominations.map(cn => cn.account_id + ' ' + cn.nomination.getName()));
     return Rx.Observable.create(messagesObserver => {
         
         DataStore.getPlayers(claimedNominations.map(cn => cn.account_id).reduce((uniq, id) => {
@@ -18,8 +19,7 @@ function generateMessages(claimedNominations) {
                 uniq.push(id);
             }
             return uniq;
-        }, [])).subscribe(players => {
-            console.dir(claimedNominations.map(cn => cn.account_id));
+        }, [])).subscribe(players => {            
             claimedNominations.forEach(claimed => {
                 const player = players.find(p => +p.account_id === +claimed.account_id);
                 const message = {
