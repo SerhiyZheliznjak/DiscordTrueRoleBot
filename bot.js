@@ -14,7 +14,16 @@ client.on('ready', () => {
     '298134653', '333303976', '118975931', '86848474', '314684987', '36753317'
   ];
   CONST.setPlayersBeingObserved(playersObserved.length);
-  client.user.send('Hi Creator!');
+  const richEmbed = new Discord.RichEmbed();
+  richEmbed.setTitle('Хуй Пезда!');
+  richEmbed.setDescription('Fqytytys dflaskjdf lasdkf ');
+  richEmbed.setImage('https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/02/029169a5c3adc6fc1ba83ba44fffdbe962f7ba31_medium.jpg');
+  // richEmbed.setTitle('Хуй Пезда!');
+  // richEmbed.setTitle('Хуй Пезда!');
+  // richEmbed.setTitle('Хуй Пезда!');
+  // richEmbed.setTitle('Хуй Пезда!');
+
+  console.log(client.channels.find('name', 'general').send('', richEmbed));
   // NominationService.observe(playersObserved).subscribe(playerScores => {
   //  const claimedNominations = AwardService.getNominationsWinners(playerScores);
   //  AwardService.generateMessages(claimedNominations).subscribe(message => Discord.post(message.title, message.description, message.profileUrl, message.avatarUrl));
