@@ -3,6 +3,10 @@ const Blade = require('./nominations/Blade');
 const Donor = require('./nominations/Donor');
 const JungleOppressor = require('./nominations/JungleOppressor');
 const RapunzelSyndrome = require('./nominations/RapunzelSyndrome');
+const MotherOfGod = require('./nominations/MotherOfGod');
+const OponentOwsMoney = require('./nominations/OponentOwsMoney');
+const StackGod = require('./nominations/StackGod');
+const Parkinson = require('./nominations/Parkinson');
 
 function getAllNominations() {
     return [
@@ -11,6 +15,10 @@ function getAllNominations() {
         Donor.create(),
         JungleOppressor.create(),
         RapunzelSyndrome.create(),
+        MotherOfGod.create(),
+        OponentOwsMoney.create(),
+        StackGod.create(),
+        Parkinson.create(),
     ];
 }
 

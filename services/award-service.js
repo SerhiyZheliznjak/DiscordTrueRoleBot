@@ -26,7 +26,8 @@ function generateMessages(claimedNominations) {
                     title: player.personaname + ' ' + claimed.nomination.getName(),
                     description: claimed.nomination.getMessage(),
                     profileUrl: player.profileurl,
-                    avatarUrl: player.avatarmedium
+                    avatarUrl: player.avatarmedium,
+                    footer: 'Рахунок: ' + claimed.nomination.getScore()
                 }
                 messagesObserver.next(message);
             });

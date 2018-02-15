@@ -9,5 +9,5 @@ function isDonor(match, player_slot) {
 }
 
 module.exports = {
-    create: () => new Nomination('Донор', isDonor, 1, 'Нє ну як не дати як просять? Ну але ж не %s раз!')
+    create: () => new Nomination('Донор', isDonor, 1, 'Нє ну як не дати як просять?')
 }

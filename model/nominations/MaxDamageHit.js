@@ -14,5 +14,5 @@ function getMaxDamage(match, player_slot) {
 }
 
 module.exports = {
-    create: () => new MaxDamageHit('Людогуб', getMaxDamage, 1, 'Йобне раз, але сильно\n %s ШКОДИ за один удар!')
+    create: () => new MaxDamageHit('Людогуб', getMaxDamage, 1, 'Йобне раз, але сильно. Дохуя ШКОДИ за один удар!')
 };

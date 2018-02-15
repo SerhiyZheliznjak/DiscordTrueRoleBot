@@ -33,7 +33,7 @@ class Nomination {
         }, 0);
     }
     getMessage() {        
-        return util.format(this._msg, this.getScore());
+        return this._msg;
     }
     isCorrupted() {
         return this._points.every(point => point.point === null);

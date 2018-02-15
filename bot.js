@@ -14,21 +14,21 @@ client.on('ready', () => {
     '298134653', '333303976', '118975931', '86848474', '314684987', '36753317'
   ];
   CONST.setPlayersBeingObserved(playersObserved.length);
-  const richEmbed = new Discord.RichEmbed();
-  richEmbed.setTitle('Хуй Пезда!');
-  richEmbed.setDescription('Fqytytys dflaskjdf lasdkf ');
-  richEmbed.setImage('https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/02/029169a5c3adc6fc1ba83ba44fffdbe962f7ba31_medium.jpg');
-  // richEmbed.setTitle('Хуй Пезда!');
-  // richEmbed.setTitle('Хуй Пезда!');
-  // richEmbed.setTitle('Хуй Пезда!');
-  // richEmbed.setTitle('Хуй Пезда!');
-
-  console.log(client.channels.find('name', 'general').send('', richEmbed));
-  // NominationService.observe(playersObserved).subscribe(playerScores => {
-  //  const claimedNominations = AwardService.getNominationsWinners(playerScores);
-  //  AwardService.generateMessages(claimedNominations).subscribe(message => Discord.post(message.title, message.description, message.profileUrl, message.avatarUrl));
-  // });
+  const chanel = client.channels.find('type', 'text');
+  NominationService.observe(playersObserved).subscribe(playerScores => {
+   const claimedNominations = AwardService.getNominationsWinners(playerScores);
+   AwardService.generateMessages(claimedNominations).subscribe(message => chanel.send('', getRichEmbed(message)));
+  });
 });
+
+function getRichEmbed(winnerMessage) {
+  const richEmbed = new Discord.RichEmbed();
+  richEmbed.setTitle(winnerMessage.title);
+  richEmbed.setDescription(winnerMessage.description);
+  richEmbed.setImage(winnerMessage.avatarUrl);
+  richEmbed.setFooter(winnerMessage.footer);
+  return richEmbed;
+}
 
 client.on('message', msg => {
   if (msg.content === 'ping') {
@@ -37,15 +37,3 @@ client.on('message', msg => {
 });
 
 client.login(authentication.testbot);
-
-
-// let title = util.format("%s %s his last game", p.profile.personaname, ((m.player_slot < 128 && m.radiant_win) || (m.player_slot >= 128 && !m.radiant_win)) ? "WON" : "LOST");
-// let description = util.format("Hero: %s\nKDA: %s/%s/%s\n\nGame mode: %s, %s\n\nIt started at %s and lasted %s minutes",
-//     enums.HEROES.find(h => h.id == m.hero_id).localized_name,
-//     m.kills, m.deaths, m.assists,
-//     enums.LOBBIES.find(l => l.id == m.lobby_type).name,
-//     enums.MODES.find(mode => mode.id == m.game_mode).name,
-//     new Date(m.start_time * 1000).toLocaleTimeString(), parseInt(m.duration / 60)
-// );
-// let url = util.format("https://www.dotabuff.com/matches/%s", m.match_id)
-// discord.post(title, description, url, p.profile.avatarmedium);
