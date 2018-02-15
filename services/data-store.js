@@ -103,12 +103,12 @@ function getPlayer(account_id) {
         let player = playersInfoCache.find(p => p.account_id === account_id);
         if (!player) {
             DotaApi.getPlayer(account_id)
-            .map(p => p.profile)
-            .subscribe(p => {
-                playersInfoCache.push(p);
-                playerObserver.next(p);
-                playerObserver.complete();
-            });
+                .map(p => p.profile)
+                .subscribe(p => {
+                    updatePlayer(p);
+                    playerObserver.next(p);
+                    playerObserver.complete();
+                });
         } else {
             playerObserver.next(player);
             playerObserver.complete();
@@ -116,11 +116,49 @@ function getPlayer(account_id) {
     });
 }
 
-function updatePlayer(player) {
-
+function getPlayers(accountsIds) {
+    return Rx.Observable.create(playersObserver => {
+        subscriptionChain(
+            accountsIds.map(account_id => getPlayer(account_id)),
+            player => updatePlayer(player),
+            () => {
+                playersObserver.next(getPlayersCache());
+                playersObserver.complete();
+            });
+    });
 }
 
-function getPlayers() {
+function subscriptionChain(observables, next, complete) {
+    const nextObservable = observables.shift();
+    if (nextObservable) {
+        nextObservable.subscribe(result => {
+            next(result);
+            subscriptionChain(observables, next, complete);
+        });
+    } else {
+        complete();
+    }
+}
+
+function updatePlayer(player) {
+    if (playersInfoCache) {
+        const playerFromCache = playersInfoCache.find(pc => pc.account_id === player.account_id);
+        if (playerFromCache) {
+            playerFromCache.personaname = player.personaname;
+            playerFromCache.name = player.name;
+            playerFromCache.avatar = player.avatar;
+            playerFromCache.avatarmedium = player.avatarmedium;
+            playerFromCache.profileurl = player.profileurl;
+            playerFromCache.last_login = player.last_login;
+        } else {
+            playersInfoCache.push(player);
+        }
+    } else {
+        playersInfoCache = [player];
+    }
+}
+
+function getPlayersCache() {
     return !!playersInfoCache ? playersInfoCache : [];
 }
 
@@ -132,7 +170,8 @@ const DataStore = {
     getMatch: getMatch,
     addMatches: addMatches,
     getPlayer: getPlayer,
-    updatePlayer: updatePlayer
+    updatePlayer: updatePlayer,
+    getPlayers: getPlayers
 };
 
 module.exports = DataStore;

@@ -20,6 +20,9 @@ class Nomination {
     }
     addPoint(match_id, val) {
         this._points.push(new Point(match_id, val));
+        while(this._points.length > 20) {
+            this._points.shift();
+        }
     }
     getPoints() {
         return this._points;

@@ -8,24 +8,44 @@ Rx.Observable.interval(340).subscribe(
   () => {
     if (queue.length > 0) {
       const nextRequest = queue.shift();
-      RxHttpRequest.get(nextRequest.url).
-        map(data => JSON.parse(data.body)).subscribe(
-          obj => {
+      RxHttpRequest.get(nextRequest.url).subscribe(
+        data => {
+          let obj;
+          try {
+            obj = JSON.parse(data.body);           
+          } catch (err) {
+            console.error(err, nextRequest.url, '. response data: ', data.body);
+            queue.push({
+              url: nextRequest.url,
+              observer: nextRequest.observer
+            });
+          }
+          if(obj) {
             nextRequest.observer.next(obj);
             nextRequest.observer.complete();
-          },
-          err => {
-            console.log(nextRequest.url, err);
-            nextRequest.observer.next({});
-            nextRequest.observer.complete();
-          },
-          () => {}
-        );
+          }
+        },
+        err => {
+          console.log(nextRequest.url, err);
+          nextRequest.observer.next({});
+          nextRequest.observer.complete();
+        },
+        () => { }
+      );
     }
   },
   err => console.dir(err),
   () => console.log('interval complete')
 );
+
+function retry(url, retryCount, observer) {
+  if (retryCount > 0) {
+    retryCount--;
+
+  } else {
+    console.err('Failed getting ', url);
+  }
+}
 
 function queueRequest(url) {
   return Rx.Observable.create(observer => {
