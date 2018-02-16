@@ -4,7 +4,7 @@ const util = require('util');
 
 const queue = [];
 
-Rx.Observable.interval(340).subscribe(
+Rx.Observable.interval(400).subscribe(
   () => {
     if (queue.length > 0) {
       const nextRequest = queue.shift();

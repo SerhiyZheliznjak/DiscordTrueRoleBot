@@ -20,7 +20,7 @@ class Nomination {
     }
     addPoint(match_id, val) {
         this._points.push(new Point(match_id, val));
-        while(this._points.length > 20) {
+        while (this._points.length > 20) {
             this._points.shift();
         }
     }
@@ -29,10 +29,10 @@ class Nomination {
     }
     getScore() {
         return this._points.reduce((r, p) => {
-            return p != null ? r + p.point : r;
+            return p != null && p.point != null ? r + p.point : r;
         }, 0);
     }
-    getMessage() {        
+    getMessage() {
         return this._msg;
     }
     isCorrupted() {

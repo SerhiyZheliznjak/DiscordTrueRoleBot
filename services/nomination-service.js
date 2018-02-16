@@ -6,6 +6,8 @@ const DotaApi = require('../dota-api/dota-api');
 const PlayerScore = require('../model/PlayerScore');
 
 let nominatedScores;
+let subscription;
+let getRecentGamesObserver;
 
 function getNominationsForPlayer(matches, player_slot) {
   const nominationsList = NominationsList.create();
@@ -15,7 +17,7 @@ function getNominationsForPlayer(matches, player_slot) {
 
 function observePlayers(accountIds) {
   return Rx.Observable.create(playersObserver => {
-    const getRecentGamesObserver = {
+    getRecentGamesObserver = {
       next: () => {
         nominatedScores = DataStore.getPlayersScores();
         subscriptionChain(accountIds.map(account_id => getPlayerScoreForRecentMatches(account_id, nominatedScores)));
@@ -35,9 +37,18 @@ function observePlayers(accountIds) {
         }
       }
     }
-    Rx.Observable.interval(5 * 60 * 1000).subscribe(getRecentGamesObserver);
+    start();
     getRecentGamesObserver.next();
   });
+}
+
+function start() {
+  subscription = Rx.Observable.interval(10 * 1000).subscribe(getRecentGamesObserver);
+}
+
+function stop() {
+  subscription.unsubscribe();
+  console.log('stopped watching');
 }
 
 function getPlayerScoreForRecentMatches(account_id, nominatedScores) {
@@ -70,5 +81,7 @@ function getPlayerScoreForRecentMatches(account_id, nominatedScores) {
 }
 
 module.exports = {
-  observe: observePlayers
+  observe: observePlayers,
+  start: start,
+  stop: stop
 };
