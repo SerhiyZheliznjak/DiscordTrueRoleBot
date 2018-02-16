@@ -95,6 +95,7 @@ function getMatch(match_id) {
 }
 
 let playersInfoCache;
+
 function getPlayer(account_id) {
     return Rx.Observable.create(playerObserver => {
         if (!playersInfoCache) {
