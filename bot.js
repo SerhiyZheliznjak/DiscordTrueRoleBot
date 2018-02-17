@@ -8,19 +8,20 @@ const AwardService = require('./services/award-service');
 const DataStore = require('./services/data-store');
 
 const client = new Discord.Client();
-let playersObserved = new Map();
+let playersMap = new Map();
 let subscription;
 let retardMap = new Map();
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  CONST.setPlayersBeingObserved(playersObserved.length);
-  const chanel = client.channels.find('type', 'text');
+  CONST.setPlayersBeingObserved(playersMap.size);
+  
   forgiveRetards();
   // startWatching();
 });
 
 function startWatching() {
+  const chanel = client.channels.find('type', 'text');
   subscription = NominationService.observe([
     '298134653', '333303976', '118975931', '86848474', '314684987', '36753317'
   ]).subscribe(playerScores => {
@@ -45,10 +46,13 @@ function getRichEmbed(winnerMessage) {
 
 client.on('message', msg => {
   if (isRetard(msg.author.id)) {
-    msg.reply('АЛОАЛОАЛОАІОВЛОАЛДОІДАЛОІДАІЖДЛАОДЛОІДВЛОАЖІДВЛАОІВДАо!!! нічого не чую!!');
+    const shutRetard = ['Стягнув', 'Ти такий розумний', 'Помовчи трохи', 'Т-с-с-с-с-с-с',
+    'Біжи далеко', 'Ти можеш трохи тихо побути?', 'Ціхо', 'Каца!', 'Таааась тась тась', 'Люди, йдіть сі подивіть', 'Інколи краще жувати',
+    'Ти то серйозно?', 'Молодець'];
+    msg.reply(shutRetard[Math.floor(Math.random() * shutRetard.length)]);
     return;
   }
-  if (msg.content === 'restart' && msg.author.id === authentication.creatorId) {
+  if (msg.content === 'restart' && isCreator(msg)) {
     stopWatching();
     startWatching();
   }
@@ -66,20 +70,29 @@ client.on('message', msg => {
       const r = / \d+/;
       DataStore.getPlayer(msg.content.match(r)[0].trim()).subscribe(playerInfo => {
         if (!!playerInfo) {
-          playersObserved.set(playerInfo.account_id, msg.mentions.users.mentions);
+          if(playersMap.get(playerInfo.account_id) && !isCreator(msg)) {
+            msg.reply('Вже закріплено за @' + playersMap.get(playerInfo.account_id));
+            retardPlusPlus(msg);
+          } else {
+            playersMap.set(playerInfo.account_id, msg.mentions.users.first().username);
+            msg.reply('Я стежитему за тобою, ' + playerInfo.personaname);
+          }
         } else {
-
+          msg.reply('Давай ще раз, але цього разу очима дивись на айді гравця');
+          retardPlusPlus(msg);
         }
       });
     }
-    console.log(msg.content)
-    console.dir(msg.mentions.users)
   }
-
-  const playersObserved = [
-    '298134653', '333303976', '118975931', '86848474', '314684987', '36753317'
-  ];
 });
+
+const regularplayers = [
+  '298134653', '333303976', '118975931', '86848474', '314684987', '36753317'
+];
+
+function isCreator(msg) {
+  return msg.author.id === authentication.creatorId;
+}
 
 function retardPlusPlus(message) {
   const authorId = message.author.id;
@@ -91,16 +104,23 @@ function retardPlusPlus(message) {
   retardCount.push(new Date().getTime());
   if (retardCount.length > 3) {
     if (isRetard(authorId)) {
-      message.reply('Я не пойму ніяк, ти розумововідсталий чи як? йди роздуплийсь трохи.');
+      client.channels.find('type', 'text').send('@everyone Чат, небезпека - розумововідсталий!');
     } else {
+      console.log('wtf?')
       retardCount.shift();
     }
   }
 }
 
 function isRetard(authorId) {
-  if(retardMap.get(authorId)) {
-    return retardCount.reduce((r, n) => n - r > r ? n - r : r) < 60*1000;
+  if(retardMap.get(authorId) && retardMap.get(authorId).length > 3 && retardMap.get(authorId)) {
+    return retardCount.reduce((r, c, i) => {
+      const next = retardCount[i+1];
+      if(next) {
+        return r > next - c ? next - c : r;
+      }
+      return r;
+    }) < 60*1000;
   }
   return false;
 }
