@@ -44,6 +44,10 @@ function getRichEmbed(winnerMessage) {
   return richEmbed;
 }
 
+function showRegistered() {
+  
+}
+
 client.on('message', msg => {
   if (isRetard(msg.author.id)) {
     const shutRetard = ['Стягнув', 'Ти такий розумний', 'Помовчи трохи', 'Т-с-с-с-с-с-с',
