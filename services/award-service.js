@@ -2,8 +2,9 @@ const Rx = require('rxjs');
 const DataStore = require('./data-store');
 const ScoreBoard = require('../model/ScoreBoard');
 
+let scoreBoard = new ScoreBoard();
 function getNominationsWinners(playerScores) {
-    const scoreBoard = new ScoreBoard();
+    scoreBoard = new ScoreBoard();
     if (playerScores.find(ps => ps.hasNewMatches)) {
         playerScores.forEach(playerScore => scoreBoard.applyPlayerScores(playerScore));
     }
@@ -36,7 +37,12 @@ function generateMessages(claimedNominations) {
     });
 }
 
+function getUnclaimedNominations() {
+    return scoreBoard.getUnclaimedNominations();
+}
+
 module.exports = {
     getNominationsWinners: getNominationsWinners,
-    generateMessages: generateMessages
+    generateMessages: generateMessages,
+    getUnclaimedNominations: getUnclaimedNominations
 }

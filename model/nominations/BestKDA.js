@@ -30,8 +30,7 @@ function countKDA(kdaString) {
 
 function getKDA(match, player_slot) {
     const player = DotaParser.getPlayerInfo(match, player_slot);
-    const wonMatch = player.isRadiant ? player.radiant_win : !player.radiant_win;
-    const matchResult = wonMatch ? 'ЗАТАЩИВ' : 'ТІМА ДНО';
+    const matchResult = DotaParser.wonMatch(match, player_slot) ? 'ЗАТАЩИВ' : 'ТІМА ДНО';
     return !!player && player.kills !== null && player.deaths !== null && player.assists !== null
         ? player.kills + '/' + player.deaths + '/' + player.assists + '/' + matchResult
         : null;

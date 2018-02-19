@@ -24,6 +24,10 @@ class ScoreBoard {
         return this._nominationList.map(nomination => this.results[nomination.getName()])
         .filter(winner => winner.nomination.isScored());
     }
+    getUnclaimedNominations() {
+        return this._nominationList.map(nomination => this.results[nomination.getName()])
+        .filter(winner => !winner.nomination.isScored());
+    }
 }
 
 module.exports = ScoreBoard;

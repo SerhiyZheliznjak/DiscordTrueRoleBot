@@ -13,7 +13,7 @@ let subscription;
 let retardMap = new Map();
 let guild;
 
-client.login(authentication.peacedota);
+client.login(authentication.testbot);
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -163,8 +163,18 @@ function startWatching() {
   subscription = NominationService.observe(getDotaIds()).subscribe(playerScores => {
     const claimedNominations = AwardService.getNominationsWinners(playerScores);
     AwardService.generateMessages(claimedNominations.filter(assignRole)).subscribe(message => {
-      console.dir(message);
-      // chanel.send('', getRichEmbed(message));
+      // console.dir(message);
+      chanel.send('', getRichEmbed(message));
+    });
+    const unclaimedNominations = AwardService.getUnclaimedNominations();
+    unclaimedNominations.forEach(unclaimed => {
+      const existingRole = getRole(unclaimed.nomination.getName());
+      if (existingRole) {
+        const previousHolder = existingRole.members.first();
+        if (previousHolder) {
+          previousHolder.removeRole(existingRole);
+        }
+      }
     });
   });
 }
@@ -224,7 +234,7 @@ function assignRole(claimedNomination) {
         return true;
       } else {
         console.log('skipped as role is already assigned to winner');
-        
+
         return false;
       }
     } else {

@@ -8,6 +8,9 @@ const OponentOwsMoney = require('./nominations/OponentOwsMoney');
 const StackGod = require('./nominations/StackGod');
 const Parkinson = require('./nominations/Parkinson');
 const BestKDA = require('./nominations/BestKDA');
+const WinnerForLife = require('./nominations/WinnerForLife');
+const Looser = require('./nominations/Looser');
+const Rage = require('./nominations/Rage');
 
 function getAllNominations() {
     return [
@@ -21,6 +24,9 @@ function getAllNominations() {
         StackGod.create(),
         Parkinson.create(),
         BestKDA.create(),
+        WinnerForLife.create(),
+        Looser.create(),
+        Rage.create(),
     ];
 }
 
