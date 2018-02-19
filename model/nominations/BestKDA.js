@@ -15,7 +15,6 @@ class BestKDA extends Nomination {
         return countKDA(this.getScore()) > countKDA(that.getScore());
     }
     isScored() {
-        console.log(this.getScore());
         return this.getScore() !== '0/0/0';
     }
 }

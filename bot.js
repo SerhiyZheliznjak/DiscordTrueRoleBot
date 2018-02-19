@@ -230,15 +230,15 @@ function assignRole(claimedNomination) {
       if (previousHolder.id !== claimedNomination.account_id) {
         previousHolder.removeRole(existingRole);
         assignRoleToMember(existingRole, claimedNomination.account_id);
-        console.log('reassigned existing role');
+        console.log('reassigned existing ' + roleName);
         return true;
       } else {
-        console.log('skipped as role is already assigned to winner');
+        console.log('skipped as ' + roleName + ' is already assigned to winner');
 
         return false;
       }
     } else {
-      console.log('failed to find role holder assigned to new one');
+      console.log('failed to find ' + roleName + ' holder assigned to new one');
       assignRoleToMember(existingRole, claimedNomination.account_id);
       return true;
     }
@@ -246,7 +246,7 @@ function assignRole(claimedNomination) {
     createRole(roleName).subscribe(role => {
       assignRoleToMember(role, claimedNomination.account_id);
     });
-    console.log('crated new role and assigned');
+    console.log('crated new ' + roleName + ' and assigned');
     return true;
   }
 }
@@ -255,5 +255,7 @@ function assignRoleToMember(role, account_id) {
   const member = getGuild().members.find('id', playersMap.get(account_id));
   if (member) {
     member.addRole(role);
+  } else {
+    console.log('failed to find member to assign' + role);
   }
 }
