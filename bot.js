@@ -13,7 +13,7 @@ let subscription;
 let retardMap = new Map();
 let guild;
 
-client.login(authentication.testbot);
+client.login(authentication.peacedota);
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -162,8 +162,10 @@ function startWatching() {
   const chanel = client.channels.find('type', 'text');
   subscription = NominationService.observe(getDotaIds()).subscribe(playerScores => {
     const claimedNominations = AwardService.getNominationsWinners(playerScores);
-    AwardService.generateMessages(claimedNominations).subscribe(message => chanel.send('', getRichEmbed(message)));
-    claimedNominations.forEach();
+    AwardService.generateMessages(claimedNominations.filter(assignRole)).subscribe(message => {
+      console.dir(message);
+      // chanel.send('', getRichEmbed(message));
+    });
   });
 }
 
@@ -213,18 +215,35 @@ function assignRole(claimedNomination) {
   const roleName = claimedNomination.nomination.getName();
   const existingRole = getRole(roleName);
   if (existingRole) {
-    existingRole.members.first().removeRole(existingRole);
-    assigneRoleToMember(existingRole, account_id)
+    const previousHolder = existingRole.members.first();
+    if (previousHolder) {
+      if (previousHolder.id !== claimedNomination.account_id) {
+        previousHolder.removeRole(existingRole);
+        assignRoleToMember(existingRole, claimedNomination.account_id);
+        console.log('reassigned existing role');
+        return true;
+      } else {
+        console.log('skipped as role is already assigned to winner');
+        
+        return false;
+      }
+    } else {
+      console.log('failed to find role holder assigned to new one');
+      assignRoleToMember(existingRole, claimedNomination.account_id);
+      return true;
+    }
   } else {
-    createRole(roleName).subscribe(role=>{
-      assigneRoleToMember(role, claimedNomination.account_id)
+    createRole(roleName).subscribe(role => {
+      assignRoleToMember(role, claimedNomination.account_id);
     });
+    console.log('crated new role and assigned');
+    return true;
   }
 }
 
-function assigneRoleToMember(role, account_id) {
+function assignRoleToMember(role, account_id) {
   const member = getGuild().members.find('id', playersMap.get(account_id));
-  if(member) {
+  if (member) {
     member.addRole(role);
   }
 }
