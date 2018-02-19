@@ -7,6 +7,7 @@ const MotherOfGod = require('./nominations/MotherOfGod');
 const OponentOwsMoney = require('./nominations/OponentOwsMoney');
 const StackGod = require('./nominations/StackGod');
 const Parkinson = require('./nominations/Parkinson');
+const BestKDA = require('./nominations/BestKDA');
 
 function getAllNominations() {
     return [
@@ -19,6 +20,7 @@ function getAllNominations() {
         OponentOwsMoney.create(),
         StackGod.create(),
         Parkinson.create(),
+        BestKDA.create(),
     ];
 }
 

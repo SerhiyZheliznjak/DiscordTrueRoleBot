@@ -25,7 +25,7 @@ describe('StorageService', () => {
     });
 
     function readPlayersScoreFile() {
-        return fs.readFileSync(CONST.PLAYERS_SCORES_FILE_PATH(), 'utf8', err => console.dir(err));
+        return fs.readFileSync(CONST.PLAYERS_SCORES_FILE_PATH(), 'utf8', err => console.error(err));
     }
 
     function cleanUp() {

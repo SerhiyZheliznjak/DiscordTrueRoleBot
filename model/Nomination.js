@@ -41,6 +41,12 @@ class Nomination {
     getMinScore() {
         return this._minScore;
     }
+    hasHigherScoreThen(that) {
+        return this.getScore() > that.getScore();
+    }
+    isScored() {
+        return this.getScore() > 0;
+    }
 }
 
 module.exports = Nomination;

@@ -14,7 +14,7 @@ function createPathIfNeeded(filePath) {
 
 function savePlayersScores(palyersScores) {
     if (!palyersScores || !palyersScores.length) {
-        console.log('write empty array yourself');
+        console.error('write empty array yourself');
         return;
     }
     createPathIfNeeded(CONST.PLAYERS_SCORES_FILE_PATH());
@@ -28,11 +28,11 @@ function savePlayersScores(palyersScores) {
     fs.writeFileSync(CONST.PLAYERS_SCORES_FILE_PATH(),
         JSON.stringify(reducedObject),
         'utf8',
-        err => console.log('error writing ', writeString, err));
+        err => console.error('error writing ', writeString, err));
 }
 
 function readFileToObject(filePath) {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8', err => console.dir(err)));
+    return JSON.parse(fs.readFileSync(filePath, 'utf8', err => console.error(err)));
 }
 
 function getPlayersScores() {

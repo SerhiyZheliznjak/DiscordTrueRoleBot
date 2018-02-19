@@ -9,7 +9,7 @@ describe("Nomination", function () {
 
     it("should be constructed properly", function () {
         expect(nomination.getName()).toBe('name');
-        expect(nomination.getMessage()).toBe('message 0');
+        expect(nomination.getMessage()).toBe('message');
         expect(nomination.getCondition()).toBeDefined();
     });
 

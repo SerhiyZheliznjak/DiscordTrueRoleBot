@@ -43,11 +43,13 @@ function observePlayers(accountIds) {
 }
 
 function start() {
-  subscription = Rx.Observable.interval(10 * 1000).subscribe(getRecentGamesObserver);
+  subscription = Rx.Observable.interval(1000 * 60 * 60 * 2).subscribe(getRecentGamesObserver);
 }
 
 function stop() {
-  subscription.unsubscribe();
+  if (subscription) {
+    subscription.unsubscribe();
+  }
   console.log('stopped watching');
 }
 

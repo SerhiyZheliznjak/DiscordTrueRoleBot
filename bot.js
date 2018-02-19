@@ -11,28 +11,175 @@ const client = new Discord.Client();
 let playersMap = new Map();
 let subscription;
 let retardMap = new Map();
+let guild;
+
+client.login(authentication.testbot);
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  CONST.setPlayersBeingObserved(playersMap.size);
-  
+
   forgiveRetards();
-  // startWatching();
+  playersMap = regularPlayersMap;
+  startWatching();
 });
+
+const regularPlayersMap = new Map();
+regularPlayersMap.set('298134653', '407971834689093632');
+regularPlayersMap.set('333303976', '407949091163865099');
+regularPlayersMap.set('118975931', '289388465034887178');
+regularPlayersMap.set('86848474', '408363774257528852');
+regularPlayersMap.set('314684987', '413792999030652938');
+regularPlayersMap.set('36753317', '408172132875501581');
+
+client.on('message', msg => {
+  if (msg.author.bot) {
+    return;
+  }
+  if (isRetard(msg.author.id)) {
+    shutUpYouRRetard(msg);
+    return;
+  }
+  if (msg.content.toLocaleLowerCase() === 'restart') {
+    restart(msg);
+  }
+  if (msg.content.toLocaleLowerCase() === 'registerall') {
+    registerall(msg);
+  }
+  if (msg.content.toLowerCase().startsWith("watch ")) {
+    addWatch(msg);
+  }
+  if (msg.content.toLocaleLowerCase() === 'watchlist') {
+    showRegistered(msg);
+  }
+});
+
+function registerall(msg) {
+  if (isCreator(msg)) {
+    playersMap = regularPlayersMap;
+  } else {
+    retardPlusPlus(msg);
+    msg.reply('хуєгістеролл');
+  }
+}
+
+function restart(msg) {
+  if (isCreator(msg)) {
+    stopWatching();
+    startWatching();
+  } else {
+    retardPlusPlus(msg);
+    msg.reply('хуємпездрестарт');
+  }
+}
+
+function shutUpYouRRetard(msg) {
+  const shutRetard = ['Стягнув', 'Ти такий розумний', 'Помовчи трохи', 'Т-с-с-с-с-с-с',
+    'Біжи далеко', 'Ти можеш трохи тихо побути?', 'Ціхо', 'Каца!', 'Таааась тась тась', 'Люди, йдіть сі подивіть', 'Інколи краще жувати',
+    'Ти то серйозно?', 'Молодець'];
+  msg.reply(shutRetard[Math.floor(Math.random() * shutRetard.length)]);
+}
+
+function showRegistered(msg) {
+  if (isCreator(msg)) {
+    let registered = 'Стежу за: ';
+    for (let info of playersMap) {
+      registered += info + '\n';
+    }
+    msg.reply(registered);
+  } else {
+    retardPlusPlus(msg);
+    msg.reply('хуйочліст');
+  }
+}
+
+function addWatch(msg) {
+  if (msg.mentions.users.array().length === 0) {
+    msg.reply('Тобі показати як вставити своє ім\'я в повідомлення?');
+    retardPlusPlus(msg);
+  } else if (msg.mentions.users.array().length > 1) {
+    msg.reply('Ти зовсім дурне? Як я маю всіх підряд зареєструвати?');
+    retardPlusPlus(msg);
+  } else if (msg.content.split(' ').filter(word => word !== '').length !== 3) {
+    msg.reply('Курва... Шо ти пишеш?.. Має бути "watch @КОРИСТУВАЧ DOTA_ID"');
+    retardPlusPlus(msg);
+  } else {
+    const r = / \d+/;
+    DataStore.getPlayer(msg.content.match(r)[0].trim()).subscribe(playerInfo => {
+      if (!!playerInfo) {
+        if (playersMap.get(playerInfo.account_id) && !isCreator(msg)) {
+          msg.reply('Вже закріплено за @' + playersMap.get(playerInfo.account_id));
+          retardPlusPlus(msg);
+        } else {
+          playersMap.set(playerInfo.account_id, msg.mentions.users.first().id);
+          msg.reply('Я стежитиму за тобою, ' + playerInfo.personaname);
+        }
+      } else {
+        msg.reply('Давай ще раз, але цього разу очима дивись на айді гравця');
+        retardPlusPlus(msg);
+      }
+    });
+  }
+}
+
+function isCreator(msg) {
+  return msg.author.id === authentication.creatorId;
+}
+
+function retardPlusPlus(msg) {
+  const authorId = msg.author.id;
+  if (!retardMap.get(authorId)) {
+    retardMap.set(authorId, []);
+  }
+  retardCount = retardMap.get(authorId);
+  retardCount.push(new Date().getTime());
+  if (retardCount.length > 3) {
+    if (isRetard(authorId)) {
+      client.channels.find('type', 'text').send('@everyone Чат, небезпека - розумововідсталий!');
+    } else {
+      retardCount.shift();
+    }
+  }
+}
+
+function isRetard(authorId) {
+  if (retardMap.get(authorId) && retardMap.get(authorId).length > 3 && retardMap.get(authorId)) {
+    return retardCount.reduce((r, c, i) => {
+      const next = retardCount[i + 1];
+      if (next) {
+        return r > next - c ? next - c : r;
+      }
+      return r;
+    }) < 60 * 1000;
+  }
+  return false;
+}
+
+function forgiveRetards() {
+  Rx.Observable.interval(1000 * 60 * 60 * 24).subscribe(() => retardMap = new Map());
+}
 
 function startWatching() {
   const chanel = client.channels.find('type', 'text');
-  subscription = NominationService.observe([
-    '298134653', '333303976', '118975931', '86848474', '314684987', '36753317'
-  ]).subscribe(playerScores => {
+  subscription = NominationService.observe(getDotaIds()).subscribe(playerScores => {
     const claimedNominations = AwardService.getNominationsWinners(playerScores);
     AwardService.generateMessages(claimedNominations).subscribe(message => chanel.send('', getRichEmbed(message)));
+    claimedNominations.forEach();
   });
+}
+
+function getDotaIds() {
+  let dotaIds = [];
+  for (let id of playersMap.keys()) {
+    dotaIds.push(id);
+  }
+  return dotaIds;
 }
 
 function stopWatching() {
   NominationService.stop();
-  subscription.unsubscribe();
+  if (subscription) {
+    subscription.unsubscribe();
+  }
 }
 
 function getRichEmbed(winnerMessage) {
@@ -44,93 +191,40 @@ function getRichEmbed(winnerMessage) {
   return richEmbed;
 }
 
-function showRegistered() {
-  
+function createRole(roleName) {
+  return Rx.Observable.fromPromise(getGuild().createRole({
+    name: roleName,
+    color: '#' + Math.floor(Math.random() * 16777215).toString(16)
+  }));
 }
 
-client.on('message', msg => {
-  if (isRetard(msg.author.id)) {
-    const shutRetard = ['Стягнув', 'Ти такий розумний', 'Помовчи трохи', 'Т-с-с-с-с-с-с',
-    'Біжи далеко', 'Ти можеш трохи тихо побути?', 'Ціхо', 'Каца!', 'Таааась тась тась', 'Люди, йдіть сі подивіть', 'Інколи краще жувати',
-    'Ти то серйозно?', 'Молодець'];
-    msg.reply(shutRetard[Math.floor(Math.random() * shutRetard.length)]);
-    return;
-  }
-  if (msg.content === 'restart' && isCreator(msg)) {
-    stopWatching();
-    startWatching();
-  }
-  if (msg.content.toLowerCase().startsWith("watch")) {
-    if (msg.mentions.users.array().length === 0) {
-      msg.reply('Тобі показати як вставити своє ім\'я в повідомлення?');
-      retardPlusPlus(msg);
-    } else if (msg.mentions.users.array().length > 1) {
-      msg.reply('Ти зовсім дурне? Як я маю всіх підряд зареєструвати?');
-      retardPlusPlus(msg);
-    } else if (msg.content.split(' ').filter(word => word !== '').length !== 3) {
-      msg.reply('Курва... Шо ти пишеш?.. Має бути "watch @КОРИСТУВАЧ DOTA_ID"');
-      retardPlusPlus(msg);
-    } else {
-      const r = / \d+/;
-      DataStore.getPlayer(msg.content.match(r)[0].trim()).subscribe(playerInfo => {
-        if (!!playerInfo) {
-          if(playersMap.get(playerInfo.account_id) && !isCreator(msg)) {
-            msg.reply('Вже закріплено за @' + playersMap.get(playerInfo.account_id));
-            retardPlusPlus(msg);
-          } else {
-            playersMap.set(playerInfo.account_id, msg.mentions.users.first().username);
-            msg.reply('Я стежитему за тобою, ' + playerInfo.personaname);
-          }
-        } else {
-          msg.reply('Давай ще раз, але цього разу очима дивись на айді гравця');
-          retardPlusPlus(msg);
-        }
-      });
-    }
-  }
-});
-
-const regularplayers = [
-  '298134653', '333303976', '118975931', '86848474', '314684987', '36753317'
-];
-
-function isCreator(msg) {
-  return msg.author.id === authentication.creatorId;
+function getRole(name) {
+  return getGuild().roles.find('name', name);
 }
 
-function retardPlusPlus(message) {
-  const authorId = message.author.id;
-  if (!retardMap.get(authorId)) {
-    console.log('initiated retard map')
-    retardMap.set(authorId, []);
+function getGuild() {
+  if (!guild) {
+    guild = client.guilds.first();
   }
-  retardCount = retardMap.get(authorId);
-  retardCount.push(new Date().getTime());
-  if (retardCount.length > 3) {
-    if (isRetard(authorId)) {
-      client.channels.find('type', 'text').send('@everyone Чат, небезпека - розумововідсталий!');
-    } else {
-      console.log('wtf?')
-      retardCount.shift();
-    }
+  return guild;
+}
+
+function assignRole(claimedNomination) {
+  const roleName = claimedNomination.nomination.getName();
+  const existingRole = getRole(roleName);
+  if (existingRole) {
+    existingRole.members.first().removeRole(existingRole);
+    assigneRoleToMember(existingRole, account_id)
+  } else {
+    createRole(roleName).subscribe(role=>{
+      assigneRoleToMember(role, claimedNomination.account_id)
+    });
   }
 }
 
-function isRetard(authorId) {
-  if(retardMap.get(authorId) && retardMap.get(authorId).length > 3 && retardMap.get(authorId)) {
-    return retardCount.reduce((r, c, i) => {
-      const next = retardCount[i+1];
-      if(next) {
-        return r > next - c ? next - c : r;
-      }
-      return r;
-    }) < 60*1000;
+function assigneRoleToMember(role, account_id) {
+  const member = getGuild().members.find('id', playersMap.get(account_id));
+  if(member) {
+    member.addRole(role);
   }
-  return false;
 }
-
-function forgiveRetards() {
-  Rx.Observable.interval(1000 * 60 * 60 * 24).subscribe(() => retardMap = new Map());
-}
-
-client.login(authentication.testbot);

@@ -14,7 +14,7 @@ class ScoreBoard {
     applyPlayerScores(challenger) {
         challenger.getNominations().forEach(cn => {
             const bestResult = this.results[cn.getName()];
-            if (cn.getScore() > bestResult.nomination.getScore()) {
+            if (cn.hasHigherScoreThen(bestResult.nomination)) {
                 bestResult.account_id = challenger.getAccountId();
                 bestResult.nomination = cn;
             }
@@ -22,7 +22,7 @@ class ScoreBoard {
     }
     getNominationsWinners() {
         return this._nominationList.map(nomination => this.results[nomination.getName()])
-        .filter(winner => winner.nomination.getScore() > 0);
+        .filter(winner => winner.nomination.isScored());
     }
 }
 

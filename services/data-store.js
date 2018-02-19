@@ -142,7 +142,7 @@ function subscriptionChain(observables, next, complete) {
 }
 
 function updatePlayer(player) {
-    if (playersInfoCache) {
+    if (playersInfoCache && player) {
         const playerFromCache = playersInfoCache.find(pc => pc.account_id === player.account_id);
         if (playerFromCache) {
             playerFromCache.personaname = player.personaname;
@@ -155,7 +155,9 @@ function updatePlayer(player) {
             playersInfoCache.push(player);
         }
     } else {
-        playersInfoCache = [player];
+        if (player) {
+            playersInfoCache = [player];
+        }
     }
 }
 

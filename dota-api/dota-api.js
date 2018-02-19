@@ -26,7 +26,7 @@ Rx.Observable.interval(400).subscribe(
           }
         },
         err => {
-          console.log(nextRequest.url, err);
+          console.error(nextRequest.url, err);
           nextRequest.observer.next({});
           nextRequest.observer.complete();
         },
@@ -34,8 +34,7 @@ Rx.Observable.interval(400).subscribe(
       );
     }
   },
-  err => console.dir(err),
-  () => console.log('interval complete')
+  err => console.error(err)
 );
 
 function retry(url, retryCount, observer) {
@@ -43,7 +42,7 @@ function retry(url, retryCount, observer) {
     retryCount--;
 
   } else {
-    console.err('Failed getting ', url);
+    console.error('Failed getting ', url);
   }
 }
 
