@@ -1,11 +1,12 @@
 const NominationsList = require('./NominationsList');
+const CONST = require('../constants');
 
 class ScoreBoard {
     constructor() {
         this._nominationList = NominationsList.create();
         this.results = this._nominationList.reduce((res, nomination) => {
             res[nomination.getName()] = {
-                account_id: 'unclaimed',
+                account_id: CONST.UNCLAIMED(),
                 nomination: nomination
             };
             return res;
@@ -22,11 +23,11 @@ class ScoreBoard {
     }
     getNominationsWinners() {
         return this._nominationList.map(nomination => this.results[nomination.getName()])
-        .filter(winner => winner.nomination.isScored());
+            .filter(winner => winner.nomination.isScored());
     }
     getUnclaimedNominations() {
         return this._nominationList.map(nomination => this.results[nomination.getName()])
-        .filter(winner => !winner.nomination.isScored());
+            .filter(winner => !winner.nomination.isScored());
     }
 }
 

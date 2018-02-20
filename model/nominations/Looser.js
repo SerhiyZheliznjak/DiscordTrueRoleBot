@@ -5,7 +5,7 @@ class Looser extends Nomination {
 }
 
 function wonMatchNotReally(match, player_slot) {
-    return !DotaParser.wonMatch(match, player_slot);
+    return DotaParser.wonMatch(match, player_slot) ? 0 : 1;
 }
 
 module.exports = {

@@ -1,12 +1,14 @@
 const StorageService = require('./storage-service');
 const PlayerScore = require('../model/PlayerScore');
 const Nomination = require('../model/Nomination');
+const NominationsList = require('../model/NominationsList');
 const CONST = require('../constants');
 const DotaApi = require('../dota-api/dota-api');
 const Rx = require('rxjs');
 
 let playerScoreCache;
 let matchesCache;
+let winnersCache;
 
 function initPlayersScoresCache() {
     if (!playerScoreCache) {
@@ -164,6 +166,16 @@ function updatePlayer(player) {
 function getPlayersCache() {
     return !!playersInfoCache ? playersInfoCache : [];
 }
+function saveWinnersScore(wonNominations) {
+    winnersCache = wonNominations;
+    StorageService.saveWinners(wonNominations);
+}
+function getWinnersScore() {
+    if (!winnersCache) {
+        winnersCache = StorageService.getWinnersScore().table;
+    }
+    return winnersCache;
+}
 
 const DataStore = {
     getPlayersScores: getPlayersScores,
@@ -174,7 +186,9 @@ const DataStore = {
     addMatches: addMatches,
     getPlayer: getPlayer,
     updatePlayer: updatePlayer,
-    getPlayers: getPlayers
+    getPlayers: getPlayers,
+    saveWinnersScore: saveWinnersScore,
+    getWinnersScore: getWinnersScore
 };
 
 module.exports = DataStore;

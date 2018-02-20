@@ -44,6 +44,9 @@ class Nomination {
     hasHigherScoreThen(that) {
         return this.getScore() > that.getScore();
     }
+    isMyScoreHigher(scoreString) {
+        return this.getScore() > parseInt(scoreString);
+    }
     isScored() {
         return this.getScore() > 0;
     }

@@ -14,13 +14,16 @@ class BestKDA extends Nomination {
     hasHigherScoreThen(that) {
         return countKDA(this.getScore()) > countKDA(that.getScore());
     }
+    isMyScoreHigher(scoreString) {
+        return countKDA(this.getScore()) > countKDA(scoreString);
+    }
     isScored() {
         return this.getScore() !== '0/0/0';
     }
 }
 
 function countKDA(kdaString) {
-    if(!kdaString) {
+    if (!kdaString) {
         return 0;
     }
     const kda = kdaString.split('/');
