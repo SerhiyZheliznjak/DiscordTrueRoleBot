@@ -1,6 +1,7 @@
 import { Message, Client, RichEmbed } from 'discord.js';
 import { Observable, Subscription } from 'rxjs';
 import DataStore from './DataStore';
+import NominationService from './NominationService';
 
 const Auth = require('../../config/auth.json');
 

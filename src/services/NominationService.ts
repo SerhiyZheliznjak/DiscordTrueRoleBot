@@ -1,9 +1,6 @@
-'use strict';
-const NominationsList = require('../model/NominationsList');
-const DataStore = require('./data-store');
-const Rx = require('rxjs');
-const DotaApi = require('../dota-api/dota-api');
-const PlayerScore = require('../model/PlayerScore');
+export default class NominationService {
+
+}
 
 let nominatedScores;
 let subscription;
@@ -81,9 +78,3 @@ function getPlayerScoreForRecentMatches(account_id, nominatedScores) {
     });
   });
 }
-
-module.exports = {
-  observe: observePlayers,
-  start: start,
-  stop: stop
-};
