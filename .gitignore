@@ -1,3 +1,4 @@
-config/authentication.json
+config
 node_modules
 storage
+dist

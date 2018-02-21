@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "main": "bot.js",
   "scripts": {
-    "start": "node bot.js",
+    "build": "tsc",
+    "dev": "tsc --watch & nodemon dist",
+    "lint": "eslint src --ext ts",
+    "tsc": "tsc",
+    "start": "npm run build && node ./dist/bot.js",
     "test": "jasmine"
   },
   "author": "Serhiy Zheliznyak",
@@ -16,10 +20,23 @@
     "rxjs": "^5.5.6"
   },
   "devDependencies": {
-    "eslint": "^4.17.0",
     "jasmine": "^3.0.0",
-    "proxyquire": "^1.8.0"
+    "proxyquire": "^1.8.0",
+    "nodemon": "^1.15.1",
+    "@types/node": "^9.4.6",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-promise": "^3.6.0",
+    "tsc": "^1.20150623.0",
+    "typescript": "^2.7.2",
+    "typescript-eslint-parser": "^14.0.0",
+    "eslint": "^4.18.1",
+    "eslint-config-google": "^0.9.1"
   },
-  "keywords": [],
+  "keywords": [
+    "bot",
+    "discord",
+    "dota2"
+  ],
   "description": ""
 }
