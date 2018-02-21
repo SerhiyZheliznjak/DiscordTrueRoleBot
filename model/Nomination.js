@@ -1,5 +1,4 @@
 const Point = require('./Point');
-const util = require('util');
 
 class Nomination {
     constructor(name, condition, minCount, msg, points) {

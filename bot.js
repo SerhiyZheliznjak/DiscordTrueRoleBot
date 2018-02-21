@@ -24,12 +24,12 @@ client.on('ready', () => {
 });
 
 const regularPlayersMap = new Map();
-regularPlayersMap.set('298134653', '407971834689093632');
-regularPlayersMap.set('333303976', '407949091163865099');
-regularPlayersMap.set('118975931', '289388465034887178');
-regularPlayersMap.set('86848474', '408363774257528852');
-regularPlayersMap.set('314684987', '413792999030652938');
-regularPlayersMap.set('36753317', '408172132875501581');
+regularPlayersMap.set('298134653', '407971834689093632');//Dno
+regularPlayersMap.set('333303976', '407949091163865099');//Tee Hee
+regularPlayersMap.set('118975931', '289388465034887178');//I'm 12 btw GG.BET
+regularPlayersMap.set('86848474', '408363774257528852');//whoami
+regularPlayersMap.set('314684987', '413792999030652938');//blackRose
+regularPlayersMap.set('36753317', '408172132875501581');//=3
 
 client.on('message', msg => {
   if (msg.author.bot) {
