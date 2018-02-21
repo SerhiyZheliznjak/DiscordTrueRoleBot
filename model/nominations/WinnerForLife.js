@@ -5,7 +5,10 @@ class WinnerForLife extends Nomination {
 }
 
 function wonMatch(match, player_slot) {
-    return DotaParser.wonMatch(match, player_slot) ? 1 : 0;
+    if (!!match) {
+        return DotaParser.getPlayerInfo(match, player_slot).win;
+    }
+    return 0;
 }
 
 module.exports = {

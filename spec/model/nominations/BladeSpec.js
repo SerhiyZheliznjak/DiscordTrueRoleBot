@@ -3,7 +3,7 @@ describe("Blade", function() {
     let match;
   
     beforeEach(function() {
-        match = require('../../helpers/TestMatchData.json');
+        match = require('../../test-data/TestMatchData.json');
     });
   
     it("should be added to nominations list", () => {
@@ -18,10 +18,10 @@ describe("Blade", function() {
         expect(nomination.getCondition()(match, 0)).toBe(1);
     });
 
-    // it("should be able to score match points", function () {
-    //     nomination.scoreMatch({match_id: 1, point: 0});
-    //     nomination.scoreMatch({match_id: 2, point: 1});
-    //     expect(nomination.getScore()).toBe(1);
-    // });
+    it("should be able to score match points", function () {
+        nomination.scoreMatch(match, 0);
+        nomination.scoreMatch(require('../../test-data/FullMatchData.json'), 0);
+        expect(nomination.getScore()).toBe(1);
+    });
   });
   

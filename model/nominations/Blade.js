@@ -7,5 +7,5 @@ function isFirstBloodOwner(match, player_slot) {
 }
 
 module.exports = {
-    create: () => new Nomination('Блейд', isFirstBloodOwner, 1, 'Є різні методи пролити першу кров. Розказувати чи ви самі знаєте?')
+    create: () => new Nomination('Целкозбий', isFirstBloodOwner, 1, 'Є різні методи пролити першу кров. Розказувати чи ви самі знаєте?')
 }

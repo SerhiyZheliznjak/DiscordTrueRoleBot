@@ -8,5 +8,7 @@ module.exports = {
     PLAYERS_SCORES_FILE_PATH: () => './storage/players-scores.json',
     PLAYERS_FILE_PATH: () => './storage/players.json',
     WINNERS_FILE_PATH: () => './storage/winners.json',
-    UNCLAIMED: () => 'UNCLAIMED'
+    UNCLAIMED: () => 'UNCLAIMED',
+    WON: () => 'ЗАТАЩИВ',
+    LOST: () => 'ТІМА ДНО'
 };

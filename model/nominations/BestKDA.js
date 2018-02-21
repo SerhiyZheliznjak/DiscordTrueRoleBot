@@ -1,5 +1,6 @@
 const Nomination = require('../Nomination');
 const DotaParser = require('../../services/dota-parser');
+const CONST = require('../../constants');
 
 class BestKDA extends Nomination {
     getScore() {
@@ -31,11 +32,14 @@ function countKDA(kdaString) {
 }
 
 function getKDA(match, player_slot) {
-    const player = DotaParser.getPlayerInfo(match, player_slot);
-    const matchResult = DotaParser.wonMatch(match, player_slot) ? 'ЗАТАЩИВ' : 'ТІМА ДНО';
-    return !!player && player.kills !== null && player.deaths !== null && player.assists !== null
-        ? player.kills + '/' + player.deaths + '/' + player.assists + '/' + matchResult
-        : null;
+    if(!!match) {
+        const player = DotaParser.getPlayerInfo(match, player_slot);
+        const matchResult = player.win === 1 ? CONST.WON() : CONST.LOST();
+        return !!player && player.kills !== null && player.deaths !== null && player.assists !== null
+            ? player.kills + '/' + player.deaths + '/' + player.assists + '/' + matchResult
+            : null;
+    }
+    return '0/0/0';
 }
 
 module.exports = {

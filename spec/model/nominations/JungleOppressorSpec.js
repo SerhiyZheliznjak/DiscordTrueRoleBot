@@ -3,7 +3,7 @@ describe("JungleOppressor", function() {
     let match;
   
     beforeEach(function() {
-        match = require('../../helpers/FullMatchData.json');
+        match = require('../../test-data/FullMatchData.json');
     });
   
     it("should be added to nominations list", () => {

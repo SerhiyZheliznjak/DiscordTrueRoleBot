@@ -47,7 +47,7 @@ class Nomination {
         return this.getScore() > parseInt(scoreString);
     }
     isScored() {
-        return this.getScore() > 0;
+        return this.getScore() > this.getMinScore();
     }
 }
 

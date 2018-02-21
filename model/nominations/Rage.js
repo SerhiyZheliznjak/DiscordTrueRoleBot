@@ -9,7 +9,10 @@ class Rage extends Nomination {
 }
 
 function getPingTimes(match, player_slot) {
-    return DotaParser.getPlayerInfo(match, player_slot).pings;
+    if (!!match) {
+        return DotaParser.getPlayerInfo(match, player_slot).pings;
+    }
+    return 0;
 }
 
 module.exports = {
