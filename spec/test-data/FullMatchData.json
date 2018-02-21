@@ -5269,7 +5269,7 @@
                 "npc_dota_neutral_kobold_taskmaster": 7,
                 "npc_dota_badguys_tower2_top": 324
             },
-            "deaths": 8,
+            "deaths": 0,
             "denies": 0,
             "dn_t": [
                 0,

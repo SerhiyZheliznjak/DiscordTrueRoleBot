@@ -29,14 +29,19 @@ describe("MaxDamageHit", function () {
     it('should treat as unscored if no AMs killed', () => {
         nomination.addPoint(0, 100);
         nomination.addPoint(0, 200);
-        // nomination.addPoint(0, 100500);
         expect(nomination.isScored()).toBeFalsy();
+    });
+
+    it('should treat as scored if at least one AM killed', () => {
+        nomination.addPoint(0, 100);
+        nomination.addPoint(0, 1000);
+        nomination.addPoint(0, 200);
+        expect(nomination.isScored()).toBeTruthy();
     });
 
     it('should say how much AMs were killed by that dmg in message', () => {
         nomination.addPoint(0, 100);
         nomination.addPoint(0, 200);
-        // nomination.addPoint(0, 100500);
-        expect(nomination.getMessage()).toBe('Йобне раз, але сильно. Вбив %s антимагів одиним ударом!');
+        expect(nomination.getMessage()).toBe('Йобне раз, але сильно. Вбив 0.31 антимагів одиним ударом!');
     });
 });
