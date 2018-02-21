@@ -1,5 +1,6 @@
 import { Message, Client, RichEmbed } from 'discord.js';
 import { Observable, Subscription } from 'rxjs';
+import DataStore from './DataStore';
 
 const Auth = require('../../config/auth.json');
 
@@ -51,24 +52,25 @@ export class BotService {
     }
 
     public startWatching() {
+        DataStore.maxMatches = this.playersMap.size * 20;
         const chanel = this.client.channels.find('type', 'text');
-        // this.subscription = NominationService.observe(this.getDotaIds()).subscribe(playerScores => {
-        //     const claimedNominations = AwardService.getNominationsWinners(playerScores);
-        //     const prevWinnersScore = DataStore.getWinnersScore();
-        //     console.dir(prevWinnersScore);
-        //     const newWinners = claimedNominations.filter(cn => {
-        //         const savedScore = prevWinnersScore.find(pws => cn.nomination.getName() === pws.nominationName);
-        //         return !savedScore || cn.account_id === savedScore.account_id && cn.nomination.isMyScoreHigher(savedScore.score);
-        //     });
+        this.subscription = NominationService.observe(this.getDotaIds()).subscribe(playerScores => {
+            const claimedNominations = AwardService.getNominationsWinners(playerScores);
+            const prevWinnersScore = DataStore.getWinnersScore();
+            console.dir(prevWinnersScore);
+            const newWinners = claimedNominations.filter(cn => {
+                const savedScore = prevWinnersScore.find(pws => cn.nomination.getName() === pws.nominationName);
+                return !savedScore || cn.account_id === savedScore.account_id && cn.nomination.isMyScoreHigher(savedScore.score);
+            });
 
-        //     AwardService.generateMessages(newWinners).subscribe(message => {
-        //         // console.dir(message);
-        //         chanel.send('', this.getRichEmbed(message));
-        //     });
-        //     if (!!newWinners.length) {
-        //         DataStore.saveWinnersScore(claimedNominations);
-        //     }
-        // });
+            AwardService.generateMessages(newWinners).subscribe(message => {
+                // console.dir(message);
+                chanel.send('', this.getRichEmbed(message));
+            });
+            if (!!newWinners.length) {
+                DataStore.saveWinnersScore();
+            }
+        });
     }
 
     private isRetard(authorId: string): boolean {
