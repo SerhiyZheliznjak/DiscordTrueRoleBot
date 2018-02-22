@@ -3,20 +3,21 @@ import { Observable, Subscription, Observer } from 'rxjs';
 import DataStore from './DataStore';
 import MyUtils from '../utils/MyUtils';
 import RecentMatchJson from '../dota-api/DotaJsonTypings';
-// import DotaApi from '../dota-api/DotaApi';
 import StorageConvertionUtil from '../utils/StorageConvertionUtil';
 import Pair from '../model/Pair';
 import DotaApi from '../dota-api/DotaApi';
 
 export default class NominationService {
-  private static subscription: Subscription;
-  private static recentGamesObserver: Observer<number>;
+  private subscription: Subscription;
+  private recentGamesObserver: Observer<number>;
 
-  public static start(): void {
+  constructor(private dotaApi: DotaApi = new DotaApi(), private dataStore: DataStore = new DataStore()) { }
+
+  public start(): void {
     this.subscription = Observable.interval(1000 * 60 * 60).subscribe(this.recentGamesObserver);
   }
 
-  public static stop(): void {
+  public stop(): void {
     if (this.subscription) {
       this.subscription.unsubscribe();
       this.subscription = undefined;
@@ -24,17 +25,17 @@ export default class NominationService {
     console.log('stopped watching');
   }
 
-  public static observeNewMatches(accountIds: number[]): Observable<Pair<number, boolean>> {
+  public observeNewMatches(accountIds: number[]): Observable<Pair<number, boolean>> {
     return Observable.create((playersObserver: Observer<Pair<number, boolean>>) => {
       this.recentGamesObserver = {
         next: () => {
-          // accountIds.forEach(account_id => {
-          //   DotaApi.getRecentMatches(account_id).subscribe(recentMatches => {
-          //     const newMatches = recentMatches.filter(rm => DataStore.playerRecentMatchesCache.get(account_id).indexOf(rm.match_id) < 0)
-          //     playersObserver.next(new Pair(account_id, !!newMatches.length));
-          //     DataStore.updatePlayerRecentMatches(account_id, recentMatches);
-          //   });
-          // });
+          accountIds.forEach(account_id => {
+            this.dotaApi.getRecentMatches(account_id).subscribe(recentMatches => {
+              const newMatches = recentMatches.filter(rm => this.dataStore.playerRecentMatchesCache.get(account_id).indexOf(rm.match_id) < 0)
+              playersObserver.next(new Pair(account_id, !!newMatches.length));
+              this.dataStore.updatePlayerRecentMatches(account_id, recentMatches);
+            });
+          });
         },
         error: () => { },
         complete: () => { }
@@ -44,8 +45,8 @@ export default class NominationService {
     });
   }
 
-  public static nominate(account_id: number) {
-    // const playerRecentMatches = StorageConvertionUtil.convertToRecentMatchJson(DataStore.playerRecentMatchesCache);
+  public nominate(account_id: number) {
+    const playerRecentMatches = StorageConvertionUtil.convertToRecentMatchJson(this.dataStore.playerRecentMatchesCache);
     // MyUtils.subscriptionChain(playerRecentMatches.map(prm => DataStore.getMatch(prm.)));
   }
 

@@ -5,7 +5,7 @@ import { Constants } from "../Constants";
 import { Observable } from "rxjs";
 import DotaApi from "../dota-api/DotaApi";
 import StorageConvertionUtil from "../utils/StorageConvertionUtil";
-import MyUtils from "../utils/MyUtils";
+// import MyUtils from "../utils/MyUtils";
 import { Nomination } from "../model/Nomination";
 
 export default class DataStore {
@@ -128,13 +128,13 @@ export default class DataStore {
 
     public getPlayers(accountsIds) {
         return Observable.create(playersObserver => {
-            MyUtils.subscriptionChain(
-                accountsIds.map(account_id => this.getProfile(account_id)),
-                (profile: ProfileJson) => this.profilesCache.set(profile.account_id, profile),
-                () => {
-                    playersObserver.next(this.profilesCache);
-                    playersObserver.complete();
-                });
+            // MyUtils.subscriptionChain(
+            //     accountsIds.map(account_id => this.getProfile(account_id)),
+            //     (profile: ProfileJson) => this.profilesCache.set(profile.account_id, profile),
+            //     () => {
+            //         playersObserver.next(this.profilesCache);
+            //         playersObserver.complete();
+            //     });
         });
     }
 }

@@ -10,7 +10,7 @@ export class BotService {
     private playersMap = new Map<number, string>();
     private subscription: Subscription;
 
-    constructor(private client: Client, private dataStore:DataStore = new DataStore()) {
+    constructor(private client: Client, private dataStore:DataStore = new DataStore(), private nominationService: NominationService = new NominationService()) {
         this.playersMap.set(298134653, '407971834689093632');//Dno
         this.playersMap.set(333303976, '407949091163865099');//Tee Hee
         this.playersMap.set(118975931, '289388465034887178');//I'm 12 btw GG.BET
@@ -42,7 +42,7 @@ export class BotService {
     }
 
     public stopWatching(): void {
-        NominationService.stop();
+        this.nominationService.stop();
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
@@ -55,9 +55,9 @@ export class BotService {
     public startWatching() {
         DataStore.maxMatches = this.playersMap.size * 20;
         const chanel = this.client.channels.find('type', 'text');
-        this.subscription = NominationService.observeNewMatches(this.getDotaIds()).subscribe(hasNewMatchPair => {
+        this.subscription = this.nominationService.observeNewMatches(this.getDotaIds()).subscribe(hasNewMatchPair => {
             if(hasNewMatchPair.val) {
-                NominationService.nominate(hasNewMatchPair.key);
+                this.nominationService.nominate(hasNewMatchPair.key);
             }
         });
     }
