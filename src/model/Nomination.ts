@@ -1,4 +1,4 @@
-import { Point } from "./Point";
+import Pair from "./Pair";
 
 export class Nomination {
     protected scorePoint(match, player_slot: number): string | number {
@@ -8,7 +8,7 @@ export class Nomination {
     protected minScore: number;
     protected msg: string;
 
-    constructor(protected points?: Point[]) {
+    constructor(protected points?: Pair<string, string | number>[]) {
         this.points = !points ? [] : points;
     }
     public getName() {
@@ -17,8 +17,8 @@ export class Nomination {
     public scoreMatch(match, player_slot) {
         this.addPoint(match.match_id, this.scorePoint(match, player_slot));
     }
-    public addPoint(match_id: string, point) {
-        this.points.push(new Point(match_id, point));
+    public addPoint(match_id: string, point: string | number) {
+        this.points.push(new Pair(match_id, point));
         while (this.points.length > 20) {
             this.points.shift();
         }
@@ -28,7 +28,7 @@ export class Nomination {
     }
     public getScore(): number {
         return this.points.reduce((r, p) => {
-            return p != null && p.point != null ? r + (p.point as number) : r;
+            return p != null && p.val != null ? r + parseInt(p.val + '') : r;
         }, 0);
     }
     public getScoreText(): string {
@@ -37,12 +37,6 @@ export class Nomination {
     public getMessage() {
         return this.msg;
     }
-    // public isCorrupted() {
-    //     return this._points.every(point => point.point === null);
-    // }
-    // public getMinScore() {
-    //     return this._minScore;
-    // }
     public hasHigherScoreThen(that) {
         return this.getScore() > that.getScore();
     }

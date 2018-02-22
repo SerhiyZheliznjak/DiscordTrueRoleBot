@@ -4,10 +4,7 @@
     "module": "commonjs",
     "outDir": "dist",
     "sourceMap": true,
-    "skipDefaultLibCheck": true,
-    "typeRoots": [
-        "./node_modules/@types"
-    ]
+    "skipDefaultLibCheck": true
   },
   "include": [
     "src/**/*.ts"

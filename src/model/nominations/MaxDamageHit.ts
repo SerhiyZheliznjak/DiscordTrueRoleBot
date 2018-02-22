@@ -1,11 +1,11 @@
 import { Nomination } from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
-import { Point } from "../Point";
 import { Constants } from "../../Constants";
 import {format} from 'util';
+import Pair from "../Pair";
 
 export class MaxDamageHit extends Nomination {
-    constructor(protected points?: Point[]) {
+    constructor(protected points?: Pair<string, number | string>[]) {
         super(points);
         this.name = 'Вірастюк';
         this.minScore = Constants.AM_HP;
@@ -18,7 +18,7 @@ export class MaxDamageHit extends Nomination {
     }
 
     getScore() {
-        const dmgArr = this.getPoints().map(p=>(p.point as number));
+        const dmgArr = this.getPoints().map(p=>parseInt(p.val + ''));
         return Math.max(...dmgArr);
     }
     getMessage() {

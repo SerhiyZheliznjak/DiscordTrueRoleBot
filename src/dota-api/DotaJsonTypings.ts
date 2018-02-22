@@ -4,10 +4,10 @@ export class MatchJson {
     barracks_status_radiant: number;
     chat: [
         {
-            time: number,
-            unit: string,
-            key: string,
-            slot: number,
+            time: number;
+            unit: string;
+            key: string;
+            slot: number;
             player_slot: number
         }
     ];
@@ -16,12 +16,12 @@ export class MatchJson {
     dire_score: number;
     draft_timings: [
         {
-            order: number,
-            pick: true,
-            active_team: number,
-            hero_id: number,
-            player_slot: number,
-            extra_time: number,
+            order: number;
+            pick: boolean;
+            active_team: number;
+            hero_id: number;
+            player_slot: number;
+            extra_time: number;
             total_time_taken: number
         }
     ];
@@ -34,12 +34,16 @@ export class MatchJson {
     lobby_type: number;
     match_seq_num: number;
     negative_votes: number;
-    objectives: {};
+    objectives: [{
+        key: [string];
+        player_slot: number;
+        type: string;
+    }];
     picks_bans: {};
     positive_votes: number;
     radiant_gold_adv: {};
     radiant_score: number;
-    radiant_win: true;
+    radiant_win: boolean;
     radiant_xp_adv: {};
     start_time: number;
     teamfights: {};
@@ -64,6 +68,7 @@ export class MatchJson {
 }
 
 export class PlayerJson {
+    firstblood_claimed: number;
     match_id: number;
     player_slot: number;
     ability_upgrades_arr: [
@@ -80,8 +85,8 @@ export class PlayerJson {
     backpack_2: number;
     buyback_log: [
         {
-            time: number,
-            slot: number,
+            time: number;
+            slot: number;
             player_slot: number
         }
     ];
@@ -120,7 +125,7 @@ export class PlayerJson {
     kills: number;
     kills_log: [
         {
-            time: number,
+            time: number;
             key: string
         }
     ];
@@ -132,7 +137,7 @@ export class PlayerJson {
         number
     ];
     life_state: {};
-    max_hero_hit: {};
+    max_hero_hit: { value: number };
     multi_kills: {};
     obs: {};
     obs_left_log: [
@@ -150,18 +155,18 @@ export class PlayerJson {
     purchase: {};
     purchase_log: [
         {
-            time: number,
+            time: number;
             key: string
         }
     ];
     rune_pickups: number;
     runes: {
-        property1: number,
+        property1: number;
         property2: number
     };
     runes_log: [
         {
-            time: number,
+            time: number;
             key: number
         }
     ];
@@ -185,8 +190,8 @@ export class PlayerJson {
     ];
     personaname: string;
     name: string;
-    last_login: null;
-    radiant_win: true;
+    last_login: number;
+    radiant_win: boolean;
     start_time: number;
     duration: number;
     cluster: number;
@@ -194,7 +199,7 @@ export class PlayerJson {
     game_mode: number;
     patch: number;
     region: number;
-    isRadiant: true;
+    isRadiant: boolean;
     win: number;
     lose: number;
     total_gold: number;
@@ -219,7 +224,7 @@ export class PlayerJson {
     lane_efficiency_pct: number;
     lane: number;
     lane_role: number;
-    is_roaming: true;
+    is_roaming: boolean;
     purchase_time: {};
     first_purchase_time: {};
     item_win: {};
@@ -240,8 +245,8 @@ export class PlayerProfileJson {
     rank_tier: number;
     leaderboard_rank: number;
     mmr_estimate: {
-        estimate: number,
-        stdDev: number,
+        estimate: number;
+        stdDev: number;
         n: number
     };
     profile: ProfileJson;
@@ -264,7 +269,7 @@ export class ProfileJson {
 export default class RecentMatchJson {
     match_id: number;
     player_slot: number;
-    radiant_win: true;
+    radiant_win: boolean;
     duration: number;
     game_mode: number;
     lobby_type: number;
@@ -277,7 +282,7 @@ export default class RecentMatchJson {
     skill: number;
     lane: number;
     lane_role: number;
-    is_roaming: true;
+    is_roaming: boolean;
     cluster: number;
     leaver_status: number;
     party_size: number;

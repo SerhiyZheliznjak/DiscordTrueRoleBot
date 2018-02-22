@@ -1,7 +1,7 @@
-import { MatchJson } from "../dota-api/DotaJsonTypings";
+import { MatchJson, PlayerJson } from "../dota-api/DotaJsonTypings";
 
 export class DotaParser {
-    public static getPlayerInfo(match: MatchJson, player_slot: number) {
+    public static getPlayerInfo(match: MatchJson, player_slot: number): PlayerJson {
         return !!match ? match.players.find(player => player.player_slot === player_slot) : undefined;
     }
     

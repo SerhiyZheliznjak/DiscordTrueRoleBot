@@ -7,16 +7,16 @@ const Auth = require('../../config/auth.json');
 
 export class BotService {
     private retardMap = new Map();
-    private playersMap = new Map();
+    private playersMap = new Map<number, string>();
     private subscription: Subscription;
 
-    constructor(private client: Client) {
-        this.playersMap.set('298134653', '407971834689093632');//Dno
-        this.playersMap.set('333303976', '407949091163865099');//Tee Hee
-        this.playersMap.set('118975931', '289388465034887178');//I'm 12 btw GG.BET
-        this.playersMap.set('86848474', '408363774257528852');//whoami
-        this.playersMap.set('314684987', '413792999030652938');//blackRose
-        this.playersMap.set('36753317', '408172132875501581');//=3
+    constructor(private client: Client, private dataStore:DataStore = new DataStore()) {
+        this.playersMap.set(298134653, '407971834689093632');//Dno
+        this.playersMap.set(333303976, '407949091163865099');//Tee Hee
+        this.playersMap.set(118975931, '289388465034887178');//I'm 12 btw GG.BET
+        this.playersMap.set(86848474, '408363774257528852');//whoami
+        this.playersMap.set(314684987, '413792999030652938');//blackRose
+        this.playersMap.set(36753317, '408172132875501581');//=3
     }
 
     public processMesage(msg: Message): void {
@@ -42,10 +42,10 @@ export class BotService {
     }
 
     public stopWatching(): void {
-        // NominationService.stop();
-        // if (this.subscription) {
-        //     this.subscription.unsubscribe();
-        // }
+        NominationService.stop();
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
     }
 
     public forgiveRetards() {
@@ -55,24 +55,28 @@ export class BotService {
     public startWatching() {
         DataStore.maxMatches = this.playersMap.size * 20;
         const chanel = this.client.channels.find('type', 'text');
-        this.subscription = NominationService.observe(this.getDotaIds()).subscribe(playerScores => {
-            const claimedNominations = AwardService.getNominationsWinners(playerScores);
-            const prevWinnersScore = DataStore.getWinnersScore();
-            console.dir(prevWinnersScore);
-            const newWinners = claimedNominations.filter(cn => {
-                const savedScore = prevWinnersScore.find(pws => cn.nomination.getName() === pws.nominationName);
-                return !savedScore || cn.account_id === savedScore.account_id && cn.nomination.isMyScoreHigher(savedScore.score);
-            });
-
-            AwardService.generateMessages(newWinners).subscribe(message => {
-                // console.dir(message);
-                chanel.send('', this.getRichEmbed(message));
-            });
-            if (!!newWinners.length) {
-                DataStore.saveWinnersScore();
+        this.subscription = NominationService.observeNewMatches(this.getDotaIds()).subscribe(hasNewMatchPair => {
+            if(hasNewMatchPair.val) {
+                NominationService.nominate(hasNewMatchPair.key);
             }
         });
     }
+
+    // const claimedNominations = AwardService.getNominationsWinners(playerScores);
+    // const prevWinnersScore = DataStore.getWinnersScore();
+    // console.dir(prevWinnersScore);
+    // const newWinners = claimedNominations.filter(cn => {
+    //     const savedScore = prevWinnersScore.find(pws => cn.nomination.getName() === pws.nominationName);
+    //     return !savedScore || cn.account_id === savedScore.account_id && cn.nomination.isMyScoreHigher(savedScore.score);
+    // });
+
+    // AwardService.generateMessages(newWinners).subscribe(message => {
+    //     // console.dir(message);
+    //     chanel.send('', this.getRichEmbed(message));
+    // });
+    // if (!!newWinners.length) {
+    //     DataStore.saveWinnersScore();
+    // }
 
     private isRetard(authorId: string): boolean {
         const retardCount = this.retardMap.get(authorId);
@@ -174,7 +178,7 @@ export class BotService {
         return msg.author.id === Auth.creatorId;
     }
 
-    private getDotaIds() {
+    private getDotaIds(): number[] {
         let dotaIds = [];
         for (let id of this.playersMap.keys()) {
             dotaIds.push(id);

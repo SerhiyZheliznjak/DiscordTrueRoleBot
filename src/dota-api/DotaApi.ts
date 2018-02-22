@@ -1,25 +1,28 @@
-import RxHttpRequest from 'rx-http-request';
+import { RxHttpRequest } from 'rx-http-request';
 import { Observable, Subscription, Observer } from 'rxjs';
 import { format } from 'util';
 import RecentMatchJson, { PlayerProfileJson, MatchJson } from './DotaJsonTypings';
 
 class QueuedRequest {
-  constructor(public url: string, public observer: Observer<any>, public retryCount: number) { }
+  constructor(public url: string, public observers: Observer<any>[], public retryCount: number, public observable: Observable<any>) { }
 }
 
 export default class DotaApi {
-  private static queue: QueuedRequest[] = [];
-  private static queueSubscription: Subscription;
+  public static queue: QueuedRequest[] = [];
+  public static queueSubscription: Subscription;
 
-  private static moveQueue() {
-    this.queueSubscription = Observable.interval(400).subscribe(
+  constructor(private rxHttpRequest: RxHttpRequest = RxHttpRequest) { }
+
+  private moveQueue() {
+    DotaApi.queueSubscription = Observable.interval(400).subscribe(
       () => {
-        if (this.queue.length > 0) {
-          const nextRequest = this.queue.shift();
+        if (DotaApi.queue.length > 0) {
+          const nextRequest = DotaApi.queue.shift();
           if (nextRequest.retryCount === 0) {
-            nextRequest.observer.error('Failed to fetch from ' + nextRequest.url);
+            nextRequest.observers.forEach(obs => obs.error('Failed to fetch from ' + nextRequest.url));
           }
-          RxHttpRequest.get(nextRequest.url).subscribe(
+          console.log('requesting ', nextRequest.url)
+          this.rxHttpRequest.get(nextRequest.url).subscribe(
             data => {
               let obj;
               try {
@@ -29,8 +32,8 @@ export default class DotaApi {
                 this.retry(nextRequest);
               }
               if (obj) {
-                nextRequest.observer.next(obj);
-                nextRequest.observer.complete();
+                nextRequest.observers.forEach(obs => obs.next(obj));
+                nextRequest.observers.forEach(obs => obs.complete());
               }
             },
             err => {
@@ -47,42 +50,68 @@ export default class DotaApi {
     );
   }
 
-  private static stopQueue() {
-    if (this.queueSubscription) {
-      this.queueSubscription.unsubscribe();
-      this.queueSubscription = undefined;
+  private stopQueue() {
+    if (DotaApi.queueSubscription) {
+      DotaApi.queueSubscription.unsubscribe();
+      DotaApi.queueSubscription = undefined;
     }
   }
 
-  public static retry(request: QueuedRequest) {
+  private retry(request: QueuedRequest) {
     request.retryCount -= 1;
-    this.queue.push(request);
+    console.log('retrying');
+    DotaApi.queue.push(request);
   }
 
-  public static queueRequest(url: string): Observable<any> {
-    return Observable.create(observer => {
-      if (!this.queueSubscription) {
-        this.moveQueue();
-      }
-      this.queue.push(new QueuedRequest(url, observer, 3));
-    });
+  public queueRequest(url: string): Observable<any> {
+    let observable;
+    const queued = this.isQueued(url);
+    if (queued === undefined) {
+      observable = Observable.create((observer: Observer<any>) => {
+        if (!DotaApi.queueSubscription) {
+          this.moveQueue();
+        }
+        const isQueued = this.isQueued(url);
+        if (!isQueued) {
+          DotaApi.queue.push(new QueuedRequest(url, [observer], 3, observable));
+        } else {
+          isQueued.observers.push(observer);
+        }
+      });
+    } else {
+      observable = queued.observable;
+    }
+
+    return observable;
   }
 
-  public static getPlayerProfile(account_id: number): Observable<PlayerProfileJson> {
+  public isQueued(url: string) {
+    return DotaApi.queue.find(q => q.url === url);
+  }
+
+  public getPlayerProfile(account_id: number): Observable<PlayerProfileJson> {
     return this.queueRequest(format('https://api.opendota.com/api/players/%s/', account_id));
   };
 
-  public static getRecentMatches(account_id: number): Observable<RecentMatchJson[]> {
-    return this.queueRequest(format('https://api.opendota.com/api/players/%s/recentMatches', account_id));
+  public getRecentMatches(account_id: number): Observable<RecentMatchJson[]> {
+    return this.queueRequest(DotaApi.getRecentMatchesUrl(account_id));
   }
 
-  public static getFullMatches(matcheIds: number[]): Observable<MatchJson[]> {
-    const formatedUrls = matcheIds.map(match_id => format('https://api.opendota.com/api/matches/%s', match_id));
+  public static getRecentMatchesUrl(account_id: number): string {
+    return format('https://api.opendota.com/api/players/%s/recentMatches', account_id);
+  }
+
+  public getFullMatches(matcheIds: number[]): Observable<MatchJson[]> {
+    const formatedUrls = matcheIds.map(match_id => DotaApi.getMatchUrl(match_id));
     return Observable.forkJoin(formatedUrls.map(url => this.queueRequest(url)));
   };
 
-  public static getMatch(match_id: number): Observable<MatchJson> {
-    return this.queueRequest(format('https://api.opendota.com/api/matches/%s', match_id));
+  public getMatch(match_id: number): Observable<MatchJson> {
+    return this.queueRequest(DotaApi.getMatchUrl(match_id));
+  }
+
+  public static getMatchUrl(match_id: number): string {
+    return format('https://api.opendota.com/api/matches/%s', match_id);
   }
 }
 

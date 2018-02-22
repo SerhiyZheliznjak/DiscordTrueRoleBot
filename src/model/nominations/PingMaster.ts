@@ -1,10 +1,10 @@
 import { Nomination } from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
 import { Constants } from "../../Constants";
-import { Point } from "../Point";
+import Pair from "../Pair";
 
 export class PingMaster extends Nomination {
-    constructor(protected points?: Point[]) {
+    constructor(protected points?: Pair<string, number|string>[]) {
         super(points);
         this.name = 'Майстер Пінг';
         this.minScore = 100;
@@ -19,7 +19,7 @@ export class PingMaster extends Nomination {
     }
 
     public getScore() {
-        const pings = this.points.map(p => (p.point as number));
+        const pings = this.points.map(p => parseInt(p.val + ''));
         return Math.max(...pings);
     }
 }

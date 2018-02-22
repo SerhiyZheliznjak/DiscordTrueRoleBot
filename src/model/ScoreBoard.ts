@@ -1,8 +1,8 @@
 import { Nomination } from "./Nomination";
 import Nominations from "./Nominations";
 import { Constants } from "../Constants";
-import PlayerScore from "./PlayerScore";
 import NominationWinner from "./NominationWinner";
+import Pair from "./Pair";
 
 export default class ScoreBoard {
     public nominationsWinners: Map<string, NominationWinner>;
@@ -13,8 +13,8 @@ export default class ScoreBoard {
             return map;
         }, new Map<string, NominationWinner>());
     }
-    applyPlayerScores(account_id: string, challenger: PlayerScore): void {
-        challenger.nominations.forEach(challengerNominationResult => {
+    applyPlayerScores(account_id: string, challenger: Pair<number, Nomination[]>): void {
+        challenger.val.forEach(challengerNominationResult => {
             const bestResultSoFar = this.nominationsWinners.get(challengerNominationResult.getName());
             if (challengerNominationResult.hasHigherScoreThen(bestResultSoFar.nomination)) {
                 bestResultSoFar.account_id = account_id;

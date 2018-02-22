@@ -1,10 +1,10 @@
 import { Nomination } from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
 import { Constants } from "../../Constants";
-import { Point } from "../Point";
+import Pair from "../Pair";
 
 export class Parkinson extends Nomination {
-    constructor(protected points?: Point[]) {
+    constructor(protected points?: Pair<string, number | string>[]) {
         super(points);
         this.name = 'Паркінсон';
         this.minScore = 100;
