@@ -1,7 +1,10 @@
 import { Message, Client, RichEmbed } from 'discord.js';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, Observer } from 'rxjs';
 import DataStore from './DataStore';
 import NominationService from './NominationService';
+import DotaApi from '../dota-api/DotaApi';
+import Pair from '../model/Pair';
+import { RecentMatchJson } from '../dota-api/DotaJsonTypings';
 
 const Auth = require('../../config/auth.json');
 
@@ -9,15 +12,42 @@ export class BotService {
     private retardMap = new Map();
     private playersMap = new Map<number, string>();
     private subscription: Subscription;
+    private recentGamesObserver: Observer<number>;
 
-    constructor(private client: Client, private dataStore:DataStore = new DataStore(), private nominationService: NominationService = new NominationService()) {
+    constructor(private client: Client,
+        private dataStore: DataStore = new DataStore(),
+        private nominationService: NominationService = new NominationService(),
+        private dotaApi: DotaApi = new DotaApi()) {
         this.playersMap.set(298134653, '407971834689093632');//Dno
         this.playersMap.set(333303976, '407949091163865099');//Tee Hee
         this.playersMap.set(118975931, '289388465034887178');//I'm 12 btw GG.BET
         this.playersMap.set(86848474, '408363774257528852');//whoami
         this.playersMap.set(314684987, '413792999030652938');//blackRose
         this.playersMap.set(36753317, '408172132875501581');//=3
+
+        this.recentGamesObserver = {
+            next: this.recentGamesObserverNext,
+            error: () => { },
+            complete: () => { }
+        };
     }
+
+    private recentGamesObserverNext() {
+        Observable.forkJoin(this.getDotaIds().map(account_id =>
+            this.dotaApi.getRecentMatches(account_id).map(recentMatch => new Pair(account_id, (recentMatch as RecentMatchJson[]).map(m => m.match_id)))))
+            .subscribe(pairs => {
+                const atLeastOneNewMatch = pairs.find(pair => {
+                    const newMatches = pair.val.filter(match_id => this.dataStore.playerRecentMatchesCache.get(pair.key).indexOf(match_id) < 0);
+                    return newMatches.length > 0;
+                });
+                if (atLeastOneNewMatch) {
+                    this.nominationService.nominate(pairs);
+                    pairs.forEach(p=>this.dataStore.updatePlayerRecentMatches(p.key, p.val));
+                }
+            });
+    }
+
+    private
 
     public processMesage(msg: Message): void {
         if (msg.author.bot) {
@@ -41,13 +71,6 @@ export class BotService {
         }
     }
 
-    public stopWatching(): void {
-        this.nominationService.stop();
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-        }
-    }
-
     public forgiveRetards() {
         Observable.interval(1000 * 60 * 60 * 24).subscribe(() => this.retardMap = new Map());
     }
@@ -55,11 +78,15 @@ export class BotService {
     public startWatching() {
         DataStore.maxMatches = this.playersMap.size * 20;
         const chanel = this.client.channels.find('type', 'text');
-        this.subscription = this.nominationService.observeNewMatches(this.getDotaIds()).subscribe(hasNewMatchPair => {
-            if(hasNewMatchPair.val) {
-                this.nominationService.nominate(hasNewMatchPair.key);
-            }
-        });
+        this.subscription = Observable.interval(1000 * 60 * 60).subscribe(this.recentGamesObserver);
+        this.recentGamesObserver.next(0);
+    }
+
+    public stopWatching(): void {
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
+        console.log('stopped watching');
     }
 
     // const claimedNominations = AwardService.getNominationsWinners(playerScores);
@@ -184,7 +211,7 @@ export class BotService {
             dotaIds.push(id);
         }
         return dotaIds;
-    }    
+    }
 
     private getRichEmbed(winnerMessage): RichEmbed {
         const richEmbed = new RichEmbed();

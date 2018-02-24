@@ -1,5 +1,5 @@
 import NominationWinner from "../model/NominationWinner";
-import RecentMatchJson, { MatchJson, ProfileJson } from "../dota-api/DotaJsonTypings";
+import { RecentMatchJson, MatchJson, ProfileJson } from "../dota-api/DotaJsonTypings";
 import StorageService from "./StorageService";
 import { Constants } from "../Constants";
 import { Observable } from "rxjs";
@@ -26,8 +26,8 @@ export default class DataStore {
         return DataStore.playerRecentMatchesCacheMap;
     }
 
-    public updatePlayerRecentMatches(account_id: number, matches: RecentMatchJson[]): void {
-        this.playerRecentMatchesCache.set(account_id, matches.map(m => m.match_id));
+    public updatePlayerRecentMatches(account_id: number, matchesIds: number[]): void {
+        this.playerRecentMatchesCache.set(account_id, matchesIds);
     }
 
     public saveRecentMatches() {
@@ -98,6 +98,10 @@ export default class DataStore {
                 observer.complete();
             }
         });
+    }
+
+    public getMatches(matchesIds: number[]): Observable<MatchJson[]> {
+        return Observable.forkJoin(matchesIds.map(match_id => this.getMatch(match_id)));
     }
 
     public get profilesCache(): Map<number, ProfileJson> {

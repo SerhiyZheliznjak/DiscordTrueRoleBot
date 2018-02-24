@@ -266,7 +266,7 @@ export class ProfileJson {
     loccountrycode: string;
 }
 
-export default class RecentMatchJson {
+export class RecentMatchJson {
     match_id: number;
     player_slot: number;
     radiant_win: boolean;

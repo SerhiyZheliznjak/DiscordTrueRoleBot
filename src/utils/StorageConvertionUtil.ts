@@ -4,7 +4,7 @@ import NominationWinner from "../model/NominationWinner";
 import NominationWinnerJson from "../model/json/NominationWinnerJson";
 import NominationFactory from "../services/NominationFactory";
 import { Nomination } from "../model/Nomination";
-import RecentMatchJson from "../dota-api/DotaJsonTypings";
+import { RecentMatchJson } from "../dota-api/DotaJsonTypings";
 
 export default class StorageConvertionUtil {
     // public static convertToPlayersScores(playersScoreJson: PlayerScoreJson[]): Map<string, PlayerScore> {
