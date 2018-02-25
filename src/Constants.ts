@@ -6,7 +6,7 @@ export class Constants {
     public static get RECENT_MATCHES() { return './storage/recent-matches.json'; }
     public static get PLAYERS_FILE_PATH() { return './storage/players.json'; }
     public static get WINNERS_FILE_PATH() { return './storage/winners.json'; }
-    public static get UNCLAIMED() { return 'UNCLAIMED'; }
+    public static get UNCLAIMED() { return 0; }
     public static get WON() { return 'ЗАТАЩИВ'; }
     public static get LOST() { return 'ТІМА ДНО'; }
     public static get AM_HP() { return 640; }

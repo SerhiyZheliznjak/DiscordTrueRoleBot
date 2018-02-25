@@ -13,16 +13,13 @@ export default class ScoreBoard {
             return map;
         }, new Map<string, NominationWinner>());
     }
-    applyPlayerScores(account_id: string, challenger: Pair<number, Nomination[]>): void {
+    applyPlayerScores(challenger: Pair<number, Nomination[]>): void {
         challenger.val.forEach(challengerNominationResult => {
             const bestResultSoFar = this.nominationsWinners.get(challengerNominationResult.getName());
             if (challengerNominationResult.hasHigherScoreThen(bestResultSoFar.nomination)) {
-                bestResultSoFar.account_id = account_id;
+                bestResultSoFar.account_id = challenger.key;
                 bestResultSoFar.nomination = challengerNominationResult;
             }
         });
-    }
-    getNominationsWinners(): Map<string, NominationWinner> {
-        return this.nominationsWinners;
     }
 }

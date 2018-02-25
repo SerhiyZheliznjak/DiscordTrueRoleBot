@@ -5,6 +5,8 @@ import NominationService from './NominationService';
 import DotaApi from '../dota-api/DotaApi';
 import Pair from '../model/Pair';
 import { RecentMatchJson } from '../dota-api/DotaJsonTypings';
+import ScoreBoard from '../model/ScoreBoard';
+import NominationWinner from '../model/NominationWinner';
 
 const Auth = require('../../config/auth.json');
 
@@ -41,13 +43,30 @@ export class BotService {
                     return newMatches.length > 0;
                 });
                 if (atLeastOneNewMatch) {
-                    this.nominationService.nominate(pairs);
-                    pairs.forEach(p=>this.dataStore.updatePlayerRecentMatches(p.key, p.val));
+                    this.nominationService.nominate(pairs).subscribe(this.awardWinners);
+                    pairs.forEach(p => this.dataStore.updatePlayerRecentMatches(p.key, p.val));
                 }
             });
     }
 
-    private
+    private awardWinners(scoreBoard: ScoreBoard): void {
+        this.dataStore.wonNominationCache;
+        const claimedNominations = AwardService.getNominationsWinners(playerScores);
+        const prevWinnersScore = DataStore.getWinnersScore();
+        console.dir(prevWinnersScore);
+        const newWinners = claimedNominations.filter(cn => {
+            const savedScore = prevWinnersScore.find(pws => cn.nomination.getName() === pws.nominationName);
+            return !savedScore || cn.account_id === savedScore.account_id && cn.nomination.isMyScoreHigher(savedScore.score);
+        });
+
+        AwardService.generateMessages(newWinners).subscribe(message => {
+            // console.dir(message);
+            chanel.send('', this.getRichEmbed(message));
+        });
+        if (!!newWinners.length) {
+            DataStore.saveWinnersScore();
+        }
+    }   
 
     public processMesage(msg: Message): void {
         if (msg.author.bot) {
@@ -88,22 +107,6 @@ export class BotService {
         }
         console.log('stopped watching');
     }
-
-    // const claimedNominations = AwardService.getNominationsWinners(playerScores);
-    // const prevWinnersScore = DataStore.getWinnersScore();
-    // console.dir(prevWinnersScore);
-    // const newWinners = claimedNominations.filter(cn => {
-    //     const savedScore = prevWinnersScore.find(pws => cn.nomination.getName() === pws.nominationName);
-    //     return !savedScore || cn.account_id === savedScore.account_id && cn.nomination.isMyScoreHigher(savedScore.score);
-    // });
-
-    // AwardService.generateMessages(newWinners).subscribe(message => {
-    //     // console.dir(message);
-    //     chanel.send('', this.getRichEmbed(message));
-    // });
-    // if (!!newWinners.length) {
-    //     DataStore.saveWinnersScore();
-    // }
 
     private isRetard(authorId: string): boolean {
         const retardCount = this.retardMap.get(authorId);
