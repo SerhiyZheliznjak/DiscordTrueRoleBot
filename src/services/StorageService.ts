@@ -31,7 +31,7 @@ export default class StorageService {
     private writeArrayToFile(array: any[], filePath: string): void {
         this.createPathIfNeeded(filePath);
         if (!array || !array.length) {
-            console.error('write empty array yourself');
+            console.error(filePath, 'write empty array yourself');
             return;
         }
         this.writeFile(filePath,
