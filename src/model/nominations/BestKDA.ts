@@ -4,7 +4,7 @@ import { Constants } from "../../Constants";
 import Pair from "../Pair";
 
 export class BestKDA extends Nomination {
-    constructor(protected points?: Pair<string, number | string>[]) {
+    constructor(protected points: Pair<string, number | string>[] = []) {
         super(points);
         this.name = 'А шо то в вас? KDA?';
         this.minScore = 1;

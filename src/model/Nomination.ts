@@ -8,9 +8,7 @@ export class Nomination {
     protected minScore: number;
     protected msg: string;
 
-    constructor(protected points?: Pair<string, string | number>[]) {
-        this.points = !points ? [] : points;
-    }
+    constructor(protected points: Pair<string, string | number>[] = []) { }
     public getName() {
         return this.name
     }

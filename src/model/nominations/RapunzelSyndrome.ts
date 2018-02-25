@@ -4,7 +4,7 @@ import { Constants } from "../../Constants";
 import Pair from "../Pair";
 
 export class RapunzelSyndrome extends Nomination {
-    constructor(protected points?: Pair<string, number | string>[]) {
+    constructor(protected points: Pair<string, number | string>[] = []) {
         super(points);
         this.name = 'Синдром Рапунзель';
         this.minScore = 1;

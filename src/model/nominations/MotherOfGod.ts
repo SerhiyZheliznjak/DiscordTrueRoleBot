@@ -3,7 +3,7 @@ import { DotaParser } from "../../services/DotaParser";
 import Pair from "../Pair";
 
 export class MotherOfGod extends Nomination {
-    constructor(protected points?: Pair<string, number | string>[]) {
+    constructor(protected points: Pair<string, number | string>[] = []) {
         super(points);
         this.name = 'Матка Бозька';
         this.minScore = 10;

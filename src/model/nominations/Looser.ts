@@ -3,7 +3,7 @@ import { DotaParser } from "../../services/DotaParser";
 import Pair from "../Pair";
 
 export class Looser extends Nomination {
-    constructor(protected points?: Pair<string, number | string>[]) {
+    constructor(protected points: Pair<string, number | string>[] = []) {
         super(points);
         this.name = 'Шота не йде';
         this.minScore = 10;

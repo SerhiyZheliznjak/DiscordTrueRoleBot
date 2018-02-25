@@ -43,12 +43,12 @@ export class BotService {
                 const atLeastOneNewMatch = pairs.find(pair => {
                     const newMatches = pair.val.filter(match_id => {
                         const prm = this.dataStore.playerRecentMatchesCache.get(pair.key);
-                        return prm ? prm.indexOf(match_id) < 0 : false;
+                        return prm ? prm.indexOf(match_id) < 0 : true;
                     });
                     return newMatches.length > 0;
                 });
                 if (atLeastOneNewMatch) {
-                    this.nominationService.nominate(pairs).subscribe(this.awardWinners);
+                    this.nominationService.nominate(pairs).subscribe(this.awardWinners.bind(this));
                     pairs.forEach(p => this.dataStore.updatePlayerRecentMatches(p.key, p.val));
                 }
             });
@@ -60,7 +60,7 @@ export class BotService {
             const newWinner = scoreBoard.nominationsWinners.get(nominationName);
             if (newWinner.account_id !== Constants.UNCLAIMED && newWinner.nomination.isScored()) {
                 const storedWinner = this.dataStore.wonNominationCache.get(nominationName);
-                if (storedWinner.nomination.getScore() < newWinner.nomination.getScore()) {
+                if (!storedWinner || storedWinner.nomination.getScore() < newWinner.nomination.getScore()) {
                     newNomintionsClaimed.push(newWinner);
                 }
             }

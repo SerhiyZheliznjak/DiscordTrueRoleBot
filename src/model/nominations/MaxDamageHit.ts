@@ -5,7 +5,7 @@ import {format} from 'util';
 import Pair from "../Pair";
 
 export class MaxDamageHit extends Nomination {
-    constructor(protected points?: Pair<string, number | string>[]) {
+    constructor(protected points: Pair<string, number | string>[] = []) {
         super(points);
         this.name = 'Вірастюк';
         this.minScore = Constants.AM_HP;

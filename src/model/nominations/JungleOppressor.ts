@@ -4,7 +4,7 @@ import { Constants } from "../../Constants";
 import Pair from "../Pair";
 
 export class JungleOppressor extends Nomination {
-    constructor(protected points?: Pair<string, number | string>[]) {
+    constructor(protected points: Pair<string, number | string>[] = []) {
         super(points);
         this.name = 'Гнобитель Джунглів';
         this.minScore = 1;
