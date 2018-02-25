@@ -1,7 +1,7 @@
 import { RxHttpRequest } from 'rx-http-request';
 import { Observable, Subscription, Observer } from 'rxjs';
 import { format } from 'util';
-import RecentMatchJson, { PlayerProfileJson, MatchJson } from './DotaJsonTypings';
+import { RecentMatchJson, PlayerProfileJson, MatchJson } from './DotaJsonTypings';
 
 class QueuedRequest {
   constructor(public url: string, public observers: Observer<any>[], public retryCount: number, public observable: Observable<any>) { }

@@ -1,5 +1,5 @@
 import { NominationJson } from "./NominationJson";
 
 export default class NominationWinnerJson {
-    constructor(public account_id: string, public nomination: NominationJson) { }
+    constructor(public account_id: number, public nomination: NominationJson) { }
 }

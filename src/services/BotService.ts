@@ -7,6 +7,7 @@ import Pair from '../model/Pair';
 import { RecentMatchJson } from '../dota-api/DotaJsonTypings';
 import ScoreBoard from '../model/ScoreBoard';
 import NominationWinner from '../model/NominationWinner';
+import { Constants } from '../Constants';
 
 const Auth = require('../../config/auth.json');
 
@@ -15,6 +16,7 @@ export class BotService {
     private playersMap = new Map<number, string>();
     private subscription: Subscription;
     private recentGamesObserver: Observer<number>;
+    private chanel;
 
     constructor(private client: Client,
         private dataStore: DataStore = new DataStore(),
@@ -28,7 +30,7 @@ export class BotService {
         this.playersMap.set(36753317, '408172132875501581');//=3
 
         this.recentGamesObserver = {
-            next: this.recentGamesObserverNext,
+            next: this.recentGamesObserverNext.bind(this),
             error: () => { },
             complete: () => { }
         };
@@ -39,7 +41,10 @@ export class BotService {
             this.dotaApi.getRecentMatches(account_id).map(recentMatch => new Pair(account_id, (recentMatch as RecentMatchJson[]).map(m => m.match_id)))))
             .subscribe(pairs => {
                 const atLeastOneNewMatch = pairs.find(pair => {
-                    const newMatches = pair.val.filter(match_id => this.dataStore.playerRecentMatchesCache.get(pair.key).indexOf(match_id) < 0);
+                    const newMatches = pair.val.filter(match_id => {
+                        const prm = this.dataStore.playerRecentMatchesCache.get(pair.key);
+                        return prm ? prm.indexOf(match_id) < 0 : false;
+                    });
                     return newMatches.length > 0;
                 });
                 if (atLeastOneNewMatch) {
@@ -50,23 +55,49 @@ export class BotService {
     }
 
     private awardWinners(scoreBoard: ScoreBoard): void {
-        this.dataStore.wonNominationCache;
-        const claimedNominations = AwardService.getNominationsWinners(playerScores);
-        const prevWinnersScore = DataStore.getWinnersScore();
-        console.dir(prevWinnersScore);
-        const newWinners = claimedNominations.filter(cn => {
-            const savedScore = prevWinnersScore.find(pws => cn.nomination.getName() === pws.nominationName);
-            return !savedScore || cn.account_id === savedScore.account_id && cn.nomination.isMyScoreHigher(savedScore.score);
-        });
-
-        AwardService.generateMessages(newWinners).subscribe(message => {
-            // console.dir(message);
-            chanel.send('', this.getRichEmbed(message));
-        });
-        if (!!newWinners.length) {
-            DataStore.saveWinnersScore();
+        let newNomintionsClaimed: NominationWinner[] = [];
+        for (let nominationName of scoreBoard.nominationsWinners.keys()) {
+            const newWinner = scoreBoard.nominationsWinners.get(nominationName);
+            if (newWinner.account_id !== Constants.UNCLAIMED && newWinner.nomination.isScored()) {
+                const storedWinner = this.dataStore.wonNominationCache.get(nominationName);
+                if (storedWinner.nomination.getScore() < newWinner.nomination.getScore()) {
+                    newNomintionsClaimed.push(newWinner);
+                }
+            }
         }
-    }   
+
+        if (!!newNomintionsClaimed.length) {
+            this.dataStore.saveWinnersScore();
+            this.generateMessages(newNomintionsClaimed).subscribe(message => {
+                this.chanel.send('', this.getRichEmbed(message));
+            });
+        }
+    }
+
+    private generateMessages(claimedNominations: NominationWinner[]) {
+        return Observable.create(messagesObserver => {
+            
+            this.dataStore.getPlayers(claimedNominations.map(cn => cn.account_id).reduce((uniq, id) => {
+                if (uniq.indexOf(id) < 0) {
+                    uniq.push(id);
+                }
+                return uniq;
+            }, [])).subscribe(players => {            
+                claimedNominations.forEach(claimed => {
+                    const player = players.find(p => +p.account_id === +claimed.account_id);
+                    const message = {
+                        title: player.personaname + ' ' + claimed.nomination.getName(),
+                        description: claimed.nomination.getMessage(),
+                        profileUrl: player.profileurl,
+                        avatarUrl: player.avatarmedium,
+                        footer: 'Рахунок: ' + claimed.nomination.getScore()
+                    }
+                    messagesObserver.next(message);
+                });
+                messagesObserver.complete();
+            });
+        });
+    }
 
     public processMesage(msg: Message): void {
         if (msg.author.bot) {
@@ -96,7 +127,7 @@ export class BotService {
 
     public startWatching() {
         DataStore.maxMatches = this.playersMap.size * 20;
-        const chanel = this.client.channels.find('type', 'text');
+        this.chanel = this.client.channels.find('type', 'text');
         this.subscription = Observable.interval(1000 * 60 * 60).subscribe(this.recentGamesObserver);
         this.recentGamesObserver.next(0);
     }

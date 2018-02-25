@@ -6,7 +6,7 @@
     "build": "tsc",
     "dev": "tsc --watch & nodemon dist",
     "tsc": "tsc -v",
-    "start": "node ./dist/bot.js",
+    "start": "tsc && node ./dist/bot.js",
     "test": "jasmine-ts \"./tests/**/*.test.ts\""
   },
   "author": "Serhiy Zheliznyak",

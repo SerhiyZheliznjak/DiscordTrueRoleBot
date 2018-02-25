@@ -4,13 +4,13 @@ import PlayerRecentMatchesJson from "../model/json/PlayerRecentMatchesJson";
 import NominationWinner from "../model/NominationWinner";
 import NominationWinnerJson from "../model/json/NominationWinnerJson";
 import StorageConvertionUtil from "../utils/StorageConvertionUtil";
-import mkdirp from 'mkdirp';
+import { mkdirp } from "mkdirp";
 
 export default class StorageService {
     constructor(private exists = existsSync,
         private readFile = readFileSync,
         private writeFile = writeFileSync,
-        private mkdir = mkdirp,) { }
+        private mkdir = mkdirp) { }
 
     public getRecentMatches(): PlayerRecentMatchesJson[] {
         return this.readFileToObject(Constants.RECENT_MATCHES).table;
