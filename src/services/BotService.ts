@@ -4,7 +4,7 @@ import DataStore from './DataStore';
 import NominationService from './NominationService';
 import DotaApi from '../dota-api/DotaApi';
 import Pair from '../model/Pair';
-import { RecentMatchJson } from '../dota-api/DotaJsonTypings';
+import { RecentMatchJson, ProfileJson } from '../dota-api/DotaJsonTypings';
 import ScoreBoard from '../model/ScoreBoard';
 import NominationWinner from '../model/NominationWinner';
 import { Constants } from '../Constants';
@@ -18,10 +18,12 @@ export class BotService {
     private recentGamesObserver: Observer<number>;
     private chanel;
 
-    constructor(private client: Client,
-                private dataStore: DataStore = new DataStore(),
-                private nominationService: NominationService = new NominationService(),
-                private dotaApi: DotaApi = new DotaApi()) {
+    constructor(
+        private client: Client,
+        private dataStore: DataStore = new DataStore(),
+        private nominationService: NominationService = new NominationService(),
+        private dotaApi: DotaApi = new DotaApi()
+    ) {
         this.playersMap.set(298134653, '407971834689093632'); // Dno
         this.playersMap.set(333303976, '407949091163865099'); // Tee Hee
         this.playersMap.set(118975931, '289388465034887178'); // I'm 12 btw GG.BET
@@ -30,7 +32,7 @@ export class BotService {
         this.playersMap.set(36753317, '408172132875501581'); // =3
 
         this.recentGamesObserver = {
-            next: this.recentGamesObserverNext.bind(this),
+            next: () => this.recentGamesObserverNext(),
             error: () => { },
             complete: () => { }
         };
@@ -109,7 +111,7 @@ export class BotService {
     private shutUpYouRRetard(msg: Message): void {
         const shutRetard = ['Стягнув', 'Ти такий розумний', 'Помовчи трохи', 'Т-с-с-с-с-с-с',
             'Біжи далеко', 'Ти можеш трохи тихо побути?', 'Ціхо', 'Каца!', 'Таааась тась тась',
-             'Люди, йдіть сі подивіть', 'Інколи краще жувати', 'Ти то серйозно?', 'Молодець'];
+            'Люди, йдіть сі подивіть', 'Інколи краще жувати', 'Ти то серйозно?', 'Молодець'];
         msg.reply(shutRetard[Math.floor(Math.random() * shutRetard.length)]);
     }
 
@@ -154,21 +156,20 @@ export class BotService {
             msg.reply('Курва... Шо ти пишеш?.. Має бути "watch @КОРИСТУВАЧ DOTA_ID"');
             this.retardPlusPlus(msg);
         } else {
-            const r = / \d+/;
-            // DataStore.getPlayer(msg.content.match(r)[0].trim()).subscribe(playerInfo => {
-            //     if (!!playerInfo) {
-            //         if (this.playersMap.get(playerInfo.account_id) && !this.isCreator(msg)) {
-            //             msg.reply('Вже закріплено за @' + this.playersMap.get(playerInfo.account_id));
-            //             this.retardPlusPlus(msg);
-            //         } else {
-            //             this.playersMap.set(playerInfo.account_id, msg.mentions.users.first().id);
-            //             msg.reply('Я стежитиму за тобою, ' + playerInfo.personaname);
-            //         }
-            //     } else {
-            //         msg.reply('Давай ще раз, але цього разу очима дивись на айді гравця');
-            //         this.retardPlusPlus(msg);
-            //     }
-            // });
+            this.dataStore.getProfile(msg.content.match(/ \d+/)[0].trim()).subscribe(playerInfo => {
+                if (!!playerInfo) {
+                    if (this.playersMap.get(playerInfo.account_id) && !this.isCreator(msg)) {
+                        msg.reply('Вже закріплено за @' + this.playersMap.get(playerInfo.account_id));
+                        this.retardPlusPlus(msg);
+                    } else {
+                        this.playersMap.set(playerInfo.account_id, msg.mentions.users.first().id);
+                        msg.reply('Я стежитиму за тобою, ' + playerInfo.personaname);
+                    }
+                } else {
+                    msg.reply('Давай ще раз, але цього разу очима дивись на айді гравця');
+                    this.retardPlusPlus(msg);
+                }
+            });
         }
     }
 
@@ -184,32 +185,45 @@ export class BotService {
         return dotaIds;
     }
 
-    private getRichEmbed(winnerMessage): RichEmbed {
+    private getRichEmbed(title: string, description: string, avatarUrl: string, footer: string, url?: string): RichEmbed {
         const richEmbed = new RichEmbed();
-        richEmbed.setTitle(winnerMessage.title);
-        richEmbed.setDescription(winnerMessage.description);
-        richEmbed.setImage(winnerMessage.avatarUrl);
-        richEmbed.setFooter(winnerMessage.footer);
+        richEmbed.setTitle(title);
+        richEmbed.setDescription(description);
+        richEmbed.setImage(avatarUrl);
+        richEmbed.setFooter(footer);
+        if (url) {
+            richEmbed.setURL(url);
+        }
         return richEmbed;
     }
 
     private recentGamesObserverNext() {
-        Observable.forkJoin(this.getDotaIds().map(account_id =>
-            this.dotaApi.getRecentMatches(account_id)
-                .map(recentMatch => new Pair(account_id, (recentMatch as RecentMatchJson[]).map(m => m.match_id)))))
-                .subscribe(pairs => {
-                    const atLeastOneNewMatch = pairs.find(pair => {
-                        const newMatches = pair.val.filter(match_id => {
-                            const prm = this.dataStore.playerRecentMatchesCache.get(pair.key);
-                            return prm ? prm.indexOf(match_id) < 0 : true;
-                        });
-                        return newMatches.length > 0;
-                    });
-                    if (atLeastOneNewMatch) {
-                        this.nominationService.nominate(pairs).subscribe(this.awardWinners.bind(this));
-                        pairs.forEach(p => this.dataStore.updatePlayerRecentMatches(p.key, p.val));
-                    }
+        Observable.forkJoin(
+            this.getDotaIds().map(account_id =>
+                this.dotaApi.getRecentMatches(account_id)
+                    .map(recentMatch => new Pair(account_id, (recentMatch as RecentMatchJson[]).map(m => m.match_id))))
+        ).subscribe(playerRecentMatches => {
+            console.log('--------joined all the matches hasNewMatches-----------', this.hasNewMatches(playerRecentMatches));
+            if (this.hasNewMatches(playerRecentMatches)) {
+                this.nominationService.nominate(playerRecentMatches).subscribe(scoreBoard => {
+                    console.log('-----------lets award some players-----------', scoreBoard.nominationsWinners.size);
+                    this.awardWinners(scoreBoard);
+                });
+                playerRecentMatches.forEach(p => this.dataStore.updatePlayerRecentMatches(p.key, p.val));
+                this.dataStore.saveRecentMatches();
+            }
+        });
+    }
+
+    private hasNewMatches(playerRecentMatches: Array<Pair<number, number[]>>): boolean {
+        const atLeastOneNewMatch = playerRecentMatches.find(pair => {
+            const newMatches = pair.val.filter(match_id => {
+                const prm = this.dataStore.playerRecentMatchesCache.get(pair.key);
+                return prm ? prm.indexOf(match_id) < 0 : true;
             });
+            return newMatches.length > 0;
+        });
+        return !!atLeastOneNewMatch;
     }
 
     private awardWinners(scoreBoard: ScoreBoard): void {
@@ -225,35 +239,39 @@ export class BotService {
         }
 
         if (!!newNomintionsClaimed.length) {
-            this.dataStore.saveWinnersScore();
-            this.generateMessages(newNomintionsClaimed).subscribe(message => {
-                this.chanel.send('', this.getRichEmbed(message));
+            console.log('awarding winners ', newNomintionsClaimed.length);
+            this.dataStore.saveWinnersScore(scoreBoard.nominationsWinners);
+            this.generateMessages(newNomintionsClaimed).subscribe((richEmbed: RichEmbed) => {
+                console.log('sending message about ', richEmbed.title);
+                this.chanel.send('', richEmbed);
             });
         }
     }
 
     private generateMessages(claimedNominations: NominationWinner[]) {
-        return Observable.create(messagesObserver => {
-
-            this.dataStore.getPlayers(claimedNominations.map(cn => cn.account_id).reduce((uniq, id) => {
-                if (uniq.indexOf(id) < 0) {
-                    uniq.push(id);
-                }
-                return uniq;
-            }, [])).subscribe(players => {
+        return Observable.create((messagesObserver: Observer<RichEmbed>) => {
+            this.getPlayerProfilesSet(claimedNominations).subscribe(players => {
                 claimedNominations.forEach(claimed => {
                     const player = players.find(p => +p.account_id === +claimed.account_id);
-                    const message = {
-                        title: player.personaname + ' ' + claimed.nomination.getName(),
-                        description: claimed.nomination.getMessage(),
-                        profileUrl: player.profileurl,
-                        avatarUrl: player.avatarmedium,
-                        footer: 'Рахунок: ' + claimed.nomination.getScore()
-                    };
-                    messagesObserver.next(message);
+                    messagesObserver.next(this.getRichEmbed(
+                        player.personaname + ' ' + claimed.nomination.getName(),
+                        claimed.nomination.getMessage(),
+                        player.avatarmedium,
+                        'Рахунок: ' + claimed.nomination.getScoreText(),
+                        player.profileurl
+                    ));
                 });
                 messagesObserver.complete();
             });
         });
+    }
+
+    private getPlayerProfilesSet(claimedNominations: NominationWinner[]): Observable<ProfileJson[]> {
+        return this.dataStore.getPlayers(claimedNominations.map(cn => cn.account_id).reduce((uniq, id) => {
+            if (uniq.indexOf(id) < 0) {
+                uniq.push(id);
+            }
+            return uniq;
+        }, []));
     }
 }

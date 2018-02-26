@@ -1,5 +1,5 @@
 import NominationWinner from "../model/NominationWinner";
-import { RecentMatchJson, MatchJson, ProfileJson } from "../dota-api/DotaJsonTypings";
+import { RecentMatchJson, MatchJson, ProfileJson, PlayerProfileJson } from "../dota-api/DotaJsonTypings";
 import StorageService from "./StorageService";
 import { Constants } from "../Constants";
 import { Observable } from "rxjs";
@@ -16,8 +16,10 @@ export default class DataStore {
     private static wonNominationsCacheMap: Map<string, NominationWinner>;
     private static profilesMap: Map<number, ProfileJson>;
 
-    constructor(private dotaApi: DotaApi = new DotaApi(),
-                private storage: StorageService = new StorageService()) { }
+    constructor(
+        private dotaApi: DotaApi = new DotaApi(),
+        private storage: StorageService = new StorageService()
+    ) { }
 
     public get playerRecentMatchesCache(): Map<number, number[]> {
         if (!DataStore.playerRecentMatchesCacheMap) {
@@ -61,8 +63,9 @@ export default class DataStore {
         return DataStore.wonNominationsCacheMap;
     }
 
-    public saveWinnersScore(): void {
-        this.storage.saveWinners(this.wonNominationCache);
+    public saveWinnersScore(recentWinners: Map<string, NominationWinner>): void {
+        DataStore.wonNominationsCacheMap = recentWinners;
+        this.storage.saveWinners(recentWinners);
     }
 
     public get matchesCache(): Map<number, MatchJson> {
@@ -86,17 +89,17 @@ export default class DataStore {
     }
 
     public getMatch(match_id): Observable<MatchJson> {
-        return Observable.create(observer => {
+        return Observable.create(getMatchObserver => {
             const match = this.matchesCache.get(match_id);
             if (!match) {
                 this.dotaApi.getMatch(match_id).subscribe(m => {
                     this.addMatch(m);
-                    observer.next(m);
-                    observer.complete();
+                    getMatchObserver.next(m);
+                    getMatchObserver.complete();
                 });
             } else {
-                observer.next(match);
-                observer.complete();
+                getMatchObserver.next(match);
+                getMatchObserver.complete();
             }
         });
     }
@@ -131,15 +134,16 @@ export default class DataStore {
         });
     }
 
-    public getPlayers(accountsIds) {
-        return Observable.create(playersObserver => {
-            // MyUtils.subscriptionChain(
-            //     accountsIds.map(account_id => this.getProfile(account_id)),
-            //     (profile: ProfileJson) => this.profilesCache.set(profile.account_id, profile),
-            //     () => {
-            //         playersObserver.next(this.profilesCache);
-            //         playersObserver.complete();
-            //     });
-        });
+    public getPlayers(accountsIds: number[]): Observable<ProfileJson[]> {
+        return Observable.forkJoin(
+            accountsIds.map(account_id => this.dotaApi.getPlayerProfile(account_id).map((ppj: PlayerProfileJson) => ppj.profile))
+        );
+        //     playersObserver => {
+        //         accountsIds.map(account_id => this.getProfile(account_id)),
+        //         (profile: ProfileJson) => this.profilesCache.set(profile.account_id, profile),
+        //         () => {
+        //             playersObserver.next(this.profilesCache);
+        //             playersObserver.complete();
+        // }
     }
 }

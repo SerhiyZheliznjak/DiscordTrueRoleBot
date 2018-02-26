@@ -5,7 +5,6 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch & nodemon dist",
-    "tsc": "tsc -v",
     "start": "tsc && node ./dist/bot.js",
     "test": "jasmine-ts \"./tests/**/*.test.ts\""
   },
