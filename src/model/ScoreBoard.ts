@@ -9,7 +9,7 @@ export default class ScoreBoard {
 
     constructor() {
         this.nominationsWinners = Nominations.all.reduce((map, nomination) => {
-            map.set(nomination.getName(), new NominationWinner(Constants.UNCLAIMED, nomination))
+            map.set(nomination.getName(), new NominationWinner(Constants.UNCLAIMED, nomination));
             return map;
         }, new Map<string, NominationWinner>());
     }

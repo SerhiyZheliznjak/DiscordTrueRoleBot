@@ -11,7 +11,7 @@ export class DotaParser {
 
     public static getPlayerSlot(match: MatchJson, account_id: number) {
         const player = match.players.find(p => p.account_id === account_id);
-        if(player) {
+        if (player) {
             return player.player_slot;
         }
     }

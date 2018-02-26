@@ -9,15 +9,15 @@ import StorageConvertionUtil from "../utils/StorageConvertionUtil";
 import { Nomination } from "../model/Nomination";
 
 export default class DataStore {
+    public static maxMatches: number;
     private static playersScoresCacheMap: Map<number, Nomination[]>;
     private static playerRecentMatchesCacheMap: Map<number, number[]>;
     private static matchesCacheMap: Map<number, MatchJson>;
     private static wonNominationsCacheMap: Map<string, NominationWinner>;
     private static profilesMap: Map<number, ProfileJson>;
-    public static maxMatches: number;
 
     constructor(private dotaApi: DotaApi = new DotaApi(),
-        private storage: StorageService = new StorageService()) { }
+                private storage: StorageService = new StorageService()) { }
 
     public get playerRecentMatchesCache(): Map<number, number[]> {
         if (!DataStore.playerRecentMatchesCacheMap) {
@@ -36,7 +36,8 @@ export default class DataStore {
 
     public get playersScoresCache(): Map<number, Nomination[]> {
         if (!DataStore.playersScoresCacheMap) {
-            DataStore.playersScoresCacheMap = new Map<number, Nomination[]>();//StorageConvertionUtil.convertToPlayersScores(StorageService.getPlayersScores());
+            DataStore.playersScoresCacheMap = new Map<number, Nomination[]>();
+            // StorageConvertionUtil.convertToPlayersScores(StorageService.getPlayersScores());
         }
         return DataStore.playersScoresCacheMap;
     }
@@ -86,7 +87,7 @@ export default class DataStore {
 
     public getMatch(match_id): Observable<MatchJson> {
         return Observable.create(observer => {
-            let match = this.matchesCache.get(match_id);
+            const match = this.matchesCache.get(match_id);
             if (!match) {
                 this.dotaApi.getMatch(match_id).subscribe(m => {
                     this.addMatch(m);
@@ -113,7 +114,7 @@ export default class DataStore {
 
     public getProfile(account_id: number): Observable<ProfileJson> {
         return Observable.create(profileObserver => {
-            let profile = this.profilesCache.get(account_id);
+            const profile = this.profilesCache.get(account_id);
             if (!profile) {
                 this.dotaApi.getPlayerProfile(account_id)
                     .map(p => p.profile)

@@ -1,5 +1,5 @@
-import StorageService from '../../src/services/StorageService';
-import { Constants } from '../../src/Constants';
+import StorageService from "../../src/services/StorageService";
+import { Constants } from "../../src/Constants";
 
 describe(`StorageService`, () => {
 
@@ -92,4 +92,3 @@ describe(`StorageService`, () => {
         return pathToCreate.join('/');
     }
 });
-

@@ -4,11 +4,26 @@ import { Constants } from "../../Constants";
 import Pair from "../Pair";
 
 export class BestKDA extends Nomination {
-    constructor(protected points: Pair<string, number | string>[] = []) {
+    constructor(protected points: Array<Pair<string, number | string>> = []) {
         super(points);
         this.name = 'А шо то в вас? KDA?';
         this.minScore = 1;
         this.msg = 'От в мене KDA то KDA';
+    }
+
+    public getScore(): number {
+        const kdaArr = this.getPoints().map(p => this.countKDA(p.val + ''));
+        return Math.max(...kdaArr);
+    }
+
+    public getScoreText(): string {
+        const bestKDA = this.getPoints().map(p => p.val + '').reduce((max, next) => {
+            if (this.countKDA(max) < this.countKDA(next)) {
+                return next;
+            }
+            return max;
+        }, '0/0/0');
+        return bestKDA;
     }
 
     protected scorePoint(match, player_slot) {
@@ -28,20 +43,5 @@ export class BestKDA extends Nomination {
         }
         const kda = kdaText.split('/');
         return (parseInt(kda[0]) + parseInt(kda[2])) / (parseInt(kda[1]) + 1);
-    }
-
-    public getScore(): number {
-        const kdaArr = this.getPoints().map(p => this.countKDA(p.val + ''));
-        return Math.max(...kdaArr);
-    }
-
-    public getScoreText(): string {
-        const bestKDA = this.getPoints().map(p => p.val + '').reduce((max, next) => {
-            if (this.countKDA(max) < this.countKDA(next)) {
-                return next;
-            }
-            return max;
-        }, '0/0/0');
-        return bestKDA;
     }
 }

@@ -4,7 +4,7 @@ import { Constants } from "../../Constants";
 import Pair from "../Pair";
 
 export class StackGod extends Nomination {
-    constructor(protected points: Pair<string, number | string>[] = []) {
+    constructor(protected points: Array<Pair<string, number | string>> = []) {
         super(points);
         this.name = 'Скиртувальник 1го розряду';
         this.minScore = 20;

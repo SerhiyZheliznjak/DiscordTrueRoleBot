@@ -19,84 +19,21 @@ export class BotService {
     private chanel;
 
     constructor(private client: Client,
-        private dataStore: DataStore = new DataStore(),
-        private nominationService: NominationService = new NominationService(),
-        private dotaApi: DotaApi = new DotaApi()) {
-        this.playersMap.set(298134653, '407971834689093632');//Dno
-        this.playersMap.set(333303976, '407949091163865099');//Tee Hee
-        this.playersMap.set(118975931, '289388465034887178');//I'm 12 btw GG.BET
-        this.playersMap.set(86848474, '408363774257528852');//whoami
-        this.playersMap.set(314684987, '413792999030652938');//blackRose
-        this.playersMap.set(36753317, '408172132875501581');//=3
+                private dataStore: DataStore = new DataStore(),
+                private nominationService: NominationService = new NominationService(),
+                private dotaApi: DotaApi = new DotaApi()) {
+        this.playersMap.set(298134653, '407971834689093632'); // Dno
+        this.playersMap.set(333303976, '407949091163865099'); // Tee Hee
+        this.playersMap.set(118975931, '289388465034887178'); // I'm 12 btw GG.BET
+        this.playersMap.set(86848474, '408363774257528852'); // whoami
+        this.playersMap.set(314684987, '413792999030652938'); // blackRose
+        this.playersMap.set(36753317, '408172132875501581'); // =3
 
         this.recentGamesObserver = {
             next: this.recentGamesObserverNext.bind(this),
             error: () => { },
             complete: () => { }
         };
-    }
-
-    private recentGamesObserverNext() {
-        Observable.forkJoin(this.getDotaIds().map(account_id =>
-            this.dotaApi.getRecentMatches(account_id).map(recentMatch => new Pair(account_id, (recentMatch as RecentMatchJson[]).map(m => m.match_id)))))
-            .subscribe(pairs => {
-                const atLeastOneNewMatch = pairs.find(pair => {
-                    const newMatches = pair.val.filter(match_id => {
-                        const prm = this.dataStore.playerRecentMatchesCache.get(pair.key);
-                        return prm ? prm.indexOf(match_id) < 0 : true;
-                    });
-                    return newMatches.length > 0;
-                });
-                if (atLeastOneNewMatch) {
-                    this.nominationService.nominate(pairs).subscribe(this.awardWinners.bind(this));
-                    pairs.forEach(p => this.dataStore.updatePlayerRecentMatches(p.key, p.val));
-                }
-            });
-    }
-
-    private awardWinners(scoreBoard: ScoreBoard): void {
-        let newNomintionsClaimed: NominationWinner[] = [];
-        for (let nominationName of scoreBoard.nominationsWinners.keys()) {
-            const newWinner = scoreBoard.nominationsWinners.get(nominationName);
-            if (newWinner.account_id !== Constants.UNCLAIMED && newWinner.nomination.isScored()) {
-                const storedWinner = this.dataStore.wonNominationCache.get(nominationName);
-                if (!storedWinner || storedWinner.nomination.getScore() < newWinner.nomination.getScore()) {
-                    newNomintionsClaimed.push(newWinner);
-                }
-            }
-        }
-
-        if (!!newNomintionsClaimed.length) {
-            this.dataStore.saveWinnersScore();
-            this.generateMessages(newNomintionsClaimed).subscribe(message => {
-                this.chanel.send('', this.getRichEmbed(message));
-            });
-        }
-    }
-
-    private generateMessages(claimedNominations: NominationWinner[]) {
-        return Observable.create(messagesObserver => {
-            
-            this.dataStore.getPlayers(claimedNominations.map(cn => cn.account_id).reduce((uniq, id) => {
-                if (uniq.indexOf(id) < 0) {
-                    uniq.push(id);
-                }
-                return uniq;
-            }, [])).subscribe(players => {            
-                claimedNominations.forEach(claimed => {
-                    const player = players.find(p => +p.account_id === +claimed.account_id);
-                    const message = {
-                        title: player.personaname + ' ' + claimed.nomination.getName(),
-                        description: claimed.nomination.getMessage(),
-                        profileUrl: player.profileurl,
-                        avatarUrl: player.avatarmedium,
-                        footer: 'Рахунок: ' + claimed.nomination.getScore()
-                    }
-                    messagesObserver.next(message);
-                });
-                messagesObserver.complete();
-            });
-        });
     }
 
     public processMesage(msg: Message): void {
@@ -171,8 +108,8 @@ export class BotService {
 
     private shutUpYouRRetard(msg: Message): void {
         const shutRetard = ['Стягнув', 'Ти такий розумний', 'Помовчи трохи', 'Т-с-с-с-с-с-с',
-            'Біжи далеко', 'Ти можеш трохи тихо побути?', 'Ціхо', 'Каца!', 'Таааась тась тась', 'Люди, йдіть сі подивіть', 'Інколи краще жувати',
-            'Ти то серйозно?', 'Молодець'];
+            'Біжи далеко', 'Ти можеш трохи тихо побути?', 'Ціхо', 'Каца!', 'Таааась тась тась',
+             'Люди, йдіть сі подивіть', 'Інколи краще жувати', 'Ти то серйозно?', 'Молодець'];
         msg.reply(shutRetard[Math.floor(Math.random() * shutRetard.length)]);
     }
 
@@ -196,7 +133,7 @@ export class BotService {
     private showRegistered(msg) {
         if (this.isCreator(msg)) {
             let registered = 'Стежу за: ';
-            for (let info of this.playersMap) {
+            for (const info of this.playersMap) {
                 registered += info + '\n';
             }
             msg.reply(registered);
@@ -240,8 +177,8 @@ export class BotService {
     }
 
     private getDotaIds(): number[] {
-        let dotaIds = [];
-        for (let id of this.playersMap.keys()) {
+        const dotaIds = [];
+        for (const id of this.playersMap.keys()) {
             dotaIds.push(id);
         }
         return dotaIds;
@@ -254,5 +191,69 @@ export class BotService {
         richEmbed.setImage(winnerMessage.avatarUrl);
         richEmbed.setFooter(winnerMessage.footer);
         return richEmbed;
+    }
+
+    private recentGamesObserverNext() {
+        Observable.forkJoin(this.getDotaIds().map(account_id =>
+            this.dotaApi.getRecentMatches(account_id)
+                .map(recentMatch => new Pair(account_id, (recentMatch as RecentMatchJson[]).map(m => m.match_id)))))
+                .subscribe(pairs => {
+                    const atLeastOneNewMatch = pairs.find(pair => {
+                        const newMatches = pair.val.filter(match_id => {
+                            const prm = this.dataStore.playerRecentMatchesCache.get(pair.key);
+                            return prm ? prm.indexOf(match_id) < 0 : true;
+                        });
+                        return newMatches.length > 0;
+                    });
+                    if (atLeastOneNewMatch) {
+                        this.nominationService.nominate(pairs).subscribe(this.awardWinners.bind(this));
+                        pairs.forEach(p => this.dataStore.updatePlayerRecentMatches(p.key, p.val));
+                    }
+            });
+    }
+
+    private awardWinners(scoreBoard: ScoreBoard): void {
+        const newNomintionsClaimed: NominationWinner[] = [];
+        for (const nominationName of scoreBoard.nominationsWinners.keys()) {
+            const newWinner = scoreBoard.nominationsWinners.get(nominationName);
+            if (newWinner.account_id !== Constants.UNCLAIMED && newWinner.nomination.isScored()) {
+                const storedWinner = this.dataStore.wonNominationCache.get(nominationName);
+                if (!storedWinner || storedWinner.nomination.getScore() < newWinner.nomination.getScore()) {
+                    newNomintionsClaimed.push(newWinner);
+                }
+            }
+        }
+
+        if (!!newNomintionsClaimed.length) {
+            this.dataStore.saveWinnersScore();
+            this.generateMessages(newNomintionsClaimed).subscribe(message => {
+                this.chanel.send('', this.getRichEmbed(message));
+            });
+        }
+    }
+
+    private generateMessages(claimedNominations: NominationWinner[]) {
+        return Observable.create(messagesObserver => {
+
+            this.dataStore.getPlayers(claimedNominations.map(cn => cn.account_id).reduce((uniq, id) => {
+                if (uniq.indexOf(id) < 0) {
+                    uniq.push(id);
+                }
+                return uniq;
+            }, [])).subscribe(players => {
+                claimedNominations.forEach(claimed => {
+                    const player = players.find(p => +p.account_id === +claimed.account_id);
+                    const message = {
+                        title: player.personaname + ' ' + claimed.nomination.getName(),
+                        description: claimed.nomination.getMessage(),
+                        profileUrl: player.profileurl,
+                        avatarUrl: player.avatarmedium,
+                        footer: 'Рахунок: ' + claimed.nomination.getScore()
+                    };
+                    messagesObserver.next(message);
+                });
+                messagesObserver.complete();
+            });
+        });
     }
 }

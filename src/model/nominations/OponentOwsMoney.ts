@@ -4,7 +4,7 @@ import { Constants } from "../../Constants";
 import Pair from "../Pair";
 
 export class OponentOwsMoney extends Nomination {
-    constructor(protected points: Pair<string, number | string>[] = []) {
+    constructor(protected points: Array<Pair<string, number | string>> = []) {
         super(points);
         this.name = 'Суперник мені гроші винен';
         this.minScore = 10;

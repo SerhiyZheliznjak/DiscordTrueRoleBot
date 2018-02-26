@@ -1,16 +1,14 @@
 import Pair from "./Pair";
 
 export class Nomination {
-    protected scorePoint(match, player_slot: number): string | number {
-        return null;
-    }
     protected name: string;
     protected minScore: number;
     protected msg: string;
 
-    constructor(protected points: Pair<string, string | number>[] = []) { }
+    constructor(protected points: Array<Pair<string, string | number>> = []) { }
+
     public getName() {
-        return this.name
+        return this.name;
     }
     public scoreMatch(match, player_slot) {
         this.addPoint(match.match_id, this.scorePoint(match, player_slot));
@@ -43,5 +41,9 @@ export class Nomination {
     }
     public isScored() {
         return this.getScore() > this.minScore;
+    }
+
+    protected scorePoint(match, player_slot: number): string | number {
+        return null;
     }
 }

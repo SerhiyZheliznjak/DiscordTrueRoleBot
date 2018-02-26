@@ -8,9 +8,9 @@ import { mkdirp } from "mkdirp";
 
 export default class StorageService {
     constructor(private exists = existsSync,
-        private readFile = readFileSync,
-        private writeFile = writeFileSync,
-        private mkdir = mkdirp) { }
+                private readFile = readFileSync,
+                private writeFile = writeFileSync,
+                private mkdir = mkdirp) { }
 
     public getRecentMatches(): PlayerRecentMatchesJson[] {
         return this.readFileToObject(Constants.RECENT_MATCHES).table;
@@ -56,4 +56,3 @@ export default class StorageService {
         return JSON.parse(this.readFile(filePath, 'utf8'));
     }
 }
-

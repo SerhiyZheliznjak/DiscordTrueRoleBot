@@ -1,6 +1,6 @@
-import DataStore from "../../src/services/DataStore";
+import NominationService from "../../src/services/NominationService";
 
-describe(`DataStore`, () => {
+describe(`NominationService`, () => {
     beforeEach(() => {
         setupTestData();
         setupMocks();

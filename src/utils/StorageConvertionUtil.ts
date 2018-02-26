@@ -16,7 +16,7 @@ export default class StorageConvertionUtil {
     //     }, new Map<string, PlayerScore>());
     // }
 
-    // public static convertToPlayersScoreJson(playersScore: Map<string, PlayerScore>): PlayerScoreJson[] { 
+    // public static convertToPlayersScoreJson(playersScore: Map<string, PlayerScore>): PlayerScoreJson[] {
     //     const playersScoreJson: PlayerScoreJson[] = [];
     //     for(let pair of playersScore.entries()) {
     //         const psj = new PlayerScoreJson();
@@ -32,7 +32,7 @@ export default class StorageConvertionUtil {
 
     public static convertToRecentMatchJson(recentMatches: Map<number, number[]>): PlayerRecentMatchesJson[] {
         const recentPlayerMatches = [];
-        for (let pair of recentMatches.entries()) {
+        for (const pair of recentMatches.entries()) {
             recentPlayerMatches.push(new PlayerRecentMatchesJson(pair[0], pair[1]));
         }
         return recentPlayerMatches;
@@ -51,7 +51,7 @@ export default class StorageConvertionUtil {
 
     public static convertToNominationWinnersJson(nominationsWinners: Map<string, NominationWinner>): NominationWinnerJson[] {
         const nominationWinnersJson = [];
-        for (let nw of nominationsWinners.values()) {
+        for (const nw of nominationsWinners.values()) {
             nominationWinnersJson.push(new NominationWinnerJson(nw.account_id, this.convertToNominationJson(nw.nomination)));
         }
         return nominationWinnersJson;

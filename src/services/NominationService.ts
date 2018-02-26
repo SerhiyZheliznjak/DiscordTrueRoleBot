@@ -15,22 +15,24 @@ export default class NominationService {
 
   constructor(private dotaApi: DotaApi = new DotaApi(), private dataStore: DataStore = new DataStore()) { }
 
-  public nominate(pairs: Pair<number, number[]>[]): Observable<ScoreBoard> {
+  public nominate(pairs: Array<Pair<number, number[]>>): Observable<ScoreBoard> {
     return Observable.create(observer => {
-      Observable.forkJoin(pairs.map(p => this.dataStore.getMatches(p.val).map(fullMatches => new Pair(p.key, fullMatches)))).subscribe(fmps => {
-        const playersScores = fmps.map(fmp => {
-          let playerScore = new Pair(fmp.key, Nominations.all);
-          fmp.val.forEach(match => {
-            playerScore.val.forEach(nomination => {
-              nomination.scoreMatch(match, DotaParser.getPlayerSlot(match, fmp.key));
+      Observable.forkJoin(
+        pairs.map(p => this.dataStore.getMatches(p.val).map(fullMatches => new Pair(p.key, fullMatches))))
+        .subscribe(fmps => {
+          const playersScores = fmps.map(fmp => {
+            const playerScore = new Pair(fmp.key, Nominations.all);
+            fmp.val.forEach(match => {
+              playerScore.val.forEach(nomination => {
+                nomination.scoreMatch(match, DotaParser.getPlayerSlot(match, fmp.key));
+              });
             });
+            return playerScore;
           });
-          return playerScore;
-        });
-        const scoreBoard = new ScoreBoard();
-        playersScores.forEach(ps => scoreBoard.applyPlayerScores(ps));
-        observer.next(scoreBoard);
-        observer.complete();
+          const scoreBoard = new ScoreBoard();
+          playersScores.forEach(ps => scoreBoard.applyPlayerScores(ps));
+          observer.next(scoreBoard);
+          observer.complete();
       });
     });
   }

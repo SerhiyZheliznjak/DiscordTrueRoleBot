@@ -4,7 +4,7 @@ import { Constants } from "../../Constants";
 import Pair from "../Pair";
 
 export class JungleOppressor extends Nomination {
-    constructor(protected points: Pair<string, number | string>[] = []) {
+    constructor(protected points: Array<Pair<string, number | string>> = []) {
         super(points);
         this.name = 'Гнобитель Джунглів';
         this.minScore = 1;
@@ -18,7 +18,7 @@ export class JungleOppressor extends Nomination {
         }
         let jungleDamaged = 0;
         let objectiveDamage = 0;
-        for (var target in player.damage) {
+        for (const target in player.damage) {
             if (player.damage.hasOwnProperty(target)) {
                 if (target.indexOf(Constants.JUNGLE_TARGETS_IDENTIFIER) === 0) {
                     jungleDamaged += player.damage[target];
