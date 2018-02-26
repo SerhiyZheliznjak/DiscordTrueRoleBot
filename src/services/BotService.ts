@@ -8,8 +8,6 @@ import NominationWinner from '../model/NominationWinner';
 import StorageService from './StorageService';
 import StorageConvertionUtil from '../utils/StorageConvertionUtil';
 
-const Auth = require('../../config/auth.json');
-
 export class BotService {
     private retardMap = new Map();
     private playersMap;
@@ -61,6 +59,15 @@ export class BotService {
         Observable.interval(1000 * 60 * 60 * 24).subscribe(() => this.retardMap = new Map());
     }
 
+    public startNominating() {
+        this.claimedNominationsSubscription = this.nominationService.startWatching(this.playersMap)
+            .subscribe((newNomintionsClaimed: NominationWinner[]) => {
+                this.generateMessages(newNomintionsClaimed).subscribe((richEmbed: RichEmbed) => {
+                    console.log('sending message about ', richEmbed.title);
+                    this.chanel.send('', richEmbed);
+                });
+            });
+    }
 
     private isRetard(authorId: string): boolean {
         const retardCount = this.retardMap.get(authorId);
@@ -164,17 +171,7 @@ export class BotService {
 
     private isCreator(msg: Message): boolean {
         console.log(msg.author.id);
-        return msg.author.id === Auth.creatorId;
-    }
-
-    public startNominating() {
-        this.claimedNominationsSubscription = this.nominationService.startWatching(this.playersMap)
-            .subscribe((newNomintionsClaimed: NominationWinner[]) => {
-                this.generateMessages(newNomintionsClaimed).subscribe((richEmbed: RichEmbed) => {
-                    console.log('sending message about ', richEmbed.title);
-                    this.chanel.send('', richEmbed);
-                });
-            });
+        return msg.author.id === process.env.creatorId;
     }
 
     private stopNominating(): void {
