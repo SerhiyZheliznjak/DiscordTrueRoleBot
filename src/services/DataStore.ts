@@ -5,12 +5,10 @@ import { Constants } from "../Constants";
 import { Observable } from "rxjs";
 import DotaApi from "../dota-api/DotaApi";
 import StorageConvertionUtil from "../utils/StorageConvertionUtil";
-// import MyUtils from "../utils/MyUtils";
 import { Nomination } from "../model/Nomination";
 
 export default class DataStore {
     public static maxMatches: number;
-    private static playersScoresCacheMap: Map<number, Nomination[]>;
     private static playerRecentMatchesCacheMap: Map<number, number[]>;
     private static matchesCacheMap: Map<number, MatchJson>;
     private static wonNominationsCacheMap: Map<string, NominationWinner>;
@@ -36,26 +34,6 @@ export default class DataStore {
         this.storage.saveRecentMatches(this.playerRecentMatchesCache);
     }
 
-    public get playersScoresCache(): Map<number, Nomination[]> {
-        if (!DataStore.playersScoresCacheMap) {
-            DataStore.playersScoresCacheMap = new Map<number, Nomination[]>();
-            // StorageConvertionUtil.convertToPlayersScores(StorageService.getPlayersScores());
-        }
-        return DataStore.playersScoresCacheMap;
-    }
-
-    public updatePlayerScore(account_id: number, nominationsScores: Nomination[]): void {
-        if (!!nominationsScores) {
-            this.playersScoresCache.set(account_id, nominationsScores);
-        }
-    }
-
-    // public static savePlayersScores(): void {
-    //     if (this.playersScoresCache.size > 0) {
-    //         StorageService.savePlayersScores(this.playersScoresCache);
-    //     }
-    // }
-
     public get wonNominationCache(): Map<string, NominationWinner> {
         if (!DataStore.wonNominationsCacheMap) {
             DataStore.wonNominationsCacheMap = StorageConvertionUtil.convertToWonNominations(this.storage.getWinners());
@@ -73,10 +51,6 @@ export default class DataStore {
             DataStore.matchesCacheMap = new Map<number, MatchJson>();
         }
         return DataStore.matchesCacheMap;
-    }
-
-    public addMatches(matches: MatchJson[]): void {
-        matches.forEach(match => this.addMatch(match));
     }
 
     public addMatch(match: MatchJson): void {
@@ -138,12 +112,5 @@ export default class DataStore {
         return Observable.forkJoin(
             accountsIds.map(account_id => this.dotaApi.getPlayerProfile(account_id).map((ppj: PlayerProfileJson) => ppj.profile))
         );
-        //     playersObserver => {
-        //         accountsIds.map(account_id => this.getProfile(account_id)),
-        //         (profile: ProfileJson) => this.profilesCache.set(profile.account_id, profile),
-        //         () => {
-        //             playersObserver.next(this.profilesCache);
-        //             playersObserver.complete();
-        // }
     }
 }

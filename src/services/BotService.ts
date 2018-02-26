@@ -2,40 +2,37 @@ import { Message, Client, RichEmbed } from 'discord.js';
 import { Observable, Subscription, Observer } from 'rxjs';
 import DataStore from './DataStore';
 import NominationService from './NominationService';
-import DotaApi from '../dota-api/DotaApi';
 import Pair from '../model/Pair';
-import { RecentMatchJson, ProfileJson } from '../dota-api/DotaJsonTypings';
-import ScoreBoard from '../model/ScoreBoard';
+import { ProfileJson } from '../dota-api/DotaJsonTypings';
 import NominationWinner from '../model/NominationWinner';
-import { Constants } from '../Constants';
+import StorageService from './StorageService';
+import StorageConvertionUtil from '../utils/StorageConvertionUtil';
 
 const Auth = require('../../config/auth.json');
 
 export class BotService {
     private retardMap = new Map();
-    private playersMap = new Map<number, string>();
-    private subscription: Subscription;
-    private recentGamesObserver: Observer<number>;
+    private playersMap;
+    private claimedNominationsSubscription: Subscription;
     private chanel;
 
     constructor(
         private client: Client,
         private dataStore: DataStore = new DataStore(),
         private nominationService: NominationService = new NominationService(),
-        private dotaApi: DotaApi = new DotaApi()
+        private storageService: StorageService = new StorageService()
     ) {
-        this.playersMap.set(298134653, '407971834689093632'); // Dno
-        this.playersMap.set(333303976, '407949091163865099'); // Tee Hee
-        this.playersMap.set(118975931, '289388465034887178'); // I'm 12 btw GG.BET
-        this.playersMap.set(86848474, '408363774257528852'); // whoami
-        this.playersMap.set(314684987, '413792999030652938'); // blackRose
-        this.playersMap.set(36753317, '408172132875501581'); // =3
+        this.playersMap = StorageConvertionUtil.convertToPlayerObserved(this.storageService.getPlayersObserved());
+        // if (this.playersMap.size === 0) {
+        //     this.playersMap.set(298134653, '407971834689093632'); // Dno
+        //     this.playersMap.set(333303976, '407949091163865099'); // Tee Hee
+        //     this.playersMap.set(118975931, '289388465034887178'); // I'm 12 btw GG.BET
+        //     this.playersMap.set(86848474, '408363774257528852'); // whoami
+        //     this.playersMap.set(314684987, '413792999030652938'); // blackRose
+        //     this.playersMap.set(36753317, '408172132875501581'); // =3
+        // }
 
-        this.recentGamesObserver = {
-            next: () => this.recentGamesObserverNext(),
-            error: () => { },
-            complete: () => { }
-        };
+        this.chanel = this.client.channels.find('type', 'text');
     }
 
     public processMesage(msg: Message): void {
@@ -60,23 +57,10 @@ export class BotService {
         }
     }
 
-    public forgiveRetards() {
+    public forgiveRetards(): void {
         Observable.interval(1000 * 60 * 60 * 24).subscribe(() => this.retardMap = new Map());
     }
 
-    public startWatching() {
-        DataStore.maxMatches = this.playersMap.size * 20;
-        this.chanel = this.client.channels.find('type', 'text');
-        this.subscription = Observable.interval(1000 * 60 * 60).subscribe(this.recentGamesObserver);
-        this.recentGamesObserver.next(0);
-    }
-
-    public stopWatching(): void {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-        }
-        console.log('stopped watching');
-    }
 
     private isRetard(authorId: string): boolean {
         const retardCount = this.retardMap.get(authorId);
@@ -115,24 +99,24 @@ export class BotService {
         msg.reply(shutRetard[Math.floor(Math.random() * shutRetard.length)]);
     }
 
-    private registerall(msg) {
+    private registerall(msg: Message): void {
         if (!this.isCreator(msg)) {
             this.retardPlusPlus(msg);
             msg.reply('хуєгістеролл');
         }
     }
 
-    private restart(msg) {
+    private restart(msg: Message): void {
         if (this.isCreator(msg)) {
-            this.stopWatching();
-            this.startWatching();
+            this.stopNominating();
+            this.startNominating();
         } else {
             this.retardPlusPlus(msg);
             msg.reply('хуємпездрестарт');
         }
     }
 
-    private showRegistered(msg) {
+    private showRegistered(msg: Message): void {
         if (this.isCreator(msg)) {
             let registered = 'Стежу за: ';
             for (const info of this.playersMap) {
@@ -145,7 +129,7 @@ export class BotService {
         }
     }
 
-    private addWatch(msg) {
+    private addWatch(msg: Message): void {
         if (msg.mentions.users.array().length === 0) {
             msg.reply('Тобі показати як вставити своє ім\'я в повідомлення?');
             this.retardPlusPlus(msg);
@@ -156,13 +140,13 @@ export class BotService {
             msg.reply('Курва... Шо ти пишеш?.. Має бути "watch @КОРИСТУВАЧ DOTA_ID"');
             this.retardPlusPlus(msg);
         } else {
-            this.dataStore.getProfile(msg.content.match(/ \d+/)[0].trim()).subscribe(playerInfo => {
+            this.dataStore.getProfile(parseInt(msg.content.match(/ \d+/)[0].trim())).subscribe(playerInfo => {
                 if (!!playerInfo) {
                     if (this.playersMap.get(playerInfo.account_id) && !this.isCreator(msg)) {
                         msg.reply('Вже закріплено за @' + this.playersMap.get(playerInfo.account_id));
                         this.retardPlusPlus(msg);
                     } else {
-                        this.playersMap.set(playerInfo.account_id, msg.mentions.users.first().id);
+                        this.watchPlayer(playerInfo.account_id, msg.mentions.users.first().id);
                         msg.reply('Я стежитиму за тобою, ' + playerInfo.personaname);
                     }
                 } else {
@@ -173,16 +157,32 @@ export class BotService {
         }
     }
 
-    private isCreator(msg) {
+    private watchPlayer(account_id: number, discordId: string): void {
+        this.playersMap.set(account_id, discordId);
+        this.storageService.savePlayersObserved(this.playersMap);
+    }
+
+    private isCreator(msg: Message): boolean {
+        console.log(msg.author.id);
         return msg.author.id === Auth.creatorId;
     }
 
-    private getDotaIds(): number[] {
-        const dotaIds = [];
-        for (const id of this.playersMap.keys()) {
-            dotaIds.push(id);
+    public startNominating() {
+        this.claimedNominationsSubscription = this.nominationService.startWatching(this.playersMap)
+            .subscribe((newNomintionsClaimed: NominationWinner[]) => {
+                this.generateMessages(newNomintionsClaimed).subscribe((richEmbed: RichEmbed) => {
+                    console.log('sending message about ', richEmbed.title);
+                    this.chanel.send('', richEmbed);
+                });
+            });
+    }
+
+    private stopNominating(): void {
+        this.nominationService.stopWatching();
+        if (this.claimedNominationsSubscription) {
+            this.claimedNominationsSubscription.unsubscribe();
         }
-        return dotaIds;
+        this.storageService.savePlayersObserved(this.playersMap);
     }
 
     private getRichEmbed(title: string, description: string, avatarUrl: string, footer: string, url?: string): RichEmbed {
@@ -195,57 +195,6 @@ export class BotService {
             richEmbed.setURL(url);
         }
         return richEmbed;
-    }
-
-    private recentGamesObserverNext() {
-        Observable.forkJoin(
-            this.getDotaIds().map(account_id =>
-                this.dotaApi.getRecentMatches(account_id)
-                    .map(recentMatch => new Pair(account_id, (recentMatch as RecentMatchJson[]).map(m => m.match_id))))
-        ).subscribe(playerRecentMatches => {
-            console.log('--------joined all the matches hasNewMatches-----------', this.hasNewMatches(playerRecentMatches));
-            if (this.hasNewMatches(playerRecentMatches)) {
-                this.nominationService.nominate(playerRecentMatches).subscribe(scoreBoard => {
-                    console.log('-----------lets award some players-----------', scoreBoard.nominationsWinners.size);
-                    this.awardWinners(scoreBoard);
-                });
-                playerRecentMatches.forEach(p => this.dataStore.updatePlayerRecentMatches(p.key, p.val));
-                this.dataStore.saveRecentMatches();
-            }
-        });
-    }
-
-    private hasNewMatches(playerRecentMatches: Array<Pair<number, number[]>>): boolean {
-        const atLeastOneNewMatch = playerRecentMatches.find(pair => {
-            const newMatches = pair.val.filter(match_id => {
-                const prm = this.dataStore.playerRecentMatchesCache.get(pair.key);
-                return prm ? prm.indexOf(match_id) < 0 : true;
-            });
-            return newMatches.length > 0;
-        });
-        return !!atLeastOneNewMatch;
-    }
-
-    private awardWinners(scoreBoard: ScoreBoard): void {
-        const newNomintionsClaimed: NominationWinner[] = [];
-        for (const nominationName of scoreBoard.nominationsWinners.keys()) {
-            const newWinner = scoreBoard.nominationsWinners.get(nominationName);
-            if (newWinner.account_id !== Constants.UNCLAIMED && newWinner.nomination.isScored()) {
-                const storedWinner = this.dataStore.wonNominationCache.get(nominationName);
-                if (!storedWinner || storedWinner.nomination.getScore() < newWinner.nomination.getScore()) {
-                    newNomintionsClaimed.push(newWinner);
-                }
-            }
-        }
-
-        if (!!newNomintionsClaimed.length) {
-            console.log('awarding winners ', newNomintionsClaimed.length);
-            this.dataStore.saveWinnersScore(scoreBoard.nominationsWinners);
-            this.generateMessages(newNomintionsClaimed).subscribe((richEmbed: RichEmbed) => {
-                console.log('sending message about ', richEmbed.title);
-                this.chanel.send('', richEmbed);
-            });
-        }
     }
 
     private generateMessages(claimedNominations: NominationWinner[]) {

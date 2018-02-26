@@ -12,11 +12,11 @@ export class MaxDamageHit extends Nomination {
         this.msg = 'Йобне раз, але сильно. Вбив %s антимагів одиним ударом!';
     }
 
-    getScore() {
+    public getScore() {
         const dmgArr = this.getPoints().map(p => parseInt(p.val + ''));
         return Math.max(...dmgArr);
     }
-    getMessage() {
+    public getMessage() {
         return format(this.msg, this.roundToTwoDec(this.getScore() / Constants.AM_HP));
     }
 

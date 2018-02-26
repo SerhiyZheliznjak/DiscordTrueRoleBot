@@ -11,6 +11,11 @@ export class Parkinson extends Nomination {
         this.msg = 'Якщо то не Tee Hee то скиньтесь йому по 5 гривень';
     }
 
+    public getScore() {
+        const apmArr = this.getPoints().map(p => parseInt(p.val + ''));
+        return Math.max(...apmArr);
+    }
+
     protected scorePoint(match, player_slot) {
         const player = DotaParser.getPlayerInfo(match, player_slot);
         return !!player ? player.actions_per_min : null;

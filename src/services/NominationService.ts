@@ -1,29 +1,51 @@
 import { Observable, Subscription, Observer } from 'rxjs';
 import DataStore from './DataStore';
 import { MatchJson, RecentMatchJson } from '../dota-api/DotaJsonTypings';
-import StorageConvertionUtil from '../utils/StorageConvertionUtil';
 import Pair from '../model/Pair';
-// import DotaApi from '../dota-api/DotaApi';
 import Nominations from '../model/Nominations';
-import { DotaParser } from './DotaParser';
 import ScoreBoard from '../model/ScoreBoard';
 import { Nomination } from '../model/Nomination';
+import DotaApi from '../dota-api/DotaApi';
+import NominationWinner from '../model/NominationWinner';
+import { Constants } from '../Constants';
 
 export default class NominationService {
   private subscription: Subscription;
   private recentGamesObserver: Observer<number>;
+  private claimedNominationsObserver: Observer<NominationWinner[]>;
+  private dotaIds: number[];
 
   constructor(
-    // private dotaApi: DotaApi = new DotaApi(),
-    private dataStore: DataStore = new DataStore()
-  ) { }
+    private dataStore: DataStore = new DataStore(),
+    private dotaApi: DotaApi = new DotaApi()
+  ) {
+    this.recentGamesObserver = {
+      next: () => this.recentGamesObserverNext(),
+      error: () => { },
+      complete: () => { }
+    };
+  }
 
-  public nominate(playerRecentMatches: Array<Pair<number, number[]>>): Observable<ScoreBoard> {
+  public startWatching(playersMap: Map<number, string>) {
+    DataStore.maxMatches = playersMap.size * 20;
+    this.dotaIds = this.getDotaIds(playersMap);
+    this.subscription = Observable.interval(1000 * 60 * 60).subscribe(this.recentGamesObserver);
+    this.recentGamesObserver.next(0);
+    return Observable.create(claimedNominationsObserver => this.claimedNominationsObserver = claimedNominationsObserver);
+  }
+
+  public stopWatching(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+    console.log('stopped watching');
+  }
+
+  private nominate(playerRecentMatches: Array<Pair<number, number[]>>): Observable<ScoreBoard> {
     const scoreBoard = new ScoreBoard();
     return Observable.create(scoreBoardObserver => {
       this.getPlayerFullMatches(playerRecentMatches)
         .subscribe(playerFullMatches => {
-          console.log('--------got all matches for all players-----------', playerFullMatches.length);
           playerFullMatches.forEach(ps => scoreBoard.scorePlayer(ps.key, ps.val));
           scoreBoardObserver.next(scoreBoard);
           scoreBoardObserver.complete();
@@ -32,12 +54,64 @@ export default class NominationService {
   }
 
   private getPlayerFullMatches(playerRecentMatches: Array<Pair<number, number[]>>): Observable<Array<Pair<number, MatchJson[]>>> {
-    console.log(' getting matches for each player ');
     return Observable.forkJoin(
       playerRecentMatches.map(p => this.dataStore.getMatches(p.val).map(fullMatches => {
-        console.log(' got matches for ', p.key);
         return new Pair(p.key, fullMatches);
       }))
     );
+  }
+
+  private getDotaIds(playersMap: Map<number, string>): number[] {
+    const dotaIds = [];
+    for (const id of playersMap.keys()) {
+      dotaIds.push(id);
+    }
+    return dotaIds;
+  }
+
+  private recentGamesObserverNext() {
+    Observable.forkJoin(
+      this.dotaIds.map(account_id =>
+        this.dotaApi.getRecentMatches(account_id)
+          .map(recentMatch => new Pair(account_id, (recentMatch as RecentMatchJson[]).map(m => m.match_id))))
+    ).subscribe(playerRecentMatches => {
+      if (this.hasNewMatches(playerRecentMatches)) {
+        this.nominate(playerRecentMatches).subscribe(scoreBoard => {
+          this.awardWinners(scoreBoard);
+        });
+        playerRecentMatches.forEach(p => this.dataStore.updatePlayerRecentMatches(p.key, p.val));
+        this.dataStore.saveRecentMatches();
+      }
+    });
+  }
+
+  private hasNewMatches(playerRecentMatches: Array<Pair<number, number[]>>): boolean {
+    const atLeastOneNewMatch = playerRecentMatches.find(pair => {
+      const newMatches = pair.val.filter(match_id => {
+        const prm = this.dataStore.playerRecentMatchesCache.get(pair.key);
+        return prm ? prm.indexOf(match_id) < 0 : true;
+      });
+      return newMatches.length > 0;
+    });
+    return !!atLeastOneNewMatch;
+  }
+
+  private awardWinners(scoreBoard: ScoreBoard): void {
+    const newNomintionsClaimed: NominationWinner[] = [];
+    for (const nominationName of scoreBoard.nominationsWinners.keys()) {
+      const newWinner = scoreBoard.nominationsWinners.get(nominationName);
+      if (newWinner.account_id !== Constants.UNCLAIMED && newWinner.nomination.isScored()) {
+        const storedWinner = this.dataStore.wonNominationCache.get(nominationName);
+        if (!storedWinner || storedWinner.nomination.getScore() < newWinner.nomination.getScore()) {
+          newNomintionsClaimed.push(newWinner);
+        }
+      }
+    }
+
+    if (!!newNomintionsClaimed.length) {
+      console.log('awarding winners ', newNomintionsClaimed.length);
+      this.dataStore.saveWinnersScore(scoreBoard.nominationsWinners);
+      this.claimedNominationsObserver.next(newNomintionsClaimed);
+    }
   }
 }

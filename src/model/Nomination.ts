@@ -36,10 +36,7 @@ export class Nomination {
     public hasHigherScoreThen(that) {
         return this.getScore() > that.getScore();
     }
-    public isMyScoreHigher(scoreString) {
-        return this.getScore() > parseInt(scoreString);
-    }
-    public isScored() {
+    public isScored(): boolean {
         return this.getScore() > this.minScore;
     }
 

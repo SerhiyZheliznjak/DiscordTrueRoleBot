@@ -12,7 +12,7 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
   botService  = new BotService(client);
   botService.forgiveRetards();
-  botService.startWatching();
+  botService.startNominating();
 });
 
 client.on('message', msg => {

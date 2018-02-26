@@ -5,6 +5,7 @@ import NominationWinner from "../model/NominationWinner";
 import NominationWinnerJson from "../model/json/NominationWinnerJson";
 import StorageConvertionUtil from "../utils/StorageConvertionUtil";
 import { mkdirp } from "mkdirp";
+import Pair from "../model/Pair";
 
 export default class StorageService {
     constructor(private exists = existsSync,
@@ -26,6 +27,14 @@ export default class StorageService {
 
     public getWinners(): NominationWinnerJson[] {
         return this.readFileToObject(Constants.WINNERS_FILE_PATH).table;
+    }
+
+    public getPlayersObserved(): Array<Pair<number, string>> {
+        return this.readFileToObject(Constants.PLAYERS_FILE_PATH).table;
+    }
+
+    public savePlayersObserved(playersObserved: Map<number, string>): void {
+        this.writeArrayToFile(StorageConvertionUtil.convertToPlayersPairs(playersObserved), Constants.PLAYERS_FILE_PATH);
     }
 
     private writeArrayToFile(array: any[], filePath: string): void {

@@ -10,4 +10,5 @@ export class Constants {
     public static get WON() { return 'ЗАТАЩИВ'; }
     public static get LOST() { return 'ТІМА ДНО'; }
     public static get AM_HP() { return 640; }
+    public static get WINNING_MATCH_ID() { return '686' }
 }
