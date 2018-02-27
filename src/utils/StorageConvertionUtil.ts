@@ -27,7 +27,12 @@ export default class StorageConvertionUtil {
     public static convertToNominationWinnersJson(nominationsWinners: Map<string, NominationWinner>): NominationWinnerJson[] {
         const nominationWinnersJson = [];
         for (const nw of nominationsWinners.values()) {
-            nominationWinnersJson.push(new NominationWinnerJson(nw.nomination.getName(), nw.account_id, nw.nomination.getScore()));
+            nominationWinnersJson.push(new NominationWinnerJson(
+                nw.nomination.getName(),
+                nw.account_id,
+                nw.nomination.getScore(),
+                new Date().getTime()
+            ));
         }
         return nominationWinnersJson;
     }
@@ -36,6 +41,7 @@ export default class StorageConvertionUtil {
         return nominationsWinnersJson.reduce((map, nwj) => {
             const nomination = NominationFactory.createByName(nwj.nominationName);
             nomination.addPoint(Constants.WINNING_MATCH_ID, nwj.score);
+            nomination.timeClaimed = nwj.timeClaimed;
             const nw = new NominationWinner(nwj.owner_account_id, nomination);
             map.set(nwj.nominationName, nw);
             return map;

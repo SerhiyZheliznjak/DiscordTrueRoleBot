@@ -7,6 +7,7 @@ import { ProfileJson } from '../dota-api/DotaJsonTypings';
 import NominationWinner from '../model/NominationWinner';
 import StorageService from './StorageService';
 import StorageConvertionUtil from '../utils/StorageConvertionUtil';
+import { Constants } from '../Constants';
 
 export class BotService {
     private retardMap = new Map();
@@ -21,14 +22,14 @@ export class BotService {
         private storageService: StorageService = new StorageService()
     ) {
         this.playersMap = StorageConvertionUtil.convertToPlayerObserved(this.storageService.getPlayersObserved());
-        // if (this.playersMap.size === 0) {
-        //     this.playersMap.set(298134653, '407971834689093632'); // Dno
-        //     this.playersMap.set(333303976, '407949091163865099'); // Tee Hee
-        //     this.playersMap.set(118975931, '289388465034887178'); // I'm 12 btw GG.BET
-        //     this.playersMap.set(86848474, '408363774257528852'); // whoami
-        //     this.playersMap.set(314684987, '413792999030652938'); // blackRose
-        //     this.playersMap.set(36753317, '408172132875501581'); // =3
-        // }
+        if (this.playersMap.size === 0) {
+            this.playersMap.set(298134653, '407971834689093632'); // Dno
+            this.playersMap.set(333303976, '407949091163865099'); // Tee Hee
+            this.playersMap.set(118975931, '289388465034887178'); // I'm 12 btw GG.BET
+            this.playersMap.set(86848474, '408363774257528852'); // whoami
+            this.playersMap.set(314684987, '413792999030652938'); // blackRose
+            this.playersMap.set(36753317, '408172132875501581'); // =3
+        }
 
         this.chanel = this.client.channels.find('type', 'text');
     }
@@ -56,7 +57,7 @@ export class BotService {
     }
 
     public forgiveRetards(): void {
-        Observable.interval(1000 * 60 * 60 * 24).subscribe(() => this.retardMap = new Map());
+        Observable.interval(Constants.FORGIVE_RETARDS_INTERVAL).subscribe(() => this.retardMap = new Map());
     }
 
     public startNominating() {

@@ -1,11 +1,14 @@
 import Pair from "./Pair";
 
 export class Nomination {
+    public timeClaimed: number;
     protected name: string;
     protected minScore: number;
     protected msg: string;
 
-    constructor(protected points: Array<Pair<string, string | number>> = []) { }
+    constructor(protected points: Array<Pair<string, string | number>> = []) {
+        this.timeClaimed = new Date().getTime();
+    }
 
     public getName() {
         return this.name;
@@ -39,7 +42,6 @@ export class Nomination {
     public isScored(): boolean {
         return this.getScore() > this.minScore;
     }
-
     protected scorePoint(match, player_slot: number): string | number {
         return null;
     }
