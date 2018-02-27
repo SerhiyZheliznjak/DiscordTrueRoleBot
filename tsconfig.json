@@ -2,8 +2,8 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "outDir": "dist",
-    "sourceMap": true,
+    "outDir": "../release",
+    "sourceMap": false,
     "skipDefaultLibCheck": true
   },
   "include": [
