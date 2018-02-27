@@ -123,8 +123,8 @@ export default class NominationService {
 
   private isClaimedNomination(newWinner: NominationWinner, storedWinner: NominationWinner): boolean {
     return !storedWinner
-      || newWinner.nomination.hasHigherScoreThen(storedWinner.nomination);
-      // || this.isOutOfDueDate(newWinner, storedWinner);
+      || newWinner.nomination.hasHigherScoreThen(storedWinner.nomination)
+      || this.isOutOfDueDate(newWinner, storedWinner);
   }
 
   private isOutOfDueDate(newWinner: NominationWinner, storedWinner: NominationWinner) {
