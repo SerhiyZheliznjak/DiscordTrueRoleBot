@@ -1,67 +1,45 @@
 import { Constants } from "../Constants";
-import { existsSync, readFileSync, writeFileSync } from "fs";
 import PlayerRecentMatchesJson from "../model/json/PlayerRecentMatchesJson";
 import NominationWinner from "../model/NominationWinner";
 import NominationWinnerJson from "../model/json/NominationWinnerJson";
 import StorageConvertionUtil from "../utils/StorageConvertionUtil";
 import { mkdirp } from "mkdirp";
 import Pair from "../model/Pair";
+import { MongoClient } from "mongodb";
 
 export default class StorageService {
-    constructor(private exists = existsSync,
-                private readFile = readFileSync,
-                private writeFile = writeFileSync,
-                private mkdir = mkdirp) { }
+    constructor(private mongoClient = MongoClient) {
+        this.initDB();
+     }
 
     public getRecentMatches(): PlayerRecentMatchesJson[] {
-        return this.readFileToObject(Constants.RECENT_MATCHES).table;
+        // return this.readFileToObject(Constants.RECENT_MATCHES).table;
+        return null;
     }
 
     public saveRecentMatches(recentPlayerMatches: Map<number, number[]>): void {
-        this.writeArrayToFile(StorageConvertionUtil.convertToRecentMatchJson(recentPlayerMatches), Constants.RECENT_MATCHES);
+        // this.writeArrayToFile(StorageConvertionUtil.convertToRecentMatchJson(recentPlayerMatches), Constants.RECENT_MATCHES);
     }
 
     public saveWinners(winners: Map<string, NominationWinner>): void {
-        this.writeArrayToFile(StorageConvertionUtil.convertToNominationWinnersJson(winners), Constants.WINNERS_FILE_PATH);
+        // this.writeArrayToFile(StorageConvertionUtil.convertToNominationWinnersJson(winners), Constants.WINNERS_FILE_PATH);
     }
 
     public getWinners(): NominationWinnerJson[] {
-        return this.readFileToObject(Constants.WINNERS_FILE_PATH).table;
+        // return this.readFileToObject(Constants.WINNERS_FILE_PATH).table;
+        return null;
     }
 
     public getPlayersObserved(): Array<Pair<number, string>> {
-        return this.readFileToObject(Constants.PLAYERS_FILE_PATH).table;
+        // return this.readFileToObject(Constants.PLAYERS_FILE_PATH).table;
+        return null;
     }
 
     public savePlayersObserved(playersObserved: Map<number, string>): void {
-        this.writeArrayToFile(StorageConvertionUtil.convertToPlayersPairs(playersObserved), Constants.PLAYERS_FILE_PATH);
+        // this.writeArrayToFile(StorageConvertionUtil.convertToPlayersPairs(playersObserved), Constants.PLAYERS_FILE_PATH);
     }
 
-    private writeArrayToFile(array: any[], filePath: string): void {
-        this.createPathIfNeeded(filePath);
-        if (!array || !array.length) {
-            console.error(filePath, 'write empty array yourself');
-            return;
-        }
-        this.writeFile(filePath,
-            JSON.stringify({ table: array }),
-            'utf8');
-    }
+    private initDB() {
 
-    private createPathIfNeeded(filePath): boolean {
-        const doesExist = this.exists(filePath);
-        if (!doesExist) {
-            const pathToCreate = filePath.split('/');
-            pathToCreate.pop();
-            this.mkdir(pathToCreate.join('/'));
-        }
-        return doesExist;
-    }
-
-    private readFileToObject(filePath) {
-        if (!this.createPathIfNeeded(filePath)) {
-            return { table: [] };
-        }
-        return JSON.parse(this.readFile(filePath, 'utf8'));
     }
 }

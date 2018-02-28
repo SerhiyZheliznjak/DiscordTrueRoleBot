@@ -26,14 +26,14 @@ export default class DotaApi {
     const queued = this.isQueued(url);
     if (queued === undefined) {
       observable = Observable.create((observer: Observer<any>) => {
-        if (!DotaApi.queueSubscription) {
-          this.moveQueue();
-        }
         const isQueued = this.isQueued(url);
         if (!isQueued) {
           DotaApi.queue.push(new QueuedRequest(url, [observer], 3, observable));
         } else {
           isQueued.observers.push(observer);
+        }
+        if (!DotaApi.queueSubscription) {
+          this.moveQueue();
         }
       });
     } else {
@@ -83,8 +83,10 @@ export default class DotaApi {
                 this.retry(nextRequest);
               }
               if (obj) {
-                nextRequest.observers.forEach(obs => obs.next(obj));
-                nextRequest.observers.forEach(obs => obs.complete());
+                nextRequest.observers.forEach(obs => {
+                  obs.next(obj);
+                  obs.complete();
+                });
               }
             },
             err => {

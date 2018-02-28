@@ -63,19 +63,19 @@ export default class DataStore {
     }
 
     public getMatch(match_id): Observable<MatchJson> {
-        return Observable.create(getMatchObserver => {
-            const match = this.matchesCache.get(match_id);
-            if (!match) {
-                this.dotaApi.getMatch(match_id).subscribe(m => {
-                    this.addMatch(m);
-                    getMatchObserver.next(m);
-                    getMatchObserver.complete();
-                });
-            } else {
+        const match = this.matchesCache.get(match_id);
+        if (!match) {
+            return this.dotaApi.getMatch(match_id).map(m => {
+                this.addMatch(m);
+                return m;
+            });
+        } else {
+            return Observable.create(getMatchObserver => {
                 getMatchObserver.next(match);
                 getMatchObserver.complete();
-            }
-        });
+            });
+
+        }
     }
 
     public getMatches(matchesIds: number[]): Observable<MatchJson[]> {
@@ -90,22 +90,20 @@ export default class DataStore {
     }
 
     public getProfile(account_id: number): Observable<ProfileJson> {
-        return Observable.create(profileObserver => {
-            const profile = this.profilesCache.get(account_id);
-            if (!profile) {
-                this.dotaApi.getPlayerProfile(account_id)
-                    .map(p => p.profile)
-                    .subscribe(p => {
-                        this.profilesCache.set(account_id, profile);
-                        profileObserver.next(p);
-                        profileObserver.complete();
-                    },
-                        err => profileObserver.error(err));
-            } else {
+        const profile = this.profilesCache.get(account_id);
+        if (profile) {
+            return Observable.create(profileObserver => {
                 profileObserver.next(profile);
                 profileObserver.complete();
-            }
-        });
+            });
+        } else {
+            this.dotaApi.getPlayerProfile(account_id)
+                .map(p => {
+                    this.profilesCache.set(account_id, profile);
+                    return p.profile;
+                });
+        }
+
     }
 
     public getPlayers(accountsIds: number[]): Observable<ProfileJson[]> {
