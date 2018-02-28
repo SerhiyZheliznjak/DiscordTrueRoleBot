@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "outDir": "../release",
+    "outDir": "../release/src",
     "sourceMap": false,
     "skipDefaultLibCheck": true
   },
