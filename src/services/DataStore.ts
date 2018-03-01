@@ -4,6 +4,7 @@ import StorageService from "./StorageService";
 import { Observable } from "rxjs";
 import DotaApi from "../dota-api/DotaApi";
 import Nomination from "../model/Nomination";
+import PlayerRecentMatches from "../model/PlayerRecentMatches";
 
 export default class DataStore {
     public static maxMatches: number;
@@ -18,23 +19,22 @@ export default class DataStore {
         private storage: StorageService = new StorageService()
     ) { }
 
-    public get playersRecentMatches(): Observable<Map<number, number[]>> {
-        if (DataStore.playersRecentMatchesCacheMap.size === 0) {
-            return this.storage.getRecentMatches().map(map => {
-                DataStore.playersRecentMatchesCacheMap = map;
-                return map;
-            });
-        }
-        return Observable.of(DataStore.playersRecentMatchesCacheMap);
+    // public get playersRecentMatches(): Observable<Map<number, number[]>> {
+    //     if (DataStore.playersRecentMatchesCacheMap.size === 0) {
+    //         return this.storage.getRecentMatches().map(map => {
+    //             DataStore.playersRecentMatchesCacheMap = map;
+    //             return map;
+    //         });
+    //     }
+    //     return Observable.of(DataStore.playersRecentMatchesCacheMap);
+    // }
+
+    public getRecentMatchesForPlayer(account_id: number): Observable<PlayerRecentMatches> {
+        return this.storage.getRecentMatchesForPlayer(account_id);
     }
 
-    public get playersRecentMatchesClone(): Observable<Map<number, number[]>> {
-        return this.playersRecentMatches.map(cache => new Map(cache));
-    }
-
-    public updatePlayerRecentMatches(account_id: number, matchesIds: number[]): void {
-        this.playersRecentMatches.subscribe(map => map.set(account_id, matchesIds));
-        this.storage.updatePlayerRecentMatches(account_id, matchesIds);
+    public updatePlayerRecentMatch(account_id: number, matchesIds: number[]): void {
+        this.storage.updateRecentMatchesForPlayer(account_id, matchesIds);
     }
 
     public get nominationsResults(): Observable<Map<string, NominationResult>> {

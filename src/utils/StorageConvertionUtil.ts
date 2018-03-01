@@ -7,6 +7,7 @@ import { RecentMatchJson } from "../dota-api/DotaJsonTypings";
 import Constants from "../Constants";
 import Pair from "../model/Pair";
 import RegisteredPlayerJson from "../model/json/RegisteredPlayerJson";
+import PlayerRecentMatches from "../model/PlayerRecentMatches";
 
 export default class StorageConvertionUtil {
 
@@ -14,11 +15,11 @@ export default class StorageConvertionUtil {
         return new PlayerRecentMatchesJson(account_id, matches);
     }
 
-    public static convertToPlayersRecentMatchesMap(recentMatches: PlayerRecentMatchesJson[]): Map<number, number[]> {
-        return recentMatches.reduce((map, rmj) => {
-            map.set(rmj.account_id, rmj.recentMatchesIds);
-            return map;
-        }, new Map<number, number[]>());
+    public static convertToPlayersRecentMatches(recentMatches: PlayerRecentMatchesJson): PlayerRecentMatches {
+        if (recentMatches) {
+            return new PlayerRecentMatches(recentMatches.account_id, recentMatches.recentMatchesIds);
+        }
+        return new PlayerRecentMatches(0, []);
     }
 
     public static convertToNominationResultJson(nominationResult: NominationResult): NominationResultJson {

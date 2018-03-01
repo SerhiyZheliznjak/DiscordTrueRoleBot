@@ -51,28 +51,26 @@ export default class NominationService {
     return dotaIds;
   }
 
-  private getRecentMatchesIds(): Observable<PlayerRecentMatches> {
-    return Observable.from(this.dotaIds).flatMap(account_id =>
-      this.dotaApi.getRecentMatches(account_id).map(recentMatches => {
-        const freshMatches = recentMatches.filter(rm => this.isFreshMatch(rm)).map(m => m.match_id);
-        this.dataStore.updatePlayerRecentMatches(account_id, freshMatches);
-        return new PlayerRecentMatches(account_id, freshMatches);
-      })
-    ); // .scan((arr, next) => [...arr, next], []);
+  private getRecentMatchesForPlayer(account_id: number): Observable<PlayerRecentMatches> {
+    return this.dotaApi.getRecentMatches(account_id).map(recentMatches => {
+      const freshMatches = recentMatches.filter(rm => this.isFreshMatch(rm)).map(m => m.match_id);
+      this.dataStore.updatePlayerRecentMatch(account_id, freshMatches);
+      return new PlayerRecentMatches(account_id, freshMatches);
+    });
   }
 
   private nextCheck() {
     const scoreBoard = new ScoreBoard();
-    this.dataStore.playersRecentMatchesClone.subscribe(oldRecentMatches => {
-      this.getRecentMatchesIds()
-        .filter(pair => this.hasNewMatches(pair, oldRecentMatches))
-        .flatMap(playersWithNewMatches => this.mapToPlayerWithFullMatches(playersWithNewMatches))
-        .scan((arr, pfm) => [...arr, pfm], [])
-        .subscribe(playersMatches => {
-          playersMatches.forEach(pfm => scoreBoard.scorePlayer(pfm.account_id, pfm.matches));
-          this.awardWinners(scoreBoard);
-        });
-    });
+    Observable.from(this.dotaIds)
+      .flatMap(account_id =>
+        Observable.zip(this.dataStore.getRecentMatchesForPlayer(account_id), this.getRecentMatchesForPlayer(account_id)))
+      .filter(playerMatches => this.hasNewMatches(...playerMatches))
+      .flatMap(playersWithNewMatches => this.mapToPlayerWithFullMatches(playersWithNewMatches[1]))
+      .scan((arr, pfm) => [...arr, pfm], [])
+      .subscribe(playersMatches => {
+        playersMatches.forEach(pfm => scoreBoard.scorePlayer(pfm.account_id, pfm.matches));
+        this.awardWinners(scoreBoard);
+      });
   }
 
   private mapToPlayerWithFullMatches(prm: PlayerRecentMatches): Observable<PlayerFullMatches> {
@@ -89,11 +87,10 @@ export default class NominationService {
     return nowInSeconds - recentMatch.start_time < Constants.MATCH_DUE_TIME_SEC;
   }
 
-  private hasNewMatches(playerRecentMatches: PlayerRecentMatches, recentMatchesCache: Map<number, number[]>): boolean {
-    return recentMatchesCache
-      && recentMatchesCache.get(playerRecentMatches.account_id)
-      && recentMatchesCache.get(playerRecentMatches.account_id)
-        .reduce((exist, match_id) => exist || playerRecentMatches.recentMatchesIds.indexOf(match_id) < 0, false);
+  private hasNewMatches(storedPlayerMatches?: PlayerRecentMatches, newPlayerMatches?: PlayerRecentMatches): boolean {
+    return storedPlayerMatches
+      && storedPlayerMatches.recentMatchesIds
+        .reduce((exist, match_id) => exist || newPlayerMatches.recentMatchesIds.indexOf(match_id) < 0, false);
   }
 
   private awardWinners(scoreBoard: ScoreBoard): void {

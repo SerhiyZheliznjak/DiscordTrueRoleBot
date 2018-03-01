@@ -8,6 +8,7 @@ import { MongoClient, MongoCallback, MongoError, Db, Collection } from "mongodb"
 import { Observable, Observer } from "rxjs";
 import { IDBKey } from "../model/json/IDBKey";
 import RegisteredPlayerJson from "../model/json/RegisteredPlayerJson";
+import PlayerRecentMatches from "../model/PlayerRecentMatches";
 
 export default class StorageService {
     constructor(
@@ -16,9 +17,11 @@ export default class StorageService {
         private dbName: string = Constants.MONGODB_DB_NAME
     ) { }
 
-    public getRecentMatches(): Observable<Map<number, number[]>> {
+    public getRecentMatchesForPlayer(account_id: number): Observable<PlayerRecentMatches> {
         return this.find<PlayerRecentMatchesJson>(Constants.RECENT_MATCHES_COLLECTION)
-            .map(json => StorageConvertionUtil.convertToPlayersRecentMatchesMap(json));
+            .map(json => StorageConvertionUtil.convertToPlayersRecentMatches(json[0]),
+            {key: account_id}
+        );
     }
 
     public getWinners(): Observable<Map<string, NominationResult>> {
@@ -31,7 +34,7 @@ export default class StorageService {
             .map(json => StorageConvertionUtil.convertToPlayerObserved(json));
     }
 
-    public updatePlayerRecentMatches(account_id: number, matchesIds: number[]): void {
+    public updateRecentMatchesForPlayer(account_id: number, matchesIds: number[]): void {
         this.update(
             Constants.RECENT_MATCHES_COLLECTION,
             StorageConvertionUtil.convertToRecentMatchJson(account_id, matchesIds));
