@@ -90,8 +90,10 @@ export default class NominationService {
   }
 
   private hasNewMatches(playerRecentMatches: PlayerRecentMatches, recentMatchesCache: Map<number, number[]>): boolean {
-    return recentMatchesCache.get(playerRecentMatches.account_id)
-      .reduce((exist, match_id) => exist || playerRecentMatches.recentMatchesIds.indexOf(match_id) < 0, false);
+    return recentMatchesCache
+      && recentMatchesCache.get(playerRecentMatches.account_id)
+      && recentMatchesCache.get(playerRecentMatches.account_id)
+        .reduce((exist, match_id) => exist || playerRecentMatches.recentMatchesIds.indexOf(match_id) < 0, false);
   }
 
   private awardWinners(scoreBoard: ScoreBoard): void {

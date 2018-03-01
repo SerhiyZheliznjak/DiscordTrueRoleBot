@@ -29,7 +29,7 @@ export default class DataStore {
     }
 
     public get playersRecentMatchesClone(): Observable<Map<number, number[]>> {
-        return this.playersRecentMatches.map(cache => Object.apply({}, cache));
+        return this.playersRecentMatches.map(cache => new Map(cache));
     }
 
     public updatePlayerRecentMatches(account_id: number, matchesIds: number[]): void {

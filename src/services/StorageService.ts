@@ -27,7 +27,7 @@ export default class StorageService {
     }
 
     public getPlayersObserved(): Observable<Map<number, string>> {
-        return this.find<Pair<number, string>>(Constants.PLAYERS_COLLECTION)
+        return this.find<RegisteredPlayerJson>(Constants.PLAYERS_COLLECTION)
             .map(json => StorageConvertionUtil.convertToPlayerObserved(json));
     }
 

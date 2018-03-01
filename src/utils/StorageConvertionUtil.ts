@@ -6,6 +6,7 @@ import Nomination from "../model/Nomination";
 import { RecentMatchJson } from "../dota-api/DotaJsonTypings";
 import Constants from "../Constants";
 import Pair from "../model/Pair";
+import RegisteredPlayerJson from "../model/json/RegisteredPlayerJson";
 
 export default class StorageConvertionUtil {
 
@@ -31,19 +32,31 @@ export default class StorageConvertionUtil {
 
     public static convertToWonNominations(nominationsWinnersJson: NominationResultJson[]): Map<string, NominationResult> {
         return nominationsWinnersJson.reduce((map, nwj) => {
-            const nomination = NominationFactory.createByName(nwj.nominationName);
-            nomination.addPoint(Constants.WINNING_MATCH_ID, nwj.score);
-            nomination.timeClaimed = nwj.timeClaimed;
-            const nw = new NominationResult(nwj.owner_account_id, nomination);
-            map.set(nwj.nominationName, nw);
+            if (this.isValidNominationResult(nwj)) {
+                const nomination = NominationFactory.createByName(nwj.nominationName);
+                nomination.addPoint(Constants.WINNING_MATCH_ID, nwj.score);
+                nomination.timeClaimed = nwj.timeClaimed;
+                const nw = new NominationResult(nwj.owner_account_id, nomination);
+                map.set(nwj.nominationName, nw);
+            } else {
+                console.error('Corrupted nomination result ', nwj);
+            }
             return map;
         }, new Map<string, NominationResult>());
     }
 
-    public static convertToPlayerObserved(playersPairs: Array<Pair<number, string>>): Map<number, string> {
-        return playersPairs.reduce((map, pair) => {
-            map.set(pair.p1, pair.p2);
+    public static convertToPlayerObserved(registeredPlayersJson: RegisteredPlayerJson[]): Map<number, string> {
+        return registeredPlayersJson.reduce((map, registeredPlayer) => {
+            if (registeredPlayer.account_id && registeredPlayer.discordId) {
+                map.set(registeredPlayer.account_id, registeredPlayer.discordId);
+            } else {
+                console.error('Corrupted Registered Player ', registeredPlayer);
+            }
             return map;
         }, new Map<number, string>());
+    }
+
+    private static isValidNominationResult(nrj: NominationResultJson): boolean {
+        return !!nrj.nominationName && !!nrj.owner_account_id && !!nrj.score && !!nrj.timeClaimed;
     }
 }
