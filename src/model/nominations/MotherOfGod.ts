@@ -7,7 +7,7 @@ export class MotherOfGod extends Nomination {
         super(points);
         this.name = 'Хуй Замочиш';
         this.minScore = 3;
-        this.msg = 'Мабуть то ліпше ніж Ісус? \n Ну бо нащо вміти воскресати за 3 дні, якщо тебе хрін замочиш?';
+        this.msg = 'Мабуть то ліпше ніж Ісус?\nНу бо нащо вміти воскресати за 3 дні, якщо тебе хрін замочиш?';
     }
 
     protected scorePoint(match, player_slot) {

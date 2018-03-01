@@ -3,9 +3,10 @@ import { Observable, Subscription, Observer } from 'rxjs';
 import DataStore from './DataStore';
 import NominationService from './NominationService';
 import { ProfileJson } from '../dota-api/DotaJsonTypings';
-import NominationWinner from '../model/NominationWinner';
+import NominationResult from '../model/NominationResult';
 import StorageService from './StorageService';
 import Constants from '../Constants';
+import Pair from '../model/Pair';
 
 export default class BotService {
     private retardMap = new Map();
@@ -50,7 +51,7 @@ export default class BotService {
     public startNominating() {
         this.dataStore.registeredPlayers.subscribe(playersMap => {
             this.claimedNominationsSubscription = this.nominationService.startNominating(playersMap)
-                .subscribe((newNomintionsClaimed: NominationWinner[]) => {
+                .subscribe((newNomintionsClaimed: NominationResult[]) => {
                     this.generateMessages(newNomintionsClaimed).subscribe((richEmbed: RichEmbed) => {
                         this.chanel.send('', richEmbed);
                     });
@@ -191,30 +192,19 @@ export default class BotService {
         return richEmbed;
     }
 
-    private generateMessages(claimedNominations: NominationWinner[]) {
-        return Observable.create((messagesObserver: Observer<RichEmbed>) => {
-            this.getPlayerProfilesSet(claimedNominations).subscribe(players => {
-                claimedNominations.forEach(claimed => {
-                    const player = players.find(p => +p.account_id === +claimed.account_id);
-                    messagesObserver.next(this.getRichEmbed(
-                        player.personaname + ': ' + claimed.nomination.getName(),
-                        claimed.nomination.getMessage(),
-                        player.avatarmedium,
-                        'Рахунок: ' + claimed.nomination.getScoreText(),
-                        player.profileurl
-                    ));
-                });
-                messagesObserver.complete();
-            });
-        });
+    private generateMessages(claimedNominations: NominationResult[]): Observable<RichEmbed> {
+        return Observable.from(claimedNominations)
+            .flatMap(cn => this.getNominationWithPlayerProfile(cn))
+            .map(pair => this.getRichEmbed(
+                pair.p2.personaname + ': ' + pair.p1.nomination.getName(),
+                pair.p1.nomination.getMessage(),
+                pair.p2.avatarmedium,
+                'Рахунок: ' + pair.p1.nomination.getScoreText(),
+                pair.p2.profileurl
+            ));
     }
 
-    private getPlayerProfilesSet(claimedNominations: NominationWinner[]): Observable<ProfileJson[]> {
-        return this.dataStore.getPlayers(claimedNominations.map(cn => cn.account_id).reduce((uniq, id) => {
-            if (uniq.indexOf(id) < 0) {
-                uniq.push(id);
-            }
-            return uniq;
-        }, []));
+    private getNominationWithPlayerProfile(claimedNomination: NominationResult): Observable<Pair<NominationResult, ProfileJson>> {
+        return this.dataStore.getProfile(claimedNomination.account_id).map(profile => new Pair(claimedNomination, profile));
     }
 }

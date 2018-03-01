@@ -6,13 +6,15 @@ import Nominations from '../model/Nominations';
 import ScoreBoard from '../model/ScoreBoard';
 import Nomination from '../model/Nomination';
 import DotaApi from '../dota-api/DotaApi';
-import NominationWinner from '../model/NominationWinner';
+import NominationResult from '../model/NominationResult';
 import Constants from '../Constants';
+import PlayerRecentMatches from '../model/PlayerRecentMatches';
+import PlayerFullMatches from '../model/PlayerFullMatches';
 
 export default class NominationService {
   private subscription: Subscription;
   private recentGamesObserver: Observer<number>;
-  private claimedNominationsObserver: Observer<NominationWinner[]>;
+  private claimedNominationsObserver: Observer<NominationResult[]>;
   private dotaIds: number[];
 
   constructor(
@@ -20,18 +22,17 @@ export default class NominationService {
     private dotaApi: DotaApi = new DotaApi()
   ) {
     this.recentGamesObserver = {
-      next: () => this.recentGamesObserverNext(),
+      next: () => this.nextCheck(),
       error: () => { },
       complete: () => { }
     };
   }
 
-  public startNominating(playersMap: Map<number, string>) {
+  public startNominating(playersMap: Map<number, string>): Observable<NominationResult[]> {
     DataStore.maxMatches = playersMap.size * 20;
     this.dotaIds = this.getDotaIds(playersMap);
     this.subscription = Observable.interval(Constants.WATCH_INTERVAL).subscribe(this.recentGamesObserver);
     this.recentGamesObserver.next(0);
-    console.log('started nominating ', playersMap.size, ' players');
     return Observable.create(claimedNominationsObserver => this.claimedNominationsObserver = claimedNominationsObserver);
   }
 
@@ -42,26 +43,6 @@ export default class NominationService {
     console.log('stopped nominating');
   }
 
-  private nominate(playerRecentMatches: Array<Pair<number, number[]>>): Observable<ScoreBoard> {
-    const scoreBoard = new ScoreBoard();
-    return Observable.create(scoreBoardObserver => {
-      this.getPlayerFullMatches(playerRecentMatches)
-        .subscribe(playerFullMatches => {
-          playerFullMatches.forEach(ps => scoreBoard.scorePlayer(ps.key, ps.val));
-          scoreBoardObserver.next(scoreBoard);
-          scoreBoardObserver.complete();
-        });
-    });
-  }
-
-  private getPlayerFullMatches(playerRecentMatches: Array<Pair<number, number[]>>): Observable<Array<Pair<number, MatchJson[]>>> {
-    return Observable.forkJoin(
-      playerRecentMatches.map(p => this.dataStore.getMatches(p.val).map(fullMatches => {
-        return new Pair(p.key, fullMatches);
-      }))
-    );
-  }
-
   private getDotaIds(playersMap: Map<number, string>): number[] {
     const dotaIds = [];
     for (const id of playersMap.keys()) {
@@ -70,47 +51,54 @@ export default class NominationService {
     return dotaIds;
   }
 
-  private recentGamesObserverNext() {
-    Observable.forkJoin(
-      this.dotaIds.map(account_id =>
-        this.dotaApi.getRecentMatches(account_id)
-          .map(recentMatch => new Pair(account_id, (recentMatch as RecentMatchJson[])
-            .filter(rm => this.isMatchYoungerThanWeek(rm))
-            .map(m => m.match_id))))
-    ).subscribe(playerRecentMatches => {
-      this.hasNewMatches(playerRecentMatches).subscribe(newMatchesHappend => {
-        if (newMatchesHappend) {
-          this.nominate(playerRecentMatches).subscribe(scoreBoard => {
-            this.awardWinners(scoreBoard);
-          });
-          playerRecentMatches.forEach(p => this.dataStore.updatePlayerRecentMatches(p.key, p.val));
-        }
-      });
-    });
+  private getRecentMatchesIds(): Observable<PlayerRecentMatches> {
+    return Observable.from(this.dotaIds).flatMap(account_id =>
+      this.dotaApi.getRecentMatches(account_id).map(recentMatches => {
+        const freshMatches = recentMatches.filter(rm => this.isFreshMatch(rm)).map(m => m.match_id);
+        this.dataStore.updatePlayerRecentMatches(account_id, freshMatches);
+        return new PlayerRecentMatches(account_id, freshMatches);
+      })
+    ); // .scan((arr, next) => [...arr, next], []);
   }
 
-  private isMatchYoungerThanWeek(recentMatch: RecentMatchJson): boolean {
-    return (recentMatch.start_time - (new Date().getTime() / 1000)) < Constants.MATCH_DUE_TIME_SEC;
-  }
-
-  private hasNewMatches(playerRecentMatches: Array<Pair<number, number[]>>): Observable<boolean> {
-    return this.dataStore.playersRecentMatches.map(recentMatches => {
-      const atLeastOneNewMatch = playerRecentMatches.find(pair => {
-        const newMatches = pair.val.filter(match_id => {
-          const prm = recentMatches.get(pair.key);
-          return prm ? prm.indexOf(match_id) < 0 : true;
+  private nextCheck() {
+    const scoreBoard = new ScoreBoard();
+    this.dataStore.playersRecentMatchesClone.subscribe(oldRecentMatches => {
+      this.getRecentMatchesIds()
+        .filter(pair => this.hasNewMatches(pair, oldRecentMatches))
+        .flatMap(playersWithNewMatches => this.mapToPlayerWithFullMatches(playersWithNewMatches))
+        .scan((arr, pfm) => [...arr, pfm], [])
+        .subscribe(playersMatches => {
+          playersMatches.forEach(pfm => scoreBoard.scorePlayer(pfm.account_id, pfm.matches));
+          this.awardWinners(scoreBoard);
         });
-        return newMatches.length > 0;
-      });
-      return !!atLeastOneNewMatch;
     });
+  }
+
+  private mapToPlayerWithFullMatches(prm: PlayerRecentMatches): Observable<PlayerFullMatches> {
+    return Observable.from(prm.recentMatchesIds)
+      .flatMap(match_id => this.dataStore.getMatch(match_id))
+      .scan((pfm: PlayerFullMatches, match) => {
+        pfm.matches.push(match);
+        return pfm;
+      }, new PlayerFullMatches(prm.account_id, []));
+  }
+
+  private isFreshMatch(recentMatch: RecentMatchJson): boolean {
+    const nowInSeconds = new Date().getTime() / 1000;
+    return nowInSeconds - recentMatch.start_time < Constants.MATCH_DUE_TIME_SEC;
+  }
+
+  private hasNewMatches(playerRecentMatches: PlayerRecentMatches, recentMatchesCache: Map<number, number[]>): boolean {
+    return recentMatchesCache.get(playerRecentMatches.account_id)
+      .reduce((exist, match_id) => exist || playerRecentMatches.recentMatchesIds.indexOf(match_id) < 0, false);
   }
 
   private awardWinners(scoreBoard: ScoreBoard): void {
-    this.dataStore.wonNominations.subscribe(wonNominations => {
-      const newNomintionsClaimed: NominationWinner[] = [];
-      for (const nominationName of scoreBoard.nominationsWinners.keys()) {
-        const newWinner = scoreBoard.nominationsWinners.get(nominationName);
+    this.dataStore.nominationsResults.subscribe(wonNominations => {
+      const newNomintionsClaimed: NominationResult[] = [];
+      for (const nominationName of scoreBoard.nominationsResults.keys()) {
+        const newWinner = scoreBoard.nominationsResults.get(nominationName);
         if (newWinner.account_id !== Constants.UNCLAIMED && newWinner.nomination.isScored()) {
           const storedWinner = wonNominations.get(nominationName);
           if (this.isClaimedNomination(newWinner, storedWinner)) {
@@ -119,19 +107,21 @@ export default class NominationService {
         }
       }
       if (!!newNomintionsClaimed.length) {
-        this.dataStore.saveWinnersScore(scoreBoard.nominationsWinners);
+        for (const nominationResult of scoreBoard.nominationsResults.values()) {
+          this.dataStore.updateNominationResult(nominationResult);
+        }
         this.claimedNominationsObserver.next(newNomintionsClaimed);
       }
     });
   }
 
-  private isClaimedNomination(newWinner: NominationWinner, storedWinner: NominationWinner): boolean {
+  private isClaimedNomination(newWinner: NominationResult, storedWinner: NominationResult): boolean {
     return !storedWinner
       || newWinner.nomination.hasHigherScoreThen(storedWinner.nomination)
       || this.isOutOfDueDate(newWinner, storedWinner);
   }
 
-  private isOutOfDueDate(newWinner: NominationWinner, storedWinner: NominationWinner) {
+  private isOutOfDueDate(newWinner: NominationResult, storedWinner: NominationResult) {
     return newWinner.nomination.timeClaimed - storedWinner.nomination.timeClaimed >= Constants.NOMINATION_DUE_INTERVAL
       && newWinner.account_id !== storedWinner.account_id
       && newWinner.nomination.getScore() !== storedWinner.nomination.getScore();

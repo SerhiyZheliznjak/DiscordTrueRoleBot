@@ -12,12 +12,12 @@ export class BestKDA extends Nomination {
     }
 
     public getScore(): number {
-        const kdaArr = this.getPoints().map(p => this.countKDA(p.val + ''));
+        const kdaArr = this.getPoints().map(p => this.countKDA(p.p2 + ''));
         return Math.max(...kdaArr);
     }
 
     public getScoreText(): string {
-        const bestKDA = this.getPoints().map(p => p.val + '').reduce((max, next) => {
+        const bestKDA = this.getPoints().map(p => p.p2 + '').reduce((max, next) => {
             if (this.countKDA(max) < this.countKDA(next)) {
                 return next;
             }

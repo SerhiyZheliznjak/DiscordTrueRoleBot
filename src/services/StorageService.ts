@@ -1,12 +1,13 @@
 import Constants from "../Constants";
 import PlayerRecentMatchesJson from "../model/json/PlayerRecentMatchesJson";
-import NominationWinner from "../model/NominationWinner";
-import NominationWinnerJson from "../model/json/NominationWinnerJson";
+import NominationResult from "../model/NominationResult";
+import NominationResultJson from "../model/json/NominationResultJson";
 import StorageConvertionUtil from "../utils/StorageConvertionUtil";
 import Pair from "../model/Pair";
 import { MongoClient, MongoCallback, MongoError, Db, Collection } from "mongodb";
 import { Observable, Observer } from "rxjs";
 import { IDBKey } from "../model/json/IDBKey";
+import RegisteredPlayerJson from "../model/json/RegisteredPlayerJson";
 
 export default class StorageService {
     constructor(
@@ -20,8 +21,8 @@ export default class StorageService {
             .map(json => StorageConvertionUtil.convertToPlayersRecentMatchesMap(json));
     }
 
-    public getWinners(): Observable<Map<string, NominationWinner>> {
-        return this.find<NominationWinnerJson>(Constants.HALL_OF_FAME_COLLECTION)
+    public getWinners(): Observable<Map<string, NominationResult>> {
+        return this.find<NominationResultJson>(Constants.HALL_OF_FAME_COLLECTION)
             .map(json => StorageConvertionUtil.convertToWonNominations(json));
     }
 
@@ -33,19 +34,19 @@ export default class StorageService {
     public updatePlayerRecentMatches(account_id: number, matchesIds: number[]): void {
         this.update(
             Constants.RECENT_MATCHES_COLLECTION,
-            [StorageConvertionUtil.convertToRecentMatchJson(account_id, matchesIds)]);
+            StorageConvertionUtil.convertToRecentMatchJson(account_id, matchesIds));
     }
 
-    public saveWinners(winners: Map<string, NominationWinner>): void {
+    public updateNominationResult(result: NominationResult): void {
         this.update(
             Constants.HALL_OF_FAME_COLLECTION,
-            StorageConvertionUtil.convertToNominationWinnersJson(winners));
+            StorageConvertionUtil.convertToNominationResultJson(result));
     }
 
     public registerPlayer(account_id: number, discordId: string): void {
         this.update(
             Constants.PLAYERS_COLLECTION,
-            [StorageConvertionUtil.convertToPair(account_id, discordId)]);
+            new RegisteredPlayerJson(account_id, discordId));
     }
 
     private get client(): Observable<MongoClient> {
@@ -71,12 +72,10 @@ export default class StorageService {
         });
     }
 
-    private update(collectionName: string, documents: IDBKey[]): void {
+    private update(collectionName: string, document: IDBKey): void {
         this.client.subscribe(client => {
             const db = client.db(this.dbName);
-            documents.forEach(doc => {
-                db.collection(collectionName).update({key: doc.key}, doc, { upsert: true });
-            });
+            db.collection(collectionName).update({ key: document.key }, document, { upsert: true });
         });
     }
 }

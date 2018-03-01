@@ -1,13 +1,13 @@
 import Nomination from "./Nomination";
-import NominationWinner from "./NominationWinner";
+import NominationResult from "./NominationResult";
 import { MatchJson } from "../dota-api/DotaJsonTypings";
 import ScoreBoardService from "../services/ScoreBoardService";
 
 export default class ScoreBoard {
-    public nominationsWinners: Map<string, NominationWinner>;
+    public nominationsResults: Map<string, NominationResult>;
 
     constructor(private scoreBoardService: ScoreBoardService = new ScoreBoardService()) {
-        this.nominationsWinners = this.scoreBoardService.initNominationWinners();
+        this.nominationsResults = this.scoreBoardService.initNominationResults();
     }
 
     public scorePlayer(account_id: number, fullMatches: MatchJson[]): void {
@@ -16,7 +16,7 @@ export default class ScoreBoard {
 
     private applyPlayerScores(account_id: number, nominations: Nomination[]): void {
         nominations.forEach(challengerNominationResult => {
-            const bestResultSoFar = this.nominationsWinners.get(challengerNominationResult.getName());
+            const bestResultSoFar = this.nominationsResults.get(challengerNominationResult.getName());
             if (challengerNominationResult.hasHigherScoreThen(bestResultSoFar.nomination)) {
                 bestResultSoFar.account_id = account_id;
                 bestResultSoFar.nomination = challengerNominationResult;

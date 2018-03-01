@@ -55,11 +55,6 @@ export default class DotaApi {
     return this.queueRequest(DotaApi.getRecentMatchesUrl(account_id));
   }
 
-  public getFullMatches(matcheIds: number[]): Observable<MatchJson[]> {
-    const formatedUrls = matcheIds.map(match_id => DotaApi.getMatchUrl(match_id));
-    return Observable.forkJoin(formatedUrls.map(url => this.queueRequest(url)));
-  }
-
   public getMatch(match_id: number): Observable<MatchJson> {
     return this.queueRequest(DotaApi.getMatchUrl(match_id));
   }
@@ -90,7 +85,6 @@ export default class DotaApi {
               }
             },
             err => {
-              console.error(nextRequest.url, err);
               this.retry(nextRequest);
             },
             () => { }
@@ -112,7 +106,7 @@ export default class DotaApi {
 
   private retry(request: QueuedRequest) {
     request.retryCount -= 1;
-    console.log('retrying');
+    console.log('retrying ', request.url);
     DotaApi.queue.push(request);
   }
 }

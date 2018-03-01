@@ -12,7 +12,7 @@ export class PingMaster extends Nomination {
     }
 
     public getScore() {
-        const pings = this.points.map(p => parseInt(p.val + ''));
+        const pings = this.points.map(p => parseInt(p.p2 + ''));
         return Math.max(...pings);
     }
 

@@ -11,7 +11,7 @@ export class DenyGod extends Nomination {
     }
 
     public getScore() {
-        const denyArr = this.getPoints().map(p => parseInt(p.val + ''));
+        const denyArr = this.getPoints().map(p => parseInt(p.p2 + ''));
         return Math.max(...denyArr);
     }
 

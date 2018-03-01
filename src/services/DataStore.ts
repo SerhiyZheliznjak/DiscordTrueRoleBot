@@ -1,4 +1,4 @@
-import NominationWinner from "../model/NominationWinner";
+import NominationResult from "../model/NominationResult";
 import { MatchJson, ProfileJson, PlayerProfileJson } from "../dota-api/DotaJsonTypings";
 import StorageService from "./StorageService";
 import { Observable } from "rxjs";
@@ -9,7 +9,7 @@ export default class DataStore {
     public static maxMatches: number;
     private static playersRecentMatchesCacheMap: Map<number, number[]> = new Map();
     private static matchesCacheMap: Map<number, MatchJson> = new Map();
-    private static wonNominationsCacheMap: Map<string, NominationWinner> = new Map();
+    private static nominationsResultsCacheMap: Map<string, NominationResult> = new Map();
     private static profilesMap: Map<number, ProfileJson>;
     private static registeredPlayersCache: Map<number, string> = new Map();
 
@@ -28,24 +28,27 @@ export default class DataStore {
         return Observable.of(DataStore.playersRecentMatchesCacheMap);
     }
 
+    public get playersRecentMatchesClone(): Observable<Map<number, number[]>> {
+        return this.playersRecentMatches.map(cache => Object.apply({}, cache));
+    }
+
     public updatePlayerRecentMatches(account_id: number, matchesIds: number[]): void {
         this.playersRecentMatches.subscribe(map => map.set(account_id, matchesIds));
         this.storage.updatePlayerRecentMatches(account_id, matchesIds);
     }
 
-    public get wonNominations(): Observable<Map<string, NominationWinner>> {
-        if (DataStore.wonNominationsCacheMap.size === 0) {
+    public get nominationsResults(): Observable<Map<string, NominationResult>> {
+        if (DataStore.nominationsResultsCacheMap.size === 0) {
             return this.storage.getWinners().map(map => {
-                DataStore.wonNominationsCacheMap = map;
+                DataStore.nominationsResultsCacheMap = map;
                 return map;
             });
         }
-        return Observable.of(DataStore.wonNominationsCacheMap);
+        return Observable.of(DataStore.nominationsResultsCacheMap);
     }
 
-    public saveWinnersScore(recentWinners: Map<string, NominationWinner>): void {
-        DataStore.wonNominationsCacheMap = recentWinners;
-        this.storage.saveWinners(recentWinners);
+    public updateNominationResult(nominationResult: NominationResult): void {
+        this.storage.updateNominationResult(nominationResult);
     }
 
     public get matchesCache(): Map<number, MatchJson> {
@@ -77,10 +80,6 @@ export default class DataStore {
         }
     }
 
-    public getMatches(matchesIds: number[]): Observable<MatchJson[]> {
-        return Observable.forkJoin(matchesIds.map(match_id => this.getMatch(match_id)));
-    }
-
     public get profilesCache(): Map<number, ProfileJson> {
         if (!DataStore.profilesMap) {
             DataStore.profilesMap = new Map<number, ProfileJson>();
@@ -102,21 +101,13 @@ export default class DataStore {
 
     }
 
-    public getPlayers(accountsIds: number[]): Observable<ProfileJson[]> {
-        return Observable.forkJoin(
-            accountsIds.map(account_id => this.dotaApi.getPlayerProfile(account_id).map((ppj: PlayerProfileJson) => ppj.profile))
-        );
-    }
-
     public get registeredPlayers(): Observable<Map<number, string>> {
         if (DataStore.registeredPlayersCache.size === 0) {
             return this.storage.getPlayersObserved().map(map => {
                 DataStore.registeredPlayersCache = map;
-                console.log("returning from db");
                 return map;
             });
         }
-        console.log("returning from cache", DataStore.registeredPlayersCache);
         return Observable.of(DataStore.registeredPlayersCache);
     }
 

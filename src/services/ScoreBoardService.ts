@@ -2,17 +2,17 @@ import { MatchJson } from "../dota-api/DotaJsonTypings";
 import Nomination from "../model/Nomination";
 import Nominations from "../model/Nominations";
 import { DotaParser } from "./DotaParser";
-import NominationWinner from "../model/NominationWinner";
+import NominationResult from "../model/NominationResult";
 import Constants from "../Constants";
 
 export default class ScoreBoardService {
     constructor() { }
 
-    public initNominationWinners(): Map<string, NominationWinner> {
+    public initNominationResults(): Map<string, NominationResult> {
         return Nominations.all.reduce((map, nomination) => {
-            map.set(nomination.getName(), new NominationWinner(Constants.UNCLAIMED, nomination));
+            map.set(nomination.getName(), new NominationResult(Constants.UNCLAIMED, nomination));
             return map;
-        }, new Map<string, NominationWinner>());
+        }, new Map<string, NominationResult>());
     }
 
     public getPlayerScores(account_id: number, fullMatches: MatchJson[]): Nomination[] {

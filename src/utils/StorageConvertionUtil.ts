@@ -1,6 +1,6 @@
 import PlayerRecentMatchesJson from "../model/json/PlayerRecentMatchesJson";
-import NominationWinner from "../model/NominationWinner";
-import NominationWinnerJson from "../model/json/NominationWinnerJson";
+import NominationResult from "../model/NominationResult";
+import NominationResultJson from "../model/json/NominationResultJson";
 import NominationFactory from "../services/NominationFactory";
 import Nomination from "../model/Nomination";
 import { RecentMatchJson } from "../dota-api/DotaJsonTypings";
@@ -20,37 +20,29 @@ export default class StorageConvertionUtil {
         }, new Map<number, number[]>());
     }
 
-    public static convertToNominationWinnersJson(nominationsWinners: Map<string, NominationWinner>): NominationWinnerJson[] {
-        const nominationWinnersJson = [];
-        for (const nw of nominationsWinners.values()) {
-            nominationWinnersJson.push(new NominationWinnerJson(
-                nw.nomination.getName(),
-                nw.account_id,
-                nw.nomination.getScore(),
-                new Date().getTime()
-            ));
-        }
-        return nominationWinnersJson;
+    public static convertToNominationResultJson(nominationResult: NominationResult): NominationResultJson {
+        return new NominationResultJson(
+            nominationResult.nomination.getName(),
+            nominationResult.account_id,
+            nominationResult.nomination.getScore(),
+            new Date().getTime()
+        );
     }
 
-    public static convertToWonNominations(nominationsWinnersJson: NominationWinnerJson[]): Map<string, NominationWinner> {
+    public static convertToWonNominations(nominationsWinnersJson: NominationResultJson[]): Map<string, NominationResult> {
         return nominationsWinnersJson.reduce((map, nwj) => {
             const nomination = NominationFactory.createByName(nwj.nominationName);
             nomination.addPoint(Constants.WINNING_MATCH_ID, nwj.score);
             nomination.timeClaimed = nwj.timeClaimed;
-            const nw = new NominationWinner(nwj.owner_account_id, nomination);
+            const nw = new NominationResult(nwj.owner_account_id, nomination);
             map.set(nwj.nominationName, nw);
             return map;
-        }, new Map<string, NominationWinner>());
-    }
-
-    public static convertToPair<K, V>(key: K, val: V): Pair<K, V> {
-        return new Pair(key, val);
+        }, new Map<string, NominationResult>());
     }
 
     public static convertToPlayerObserved(playersPairs: Array<Pair<number, string>>): Map<number, string> {
         return playersPairs.reduce((map, pair) => {
-            map.set(pair.key, pair.val);
+            map.set(pair.p1, pair.p2);
             return map;
         }, new Map<number, string>());
     }

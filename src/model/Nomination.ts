@@ -28,7 +28,7 @@ export default class Nomination {
     }
     public getScore(): number {
         return this.points.reduce((r, p) => {
-            return p != null && p.val != null ? r + parseInt(p.val + '') : r;
+            return p != null && p.p2 != null ? r + parseInt(p.p2 + '') : r;
         }, 0);
     }
     public getScoreText(): string {

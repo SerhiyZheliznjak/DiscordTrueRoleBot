@@ -13,7 +13,7 @@ export class MaxDamageHit extends Nomination {
     }
 
     public getScore() {
-        const dmgArr = this.getPoints().map(p => parseInt(p.val + ''));
+        const dmgArr = this.getPoints().map(p => parseInt(p.p2 + ''));
         return Math.max(...dmgArr);
     }
     public getMessage() {

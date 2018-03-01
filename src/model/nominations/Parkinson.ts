@@ -8,11 +8,11 @@ export class Parkinson extends Nomination {
         super(points);
         this.name = 'Паркінсон';
         this.minScore = 100;
-        this.msg = 'Як крілик, бо не факт що крілики каждий раз попадають там де цілились.\n Якщо крілики взагалі вміють цілитись...';
+        this.msg = 'Як крілик, бо не факт що крілики каждий раз попадають там де цілились.\nЯкщо крілики взагалі вміють цілитись...';
     }
 
     public getScore() {
-        const apmArr = this.getPoints().map(p => parseInt(p.val + ''));
+        const apmArr = this.getPoints().map(p => parseInt(p.p2 + ''));
         return Math.max(...apmArr);
     }
 
