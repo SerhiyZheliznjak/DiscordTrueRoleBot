@@ -58,6 +58,13 @@ export default class StorageConvertionUtil {
     }
 
     private static isValidNominationResult(nrj: NominationResultJson): boolean {
-        return !!nrj.nominationName && !!nrj.owner_account_id && !!nrj.score && !!nrj.timeClaimed;
+        return this.isDefined(nrj.nominationName)
+            && this.isDefined(nrj.owner_account_id)
+            && this.isDefined(nrj.score)
+            && this.isDefined(nrj.timeClaimed);
+    }
+
+    private static isDefined(val: any): boolean {
+        return val !== undefined && val !== null;
     }
 }
