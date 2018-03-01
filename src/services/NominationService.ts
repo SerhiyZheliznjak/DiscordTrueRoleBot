@@ -63,9 +63,9 @@ export default class NominationService {
     const scoreBoard = new ScoreBoard();
     Observable.from(this.dotaIds)
       .flatMap((account_id: number) =>
-        Observable.zip(this.dataStore.getRecentMatchesForPlayer(account_id), this.getRecentMatchesForPlayer(account_id)))
+        Observable.zip(this.getRecentMatchesForPlayer(account_id), this.dataStore.getRecentMatchesForPlayer(account_id)))
       .filter((playerMatches) => this.hasNewMatches(...playerMatches))
-      .flatMap(playersWithNewMatches => this.mapToPlayerWithFullMatches(playersWithNewMatches[1]))
+      .flatMap(playersWithNewMatches => this.mapToPlayerWithFullMatches(playersWithNewMatches[0]))
       .scan((arr: PlayerFullMatches[], pfm: PlayerFullMatches) => [...arr, pfm], [])
       .subscribe((playersMatches: PlayerFullMatches[]) => {
         playersMatches.forEach(pfm => scoreBoard.scorePlayer(pfm.account_id, pfm.matches));
@@ -87,7 +87,10 @@ export default class NominationService {
     return nowInSeconds - recentMatch.start_time < Constants.MATCH_DUE_TIME_SEC;
   }
 
-  private hasNewMatches(storedPlayerMatches?: PlayerRecentMatches, newPlayerMatches?: PlayerRecentMatches): boolean {
+  private hasNewMatches(newPlayerMatches?: PlayerRecentMatches, storedPlayerMatches?: PlayerRecentMatches): boolean {
+    console.log('Player ', newPlayerMatches.account_id, ' has new matches: ', storedPlayerMatches
+    && storedPlayerMatches.recentMatchesIds
+      .reduce((exist, match_id) => exist || newPlayerMatches.recentMatchesIds.indexOf(match_id) < 0, false));
     return storedPlayerMatches
       && storedPlayerMatches.recentMatchesIds
         .reduce((exist, match_id) => exist || newPlayerMatches.recentMatchesIds.indexOf(match_id) < 0, false);

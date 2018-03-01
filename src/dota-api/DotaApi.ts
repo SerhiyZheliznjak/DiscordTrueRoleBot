@@ -92,8 +92,7 @@ export default class DotaApi {
         } else {
           this.stopQueue();
         }
-      },
-      err => console.error(err)
+      }
     );
   }
 
