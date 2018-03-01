@@ -2,6 +2,7 @@ import Nomination from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
 import Constants from "../../Constants";
 import Pair from "../Pair";
+import { MatchJson } from "../../dota-api/DotaJsonTypings";
 
 export class RapunzelSyndrome extends Nomination {
     constructor(protected points: Array<Pair<string, number | string>> = []) {
@@ -11,8 +12,7 @@ export class RapunzelSyndrome extends Nomination {
         this.msg = 'Вежу ліпше знести ніж в ній сидіти';
     }
 
-    // this way it counts if team killed towers, if want to award for all towers kill then just check if player.towers_killed === 10
-    protected scorePoint(match, player_slot) {
+    protected scorePoint(match, player_slot): number {
         const objectives = DotaParser.getObjectives(match);
         const player = DotaParser.getPlayerInfo(match, player_slot);
         if (!objectives || !player) {

@@ -5,9 +5,9 @@ import Pair from "../Pair";
 export class MotherOfGod extends Nomination {
     constructor(protected points: Array<Pair<string, number | string>> = []) {
         super(points);
-        this.name = 'Матка Бозька';
-        this.minScore = 10;
-        this.msg = 'Я лічно не вірю що це хтось досягне';
+        this.name = 'Хуй Замочиш';
+        this.minScore = 3;
+        this.msg = 'Мабуть то ліпше ніж Ісус? \n Ну бо нащо вміти воскресати за 3 дні, якщо тебе хрін замочиш?';
     }
 
     protected scorePoint(match, player_slot) {

@@ -5,7 +5,7 @@ import Pair from "../Pair";
 export class FirstBloodOwner extends Nomination {
     constructor(protected points: Array<Pair<string, number | string>> = []) {
         super(points);
-        this.name = 'Целкозбий';
+        this.name = 'Володар крові';
         this.minScore = 1;
         this.msg = 'Є різні методи пролити першу кров. Розказувати чи ви самі знаєте?';
     }

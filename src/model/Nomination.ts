@@ -1,4 +1,5 @@
 import Pair from "./Pair";
+import { MatchJson } from "../dota-api/DotaJsonTypings";
 
 export default class Nomination {
     public timeClaimed: number;
@@ -40,9 +41,9 @@ export default class Nomination {
         return this.getScore() > that.getScore();
     }
     public isScored(): boolean {
-        return this.getScore() > this.minScore;
+        return this.getScore() >= this.minScore;
     }
-    protected scorePoint(match, player_slot: number): string | number {
+    protected scorePoint(match: MatchJson, player_slot: number): string | number {
         return null;
     }
 }
