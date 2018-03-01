@@ -1,4 +1,4 @@
-import { Nomination } from "./Nomination";
+import Nomination from "./Nomination";
 import NominationWinner from "./NominationWinner";
 import { MatchJson } from "../dota-api/DotaJsonTypings";
 import ScoreBoardService from "../services/ScoreBoardService";

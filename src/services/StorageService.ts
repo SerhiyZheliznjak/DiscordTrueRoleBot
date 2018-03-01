@@ -1,45 +1,82 @@
-import { Constants } from "../Constants";
+import Constants from "../Constants";
 import PlayerRecentMatchesJson from "../model/json/PlayerRecentMatchesJson";
 import NominationWinner from "../model/NominationWinner";
 import NominationWinnerJson from "../model/json/NominationWinnerJson";
 import StorageConvertionUtil from "../utils/StorageConvertionUtil";
-import { mkdirp } from "mkdirp";
 import Pair from "../model/Pair";
-import { MongoClient } from "mongodb";
+import { MongoClient, MongoCallback, MongoError, Db, Collection } from "mongodb";
+import { Observable, Observer } from "rxjs";
+import { IDBKey } from "../model/json/IDBKey";
 
 export default class StorageService {
-    constructor(private mongoClient = MongoClient) {
-        this.initDB();
-     }
+    constructor(
+        private mongoClient = MongoClient,
+        private url: string = Constants.MONGODB_URI,
+        private dbName: string = Constants.MONGODB_DB_NAME
+    ) { }
 
-    public getRecentMatches(): PlayerRecentMatchesJson[] {
-        // return this.readFileToObject(Constants.RECENT_MATCHES).table;
-        return null;
+    public getRecentMatches(): Observable<Map<number, number[]>> {
+        return this.find<PlayerRecentMatchesJson>(Constants.RECENT_MATCHES_COLLECTION)
+            .map(json => StorageConvertionUtil.convertToPlayersRecentMatchesMap(json));
     }
 
-    public saveRecentMatches(recentPlayerMatches: Map<number, number[]>): void {
-        // this.writeArrayToFile(StorageConvertionUtil.convertToRecentMatchJson(recentPlayerMatches), Constants.RECENT_MATCHES);
+    public getWinners(): Observable<Map<string, NominationWinner>> {
+        return this.find<NominationWinnerJson>(Constants.HALL_OF_FAME_COLLECTION)
+            .map(json => StorageConvertionUtil.convertToWonNominations(json));
+    }
+
+    public getPlayersObserved(): Observable<Map<number, string>> {
+        return this.find<Pair<number, string>>(Constants.PLAYERS_COLLECTION)
+            .map(json => StorageConvertionUtil.convertToPlayerObserved(json));
+    }
+
+    public updatePlayerRecentMatches(account_id: number, matchesIds: number[]): void {
+        this.update(
+            Constants.RECENT_MATCHES_COLLECTION,
+            [StorageConvertionUtil.convertToRecentMatchJson(account_id, matchesIds)]);
     }
 
     public saveWinners(winners: Map<string, NominationWinner>): void {
-        // this.writeArrayToFile(StorageConvertionUtil.convertToNominationWinnersJson(winners), Constants.WINNERS_FILE_PATH);
+        this.update(
+            Constants.HALL_OF_FAME_COLLECTION,
+            StorageConvertionUtil.convertToNominationWinnersJson(winners));
     }
 
-    public getWinners(): NominationWinnerJson[] {
-        // return this.readFileToObject(Constants.WINNERS_FILE_PATH).table;
-        return null;
+    public registerPlayer(account_id: number, discordId: string): void {
+        this.update(
+            Constants.PLAYERS_COLLECTION,
+            [StorageConvertionUtil.convertToPair(account_id, discordId)]);
     }
 
-    public getPlayersObserved(): Array<Pair<number, string>> {
-        // return this.readFileToObject(Constants.PLAYERS_FILE_PATH).table;
-        return null;
+    private get client(): Observable<MongoClient> {
+        return Observable.create(clientObserver => {
+            this.mongoClient.connect(this.url, (err: MongoError, client: MongoClient) => {
+                clientObserver.next(client);
+                clientObserver.complete();
+            });
+        });
     }
 
-    public savePlayersObserved(playersObserved: Map<number, string>): void {
-        // this.writeArrayToFile(StorageConvertionUtil.convertToPlayersPairs(playersObserved), Constants.PLAYERS_FILE_PATH);
+    private find<T>(collectionName: string, query?): Observable<T[]> {
+        return Observable.create((subscriber: Observer<T[]>) => {
+            this.client.subscribe(client => {
+                const db = client.db(this.dbName);
+                Observable.fromPromise(db.collection(collectionName).find(query).toArray())
+                    .subscribe((docs: T[]) => {
+                        subscriber.next(docs);
+                        subscriber.complete();
+                        client.close();
+                    });
+            });
+        });
     }
 
-    private initDB() {
-
+    private update(collectionName: string, documents: IDBKey[]): void {
+        this.client.subscribe(client => {
+            const db = client.db(this.dbName);
+            documents.forEach(doc => {
+                db.collection(collectionName).update({key: doc.key}, doc, { upsert: true });
+            });
+        });
     }
 }

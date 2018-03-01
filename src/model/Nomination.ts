@@ -1,6 +1,6 @@
 import Pair from "./Pair";
 
-export class Nomination {
+export default class Nomination {
     public timeClaimed: number;
     protected name: string;
     protected minScore: number;

@@ -1,5 +1,5 @@
 import StorageService from "../../src/services/StorageService";
-import { Constants } from "../../src/Constants";
+import Constants from "../../src/Constants";
 
 describe(`StorageService`, () => {
 

@@ -11,7 +11,7 @@ import { BestKDA } from "./nominations/BestKDA";
 import { WinnerForLife } from "./nominations/WinnerForLife";
 import { Looser } from "./nominations/Looser";
 import { PingMaster } from "./nominations/PingMaster";
-import { Nomination } from "./Nomination";
+import Nomination from "./Nomination";
 
 export default class Nominations {
     public static get all(): Nomination[] {

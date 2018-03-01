@@ -1,44 +1,46 @@
 import NominationWinner from "../model/NominationWinner";
-import { RecentMatchJson, MatchJson, ProfileJson, PlayerProfileJson } from "../dota-api/DotaJsonTypings";
+import { MatchJson, ProfileJson, PlayerProfileJson } from "../dota-api/DotaJsonTypings";
 import StorageService from "./StorageService";
-import { Constants } from "../Constants";
 import { Observable } from "rxjs";
 import DotaApi from "../dota-api/DotaApi";
-import StorageConvertionUtil from "../utils/StorageConvertionUtil";
-import { Nomination } from "../model/Nomination";
+import Nomination from "../model/Nomination";
 
 export default class DataStore {
     public static maxMatches: number;
-    private static playerRecentMatchesCacheMap: Map<number, number[]>;
-    private static matchesCacheMap: Map<number, MatchJson>;
-    private static wonNominationsCacheMap: Map<string, NominationWinner>;
+    private static playersRecentMatchesCacheMap: Map<number, number[]> = new Map();
+    private static matchesCacheMap: Map<number, MatchJson> = new Map();
+    private static wonNominationsCacheMap: Map<string, NominationWinner> = new Map();
     private static profilesMap: Map<number, ProfileJson>;
+    private static registeredPlayersCache: Map<number, string> = new Map();
 
     constructor(
         private dotaApi: DotaApi = new DotaApi(),
         private storage: StorageService = new StorageService()
     ) { }
 
-    public get playerRecentMatchesCache(): Map<number, number[]> {
-        if (!DataStore.playerRecentMatchesCacheMap) {
-            DataStore.playerRecentMatchesCacheMap = StorageConvertionUtil.convertToPlayerRecentMatches(this.storage.getRecentMatches());
+    public get playersRecentMatches(): Observable<Map<number, number[]>> {
+        if (DataStore.playersRecentMatchesCacheMap.size === 0) {
+            return this.storage.getRecentMatches().map(map => {
+                DataStore.playersRecentMatchesCacheMap = map;
+                return map;
+            });
         }
-        return DataStore.playerRecentMatchesCacheMap;
+        return Observable.of(DataStore.playersRecentMatchesCacheMap);
     }
 
     public updatePlayerRecentMatches(account_id: number, matchesIds: number[]): void {
-        this.playerRecentMatchesCache.set(account_id, matchesIds);
+        this.playersRecentMatches.subscribe(map => map.set(account_id, matchesIds));
+        this.storage.updatePlayerRecentMatches(account_id, matchesIds);
     }
 
-    public saveRecentMatches() {
-        this.storage.saveRecentMatches(this.playerRecentMatchesCache);
-    }
-
-    public get wonNominationCache(): Map<string, NominationWinner> {
-        if (!DataStore.wonNominationsCacheMap) {
-            DataStore.wonNominationsCacheMap = StorageConvertionUtil.convertToWonNominations(this.storage.getWinners());
+    public get wonNominations(): Observable<Map<string, NominationWinner>> {
+        if (DataStore.wonNominationsCacheMap.size === 0) {
+            return this.storage.getWinners().map(map => {
+                DataStore.wonNominationsCacheMap = map;
+                return map;
+            });
         }
-        return DataStore.wonNominationsCacheMap;
+        return Observable.of(DataStore.wonNominationsCacheMap);
     }
 
     public saveWinnersScore(recentWinners: Map<string, NominationWinner>): void {
@@ -47,7 +49,7 @@ export default class DataStore {
     }
 
     public get matchesCache(): Map<number, MatchJson> {
-        if (!DataStore.matchesCacheMap) {
+        if (DataStore.matchesCacheMap.size === 0) {
             DataStore.matchesCacheMap = new Map<number, MatchJson>();
         }
         return DataStore.matchesCacheMap;
@@ -70,10 +72,7 @@ export default class DataStore {
                 return m;
             });
         } else {
-            return Observable.create(getMatchObserver => {
-                getMatchObserver.next(match);
-                getMatchObserver.complete();
-            });
+            return Observable.of(match);
 
         }
     }
@@ -92,12 +91,9 @@ export default class DataStore {
     public getProfile(account_id: number): Observable<ProfileJson> {
         const profile = this.profilesCache.get(account_id);
         if (profile) {
-            return Observable.create(profileObserver => {
-                profileObserver.next(profile);
-                profileObserver.complete();
-            });
+            return Observable.of(profile);
         } else {
-            this.dotaApi.getPlayerProfile(account_id)
+            return this.dotaApi.getPlayerProfile(account_id)
                 .map(p => {
                     this.profilesCache.set(account_id, profile);
                     return p.profile;
@@ -110,5 +106,21 @@ export default class DataStore {
         return Observable.forkJoin(
             accountsIds.map(account_id => this.dotaApi.getPlayerProfile(account_id).map((ppj: PlayerProfileJson) => ppj.profile))
         );
+    }
+
+    public get registeredPlayers(): Observable<Map<number, string>> {
+        if (DataStore.registeredPlayersCache.size === 0) {
+            return this.storage.getPlayersObserved().map(map => {
+                DataStore.registeredPlayersCache = map;
+                console.log("returning from db");
+                return map;
+            });
+        }
+        console.log("returning from cache", DataStore.registeredPlayersCache);
+        return Observable.of(DataStore.registeredPlayersCache);
+    }
+
+    public registerPlayer(account_id: number, discordId: string): void {
+        this.storage.registerPlayer(account_id, discordId);
     }
 }

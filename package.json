@@ -12,13 +12,13 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "^11.3.0",
-    "mkdirp": "^0.5.1",
     "rx-http-request": "^1.2.0",
     "rxjs": "^5.5.6",
     "mongodb": "^3.0.3"
   },
   "devDependencies": {
     "@types/jasmine": "^2.8.6",
+    "@types/mongodb": "^3.0.5",
     "@types/node": "^9.4.6",
     "eslint-config-google": "^0.9.1",
     "eslint-plugin-import": "^2.8.0",

@@ -1,9 +1,9 @@
 import { MatchJson } from "../dota-api/DotaJsonTypings";
-import { Nomination } from "../model/Nomination";
+import Nomination from "../model/Nomination";
 import Nominations from "../model/Nominations";
 import { DotaParser } from "./DotaParser";
 import NominationWinner from "../model/NominationWinner";
-import { Constants } from "../Constants";
+import Constants from "../Constants";
 
 export default class ScoreBoardService {
     constructor() { }

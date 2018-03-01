@@ -1,6 +1,6 @@
-import { Nomination } from "../Nomination";
+import Nomination from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
-import { Constants } from "../../Constants";
+import Constants from "../../Constants";
 import Pair from "../Pair";
 
 export class RapunzelSyndrome extends Nomination {

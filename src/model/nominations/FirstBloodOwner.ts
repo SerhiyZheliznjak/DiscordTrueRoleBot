@@ -1,4 +1,4 @@
-import { Nomination } from "../Nomination";
+import Nomination from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
 import Pair from "../Pair";
 

@@ -2,22 +2,18 @@ import PlayerRecentMatchesJson from "../model/json/PlayerRecentMatchesJson";
 import NominationWinner from "../model/NominationWinner";
 import NominationWinnerJson from "../model/json/NominationWinnerJson";
 import NominationFactory from "../services/NominationFactory";
-import { Nomination } from "../model/Nomination";
+import Nomination from "../model/Nomination";
 import { RecentMatchJson } from "../dota-api/DotaJsonTypings";
-import { Constants } from "../Constants";
+import Constants from "../Constants";
 import Pair from "../model/Pair";
 
 export default class StorageConvertionUtil {
 
-    public static convertToRecentMatchJson(recentMatches: Map<number, number[]>): PlayerRecentMatchesJson[] {
-        const recentPlayerMatches = [];
-        for (const pair of recentMatches.entries()) {
-            recentPlayerMatches.push(new PlayerRecentMatchesJson(pair[0], pair[1]));
-        }
-        return recentPlayerMatches;
+    public static convertToRecentMatchJson(account_id: number, matches: number[]): PlayerRecentMatchesJson {
+        return new PlayerRecentMatchesJson(account_id, matches);
     }
 
-    public static convertToPlayerRecentMatches(recentMatches: PlayerRecentMatchesJson[]): Map<number, number[]> {
+    public static convertToPlayersRecentMatchesMap(recentMatches: PlayerRecentMatchesJson[]): Map<number, number[]> {
         return recentMatches.reduce((map, rmj) => {
             map.set(rmj.account_id, rmj.recentMatchesIds);
             return map;
@@ -48,12 +44,8 @@ export default class StorageConvertionUtil {
         }, new Map<string, NominationWinner>());
     }
 
-    public static convertToPlayersPairs(playerObserved: Map<number, string>): Array<Pair<number, string>> {
-        const pairs = [];
-        for (const account_id of playerObserved.keys()) {
-            pairs.push(new Pair(account_id, playerObserved.get(account_id)));
-        }
-        return pairs;
+    public static convertToPair<K, V>(key: K, val: V): Pair<K, V> {
+        return new Pair(key, val);
     }
 
     public static convertToPlayerObserved(playersPairs: Array<Pair<number, string>>): Map<number, string> {

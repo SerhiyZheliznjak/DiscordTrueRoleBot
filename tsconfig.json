@@ -4,7 +4,10 @@
     "module": "commonjs",
     "outDir": "../release/src",
     "sourceMap": false,
-    "skipDefaultLibCheck": true
+    "skipDefaultLibCheck": true,
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
   },
   "include": [
     "./src/**/*.ts"
