@@ -1,18 +1,17 @@
 import Nomination from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
-import Constants from "../../Constants";
 import Pair from "../Pair";
 
-export class OponentOwsMoney extends Nomination {
+export class StunningMan extends Nomination {
     constructor(protected points: Array<Pair<string, number | string>> = []) {
         super(points);
-        this.name = 'Не вбий суперника свого';
-        this.minScore = 5;
-        this.msg = 'Суперник гроші винен';
+        this.name = 'Гупало Василь';
+        this.minScore = 100;
+        this.msg = 'Він такий приголомшливий!';
     }
 
     protected scorePoint(match, player_slot) {
         const player = DotaParser.getPlayerInfo(match, player_slot);
-        return !!player && player.kills === 0 ? 1 : 0;
+        return player && player.stuns ? player.stuns : 0;
     }
 }

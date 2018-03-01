@@ -12,6 +12,10 @@ import { WinnerForLife } from "./nominations/WinnerForLife";
 import { Looser } from "./nominations/Looser";
 import { PingMaster } from "./nominations/PingMaster";
 import Nomination from "./Nomination";
+import { ChickeSoupLover } from "./nominations/ChickenSoupLover";
+import { DenyGod } from "./nominations/DenyGod";
+import { Nenza } from "./nominations/Nenza";
+import { StunningMan } from "./nominations/StunningMan";
 
 export default class Nominations {
     public static get all(): Nomination[] {
@@ -29,6 +33,10 @@ export default class Nominations {
             new WinnerForLife(),
             new Looser(),
             new PingMaster(),
+            new ChickeSoupLover(),
+            new DenyGod(),
+            new Nenza(),
+            new StunningMan()
         ];
     }
 }

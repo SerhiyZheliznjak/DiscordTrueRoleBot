@@ -5,6 +5,7 @@ export class MatchJson {
     chat: [
         {
             time: number;
+            type: string;
             unit: string;
             key: string;
             slot: number;

@@ -9,18 +9,11 @@ export class RapunzelSyndrome extends Nomination {
         super(points);
         this.name = 'Синдром Рапунзель';
         this.minScore = 1;
-        this.msg = 'Вежу ліпше знести ніж в ній сидіти';
+        this.msg = 'Нахєр вежі!';
     }
 
     protected scorePoint(match, player_slot): number {
-        const objectives = DotaParser.getObjectives(match);
         const player = DotaParser.getPlayerInfo(match, player_slot);
-        if (!objectives || !player) {
-            return null;
-        }
-        const towerIdentifier = player.isRadiant ? Constants.DIRE_TOWER_TARGET_IDENTIFIER : Constants.RADIANT_TOWER_TARGET_IDENTIFIER;
-        const killedAllTowers = objectives.filter(obj => !!obj.key && !!obj.key.indexOf && obj.key.indexOf(towerIdentifier) === 0)
-            .every(obj => obj.player_slot === player_slot);
-        return killedAllTowers ? 1 : 0;
+        return player && player.tower_kills > 5 ? player.tower_kills : 0;
     }
 }
