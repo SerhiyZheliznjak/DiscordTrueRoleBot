@@ -67,30 +67,36 @@ export default class DotaApi {
         if (DotaApi.queue.length > 0) {
           const nextRequest = DotaApi.queue.shift();
           if (nextRequest.retryCount === 0) {
-            nextRequest.observers.forEach(obs => obs.error('Failed to fetch from ' + nextRequest.url));
-          }
-          console.log('requesting ', nextRequest.url);
-          this.rxHttpRequest.get(nextRequest.url).subscribe(
-            (data: any) => {
-              let obj;
-              try {
-                obj = JSON.parse(data.body);
-              } catch (err) {
-                console.error('DotaApi: ', err, nextRequest.url, '. response data: ', data.body);
+            console.error('DotaApi: FAILED get ', nextRequest.url);
+            nextRequest.observers.forEach(obs => {
+              obs.next(null);
+              obs.complete();
+            });
+          } else {
+            console.log('DotaApi: requesting ', nextRequest.url);
+            this.rxHttpRequest.get(nextRequest.url).subscribe(
+              (data: any) => {
+                let obj;
+                try {
+                  obj = JSON.parse(data.body);
+                } catch (err) {
+                  console.error('DotaApi: ', err, nextRequest.url, '. response data: ', data.body);
+                  this.retry(nextRequest);
+                }
+                if (obj) {
+                  nextRequest.observers.forEach(obs => {
+                    console.log('DotaApi: ', nextRequest.url, ' OK');
+                    obs.next(obj);
+                    obs.complete();
+                  });
+                }
+              },
+              err => {
                 this.retry(nextRequest);
-              }
-              if (obj) {
-                nextRequest.observers.forEach(obs => {
-                  obs.next(obj);
-                  obs.complete();
-                });
-              }
-            },
-            err => {
-              this.retry(nextRequest);
-            },
-            () => { }
-          );
+              },
+              () => { }
+            );
+          }
         } else {
           this.stopQueue();
         }

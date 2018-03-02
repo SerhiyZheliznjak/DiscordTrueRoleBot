@@ -83,8 +83,10 @@ export default class NominationService {
     return Observable.from(prm.recentMatchesIds)
       .flatMap(match_id => this.dataStore.getMatch(match_id))
       .scan((pfm: PlayerFullMatches, match) => {
-        console.log('Scanend ', match.match_id, 'match for ', prm.account_id, ' curernt length ', pfm.matches.length);
-        pfm.matches.push(match);
+        if (match) {
+          console.log('Scanend ', match.match_id, 'match for ', prm.account_id, ' curernt length ', pfm.matches.length);
+          pfm.matches.push(match);
+        }
         return pfm;
       }, new PlayerFullMatches(prm.account_id, []));
   }

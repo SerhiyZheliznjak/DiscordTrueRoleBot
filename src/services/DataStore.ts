@@ -71,7 +71,9 @@ export default class DataStore {
         const match = this.matchesCache.get(match_id);
         if (!match) {
             return this.dotaApi.getMatch(match_id).map(m => {
-                this.addMatch(m);
+                if (m) {
+                    this.addMatch(m);
+                }
                 return m;
             });
         } else {
