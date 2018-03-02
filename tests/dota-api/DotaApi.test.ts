@@ -18,6 +18,15 @@ describe(`DotaApi`, () => {
         expect(DotaApi.queue[0].observers.length).toBe(2);
         expect(DotaApi.queue[1].observers.length).toBe(1);
     });
+
+    it(`should share only one request queue`, () => {
+        new DotaApi(RxHttpRequestMock).getMatch(89898).subscribe(() => {});
+        dotaApi.getMatch(89898).subscribe(() => {});
+        dotaApi.getMatch(777).subscribe(() => {});
+        expect(DotaApi.queue.length).toBe(2);
+        expect(DotaApi.queue[0].observers.length).toBe(2);
+        expect(DotaApi.queue[1].observers.length).toBe(1);
+    });
 });
 
 function setupMocks() {

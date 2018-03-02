@@ -19,7 +19,9 @@ export default class DotaApi {
     return format('https://api.opendota.com/api/players/%s/recentMatches', account_id);
   }
 
-  constructor(private rxHttpRequest: RxHttpRequest = RxHttpRequest) { }
+  constructor(private rxHttpRequest: RxHttpRequest = RxHttpRequest) {
+    console.log('Initialized DotaApi');
+  }
 
   public queueRequest(url: string): Observable<any> {
     let observable;
@@ -60,7 +62,7 @@ export default class DotaApi {
   }
 
   private moveQueue() {
-    DotaApi.queueSubscription = Observable.interval(400).subscribe(
+    DotaApi.queueSubscription = Observable.interval(500).subscribe(
       () => {
         if (DotaApi.queue.length > 0) {
           const nextRequest = DotaApi.queue.shift();
@@ -74,7 +76,7 @@ export default class DotaApi {
               try {
                 obj = JSON.parse(data.body);
               } catch (err) {
-                console.error(err, nextRequest.url, '. response data: ', data.body);
+                console.error('DotaApi: ', err, nextRequest.url, '. response data: ', data.body);
                 this.retry(nextRequest);
               }
               if (obj) {
@@ -105,7 +107,7 @@ export default class DotaApi {
 
   private retry(request: QueuedRequest) {
     request.retryCount -= 1;
-    console.log('retrying ', request.url);
+    console.log('DotaApi: retrying ', request.url);
     DotaApi.queue.push(request);
   }
 }

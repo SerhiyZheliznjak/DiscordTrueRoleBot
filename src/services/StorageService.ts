@@ -20,8 +20,8 @@ export default class StorageService {
     public getRecentMatchesForPlayer(account_id: number): Observable<PlayerRecentMatches> {
         return this.find<PlayerRecentMatchesJson>(Constants.RECENT_MATCHES_COLLECTION)
             .map(json => StorageConvertionUtil.convertToPlayersRecentMatches(json[0]),
-            {key: account_id}
-        );
+                { key: account_id }
+            );
     }
 
     public getWinners(): Observable<Map<string, NominationResult>> {
@@ -53,11 +53,17 @@ export default class StorageService {
     }
 
     private get client(): Observable<MongoClient> {
-        return Observable.create(clientObserver => {
-            this.mongoClient.connect(this.url, (err: MongoError, client: MongoClient) => {
+        return Observable.create(clientObserver => this.connectLoop(clientObserver, 5));
+    }
+
+    private connectLoop(clientObserver: Observer<MongoClient>, retryCount: number) {
+        this.mongoClient.connect(this.url, (err: MongoError, client: MongoClient) => {
+            if (err !== null) {
+                this.connectLoop(clientObserver, retryCount);
+            } else {
                 clientObserver.next(client);
                 clientObserver.complete();
-            });
+            }
         });
     }
 
