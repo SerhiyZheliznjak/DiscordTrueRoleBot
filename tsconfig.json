@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "outDir": "../release/src",
+    "outDir": "../DiscordTrueRoleDeployment/src",
     "sourceMap": false,
     "skipDefaultLibCheck": true,
     "typeRoots": [

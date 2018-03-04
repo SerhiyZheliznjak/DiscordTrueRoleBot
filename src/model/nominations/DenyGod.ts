@@ -5,7 +5,7 @@ import Pair from "../Pair";
 export class DenyGod extends Nomination {
     constructor(protected points: Array<Pair<string, number | string>> = []) {
         super(points);
-        this.name = 'Заперечувало';
+        this.name = 'Заперечувач';
         this.minScore = 10;
         this.msg = 'Сам не гам і ворогу не дам!';
     }

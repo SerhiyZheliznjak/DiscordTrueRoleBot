@@ -8,7 +8,7 @@ export class PingMaster extends Nomination {
         super(points);
         this.name = 'Майстер Пінг';
         this.minScore = 100;
-        this.msg = 'Нема такого що не можливо виразити пінгом';
+        this.msg = 'Мабуть, він вірить в силу пінга, а також телекінез, магію і Святого Миколая';
     }
 
     public getScore() {

@@ -85,7 +85,6 @@ export default class DotaApi {
                 }
                 if (obj) {
                   nextRequest.observers.forEach(obs => {
-                    console.log('DotaApi: ', nextRequest.url, ' OK');
                     obs.next(obj);
                     obs.complete();
                   });

@@ -66,10 +66,7 @@ export default class NominationService {
         Observable.zip(this.getFreshRecentMatchesForPlayer(account_id), this.dataStore.getRecentMatchesForPlayer(account_id)))
       .map((playerMatches: PlayerRecentMatches[]) => this.getOnlyFreshNewMatches(playerMatches))
       .flatMap(playersWithNewMatches => this.mapToPlayerWithFullMatches(playersWithNewMatches))
-      .scan((arr: PlayerFullMatches[], pfm: PlayerFullMatches) => {
-        // console.log('Scan for ');   sdfsd
-        return [...arr, pfm];
-      }, [])
+      .reduce((arr: PlayerFullMatches[], pfm: PlayerFullMatches) => [...arr, pfm], [])
       .subscribe((playersMatches: PlayerFullMatches[]) => {
         playersMatches.forEach(pfm => scoreBoard.scorePlayer(pfm.account_id, pfm.matches));
         this.awardWinners(scoreBoard);

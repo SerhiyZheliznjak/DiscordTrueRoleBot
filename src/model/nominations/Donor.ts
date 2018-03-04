@@ -8,7 +8,7 @@ export class Donor extends Nomination {
         super(points);
         this.name = 'Донор';
         this.minScore = 1;
-        this.msg = 'Нє ну як не дати як просять?';
+        this.msg = 'Благородне діло, но не в доті';
     }
 
     protected scorePoint(match, player_slot) {
