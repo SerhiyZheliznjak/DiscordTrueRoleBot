@@ -21,8 +21,11 @@ export class MaxDamageHit extends Nomination {
     }
 
     protected scorePoint(match, player_slot) {
-        const player = DotaParser.getPlayerInfo(match, player_slot);
-        return !!player && !!player.max_hero_hit && !!player.max_hero_hit.value ? player.max_hero_hit.value : null;
+        if (!!match) {
+            const player = DotaParser.getPlayerInfo(match, player_slot);
+            return !!player && !!player.max_hero_hit && !!player.max_hero_hit.value ? player.max_hero_hit.value : 0;
+        }
+        return 0;
     }
 
     private roundToTwoDec(num) {

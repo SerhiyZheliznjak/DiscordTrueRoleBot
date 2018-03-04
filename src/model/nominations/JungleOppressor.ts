@@ -12,9 +12,12 @@ export class JungleOppressor extends Nomination {
     }
 
     protected scorePoint(match, player_slot) {
+        if (!match) {
+            return 0;
+        }
         const player = DotaParser.getPlayerInfo(match, player_slot);
         if (!player || !player.damage) {
-            return null;
+            return 0;
         }
         let jungleDamaged = 0;
         let objectiveDamage = 0;

@@ -18,9 +18,8 @@ export default class StorageService {
     ) { }
 
     public getRecentMatchesForPlayer(account_id: number): Observable<PlayerRecentMatches> {
-        return this.find<PlayerRecentMatchesJson>(Constants.RECENT_MATCHES_COLLECTION)
-            .map(json => StorageConvertionUtil.convertToPlayersRecentMatches(json[0]),
-                { key: account_id }
+        return this.find<PlayerRecentMatchesJson>(Constants.RECENT_MATCHES_COLLECTION, { key: account_id })
+            .map(json => StorageConvertionUtil.convertToPlayersRecentMatches(json[0])
             );
     }
 

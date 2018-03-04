@@ -12,7 +12,10 @@ export class OponentOwsMoney extends Nomination {
     }
 
     protected scorePoint(match, player_slot) {
-        const player = DotaParser.getPlayerInfo(match, player_slot);
-        return !!player && player.kills === 0 ? 1 : 0;
+        if (!!match) {
+            const player = DotaParser.getPlayerInfo(match, player_slot);
+            return !!player && player.kills === 0 ? 1 : 0;
+        }
+        return 0;
     }
 }

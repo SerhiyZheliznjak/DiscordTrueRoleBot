@@ -11,7 +11,10 @@ export class StunningMan extends Nomination {
     }
 
     protected scorePoint(match, player_slot) {
-        const player = DotaParser.getPlayerInfo(match, player_slot);
-        return player && player.stuns ? player.stuns : 0;
+        if (!!match) {
+            const player = DotaParser.getPlayerInfo(match, player_slot);
+            return player && player.stuns ? player.stuns : 0;
+        }
+        return 0;
     }
 }

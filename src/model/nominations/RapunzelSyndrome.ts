@@ -13,7 +13,10 @@ export class RapunzelSyndrome extends Nomination {
     }
 
     protected scorePoint(match, player_slot): number {
-        const player = DotaParser.getPlayerInfo(match, player_slot);
-        return player && player.tower_kills > 5 ? player.tower_kills : 0;
+        if (!!match) {
+            const player = DotaParser.getPlayerInfo(match, player_slot);
+            return player && player.tower_kills > 5 ? player.tower_kills : 0;
+        }
+        return 0;
     }
 }

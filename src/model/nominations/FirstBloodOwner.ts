@@ -11,7 +11,10 @@ export class FirstBloodOwner extends Nomination {
     }
 
     protected scorePoint(match, player_slot) {
+        if (!match) {
+            return 0;
+        }
         const player = DotaParser.getPlayerInfo(match, player_slot);
-        return !!player ? player.firstblood_claimed : null;
+        return !!player && player.firstblood_claimed ? player.firstblood_claimed : 0;
     }
 }

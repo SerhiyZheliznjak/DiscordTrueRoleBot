@@ -17,7 +17,10 @@ export class Parkinson extends Nomination {
     }
 
     protected scorePoint(match, player_slot) {
-        const player = DotaParser.getPlayerInfo(match, player_slot);
-        return !!player ? player.actions_per_min : null;
+        if (!!match) {
+            const player = DotaParser.getPlayerInfo(match, player_slot);
+            return !!player && player.actions_per_min ? player.actions_per_min : 0;
+        }
+        return 0;
     }
 }

@@ -60,7 +60,6 @@ export default class NominationService {
   }
 
   private nextCheck() {
-    const scoreBoard = new ScoreBoard();
     Observable.from(this.dotaIds)
       .flatMap((account_id: number) =>
         Observable.zip(this.getFreshRecentMatchesForPlayer(account_id), this.dataStore.getRecentMatchesForPlayer(account_id)))
@@ -68,6 +67,7 @@ export default class NominationService {
       .flatMap(playersWithNewMatches => this.mapToPlayerWithFullMatches(playersWithNewMatches))
       .reduce((arr: PlayerFullMatches[], pfm: PlayerFullMatches) => [...arr, pfm], [])
       .subscribe((playersMatches: PlayerFullMatches[]) => {
+        const scoreBoard = new ScoreBoard();
         playersMatches.forEach(pfm => scoreBoard.scorePlayer(pfm.account_id, pfm.matches));
         this.awardWinners(scoreBoard);
       });
@@ -79,9 +79,8 @@ export default class NominationService {
     }
     return Observable.from(prm.recentMatchesIds)
       .flatMap(match_id => this.dataStore.getMatch(match_id))
-      .scan((pfm: PlayerFullMatches, match) => {
+      .reduce((pfm: PlayerFullMatches, match) => {
         if (match) {
-          console.log('Scanend ', match.match_id, 'match for ', prm.account_id, ' curernt length ', pfm.matches.length);
           pfm.matches.push(match);
         }
         return pfm;
@@ -95,15 +94,13 @@ export default class NominationService {
 
   private hasNewMatches(freshMatches?: PlayerRecentMatches, storedMatches?: PlayerRecentMatches): boolean {
     let hasNewMatch = false;
-    console.log('Player ', freshMatches.account_id);
     if (this.noMatches(storedMatches)) {
       hasNewMatch = !this.noMatches(freshMatches);
     } else {
       if (!this.noMatches(freshMatches)) {
-        hasNewMatch = this.storedMatchesDoNotContainRecent(freshMatches, storedMatches);
+        hasNewMatch = this.freshMatchesNotStored(freshMatches, storedMatches);
       }
     }
-    console.log('has new matches: ', hasNewMatch);
     return hasNewMatch;
   }
 
@@ -111,9 +108,9 @@ export default class NominationService {
     return !playerMatches || !playerMatches.recentMatchesIds || !playerMatches.recentMatchesIds.length;
   }
 
-  private storedMatchesDoNotContainRecent(freshMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches) {
-    return storedMatches.recentMatchesIds
-      .reduce((exist, match_id) => exist || freshMatches.recentMatchesIds.indexOf(match_id) < 0, false);
+  private freshMatchesNotStored(freshMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): boolean {
+    const notStored = freshMatches.recentMatchesIds.filter(match_id => storedMatches.recentMatchesIds.indexOf(match_id) < 0);
+    return notStored.length > 0;
   }
 
   private getOnlyFreshNewMatches(playerMatches: PlayerRecentMatches[]): PlayerRecentMatches {

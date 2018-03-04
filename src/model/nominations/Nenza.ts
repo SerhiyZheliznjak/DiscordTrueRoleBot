@@ -12,15 +12,15 @@ export class Nenza extends Nomination {
     }
 
     protected scorePoint(match: MatchJson, player_slot: number): number {
-        if (match.chat) {
+        if (match && match.chat) {
             const nenzaMsg = match.chat.filter(msg => msg.player_slot === player_slot)
                 .filter(msg => {
                     const text = msg.key ? msg.key.toLowerCase() : '';
                     return text.indexOf('ff') > -1
-                    || text.indexOf('report') > -1;
+                        || text.indexOf('report') > -1;
                 });
             return nenzaMsg.length;
         }
-        return null;
+        return 0;
     }
 }

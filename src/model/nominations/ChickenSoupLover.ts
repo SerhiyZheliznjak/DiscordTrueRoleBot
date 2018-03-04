@@ -11,6 +11,9 @@ export class ChickeSoupLover extends Nomination {
     }
 
     protected scorePoint(match, player_slot) {
+        if (!match) {
+            return 0;
+        }
         const player = DotaParser.getPlayerInfo(match, player_slot);
         return player && player.courier_kills ? player.courier_kills : 0;
     }

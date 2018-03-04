@@ -19,16 +19,6 @@ export default class DataStore {
         private storage: StorageService = new StorageService()
     ) { }
 
-    // public get playersRecentMatches(): Observable<Map<number, number[]>> {
-    //     if (DataStore.playersRecentMatchesCacheMap.size === 0) {
-    //         return this.storage.getRecentMatches().map(map => {
-    //             DataStore.playersRecentMatchesCacheMap = map;
-    //             return map;
-    //         });
-    //     }
-    //     return Observable.of(DataStore.playersRecentMatchesCacheMap);
-    // }
-
     public getRecentMatchesForPlayer(account_id: number): Observable<PlayerRecentMatches> {
         return this.storage.getRecentMatchesForPlayer(account_id);
     }
