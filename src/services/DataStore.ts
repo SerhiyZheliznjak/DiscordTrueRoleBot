@@ -38,6 +38,7 @@ export default class DataStore {
     }
 
     public updateNominationResult(nominationResult: NominationResult): void {
+        console.log('updating hall of fame with ', nominationResult.account_id, nominationResult.nomination.getName());
         this.storage.updateNominationResult(nominationResult);
     }
 

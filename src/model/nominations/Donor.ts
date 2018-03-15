@@ -7,7 +7,7 @@ export class Donor extends Nomination {
     constructor(protected points: Array<Pair<string, number | string>> = []) {
         super(points);
         this.name = 'Донор';
-        this.minScore = 1;
+        this.minScore = 3;
         this.msg = 'Благородне діло, но не в доті';
     }
 

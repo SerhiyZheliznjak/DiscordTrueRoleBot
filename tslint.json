@@ -19,6 +19,7 @@
     "variable-name": false,
     "trailing-comma": false,
     "radix": false,
-    "object-literal-sort-keys": false
+    "object-literal-sort-keys": false,
+    "no-bitwise": false
   }
 }

@@ -143,14 +143,11 @@ export default class NominationService {
   }
 
   private isClaimedNomination(newWinner: NominationResult, storedWinner: NominationResult): boolean {
-    return !storedWinner
-      || newWinner.nomination.hasHigherScoreThen(storedWinner.nomination)
-      || this.isOutOfDueDate(newWinner, storedWinner);
+    return !storedWinner || this.isOutOfDueDate(storedWinner)
+      || newWinner.nomination.hasHigherScoreThen(storedWinner.nomination);
   }
 
-  private isOutOfDueDate(newWinner: NominationResult, storedWinner: NominationResult) {
-    return newWinner.nomination.timeClaimed - storedWinner.nomination.timeClaimed >= Constants.NOMINATION_DUE_INTERVAL
-      && newWinner.account_id !== storedWinner.account_id
-      && newWinner.nomination.getScore() !== storedWinner.nomination.getScore();
+  private isOutOfDueDate(storedWinner: NominationResult) {
+    return new Date().getTime() - storedWinner.nomination.timeClaimed >= Constants.NOMINATION_DUE_INTERVAL;
   }
 }

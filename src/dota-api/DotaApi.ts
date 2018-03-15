@@ -19,9 +19,7 @@ export default class DotaApi {
     return format('https://api.opendota.com/api/players/%s/recentMatches', account_id);
   }
 
-  constructor(private rxHttpRequest: RxHttpRequest = RxHttpRequest) {
-    console.log('Initialized DotaApi');
-  }
+  constructor(private rxHttpRequest: RxHttpRequest = RxHttpRequest) { }
 
   public queueRequest(url: string): Observable<any> {
     let observable;

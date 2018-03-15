@@ -6,7 +6,7 @@ export class FirstBloodOwner extends Nomination {
     constructor(protected points: Array<Pair<string, number | string>> = []) {
         super(points);
         this.name = 'Власнить першу кров';
-        this.minScore = 1;
+        this.minScore = 3;
         this.msg = 'Є різні методи то пролити... Вам розказувати чи самі знаєте?';
     }
 
