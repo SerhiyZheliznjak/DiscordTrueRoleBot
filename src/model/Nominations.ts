@@ -17,6 +17,7 @@ import { DenyGod } from "./nominations/DenyGod";
 import { Nenza } from "./nominations/Nenza";
 import { StunningMan } from "./nominations/StunningMan";
 import { TacticalFeeder } from "./nominations/TacticalFeeder";
+import { ThisTimeItWillWork } from "./nominations/ThisTimeItWillWork";
 
 export default class Nominations {
     public static get all(): Nomination[] {
@@ -38,7 +39,8 @@ export default class Nominations {
             new DenyGod(),
             new Nenza(),
             new StunningMan(),
-            new TacticalFeeder()
+            new TacticalFeeder(),
+            new ThisTimeItWillWork()
         ];
     }
 }
