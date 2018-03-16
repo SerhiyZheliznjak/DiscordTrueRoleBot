@@ -27,7 +27,7 @@ export default class DataStore {
         this.storage.updateRecentMatchesForPlayer(account_id, matchesIds);
     }
 
-    public get nominationsResults(): Observable<Map<string, NominationResult>> {
+    public get hallOfFame(): Observable<Map<string, NominationResult>> {
         if (DataStore.nominationsResultsCacheMap.size === 0) {
             return this.storage.getWinners().map(map => {
                 DataStore.nominationsResultsCacheMap = map;
