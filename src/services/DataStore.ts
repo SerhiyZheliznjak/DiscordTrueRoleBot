@@ -10,7 +10,7 @@ export default class DataStore {
     public static maxMatches: number;
     private static playersRecentMatchesCacheMap: Map<number, number[]> = new Map();
     private static matchesCacheMap: Map<number, MatchJson> = new Map();
-    private static nominationsResultsCacheMap: Map<string, NominationResult> = new Map();
+    private static nominationsResultsCacheMap: Map<number, NominationResult> = new Map();
     private static profilesMap: Map<number, ProfileJson>;
     private static registeredPlayersCache: Map<number, string> = new Map();
 
@@ -27,7 +27,7 @@ export default class DataStore {
         this.storage.updateRecentMatchesForPlayer(account_id, matchesIds);
     }
 
-    public get hallOfFame(): Observable<Map<string, NominationResult>> {
+    public get hallOfFame(): Observable<Map<number, NominationResult>> {
         if (DataStore.nominationsResultsCacheMap.size === 0) {
             return this.storage.getWinners().map(map => {
                 DataStore.nominationsResultsCacheMap = map;
