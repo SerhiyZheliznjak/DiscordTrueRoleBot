@@ -12,6 +12,10 @@ export class JungleOppressor extends Nomination {
             + 'Наніс більше шкоди лісним кріпам ніж героям, кріпам і будівлям разом взятим';
     }
 
+    public getScoreText(): string {
+        return 'Кількість матчів з цим "досягненням": ' + this.getScore();
+    }
+
     protected scorePoint(match, player_slot) {
         if (!match) {
             return 0;

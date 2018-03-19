@@ -12,6 +12,10 @@ export class RapunzelSyndrome extends Nomination {
         this.msg = 'Нахєр вежі!\nДобив 5 або більше веж за матч';
     }
 
+    public getScoreText(): string {
+        return 'Добито веж: ' + this.getScore();
+    }
+
     protected scorePoint(match, player_slot): number {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);

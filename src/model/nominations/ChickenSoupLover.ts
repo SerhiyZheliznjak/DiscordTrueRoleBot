@@ -10,6 +10,10 @@ export class ChickeSoupLover extends Nomination {
         this.msg = 'А як ще пояснити нащо йому всі ті кури?';
     }
 
+    public getScoreText(): string {
+        return 'Вбито кур\'єрів: ' + this.getScore();
+    }
+
     protected scorePoint(match, player_slot) {
         if (!match) {
             return 0;

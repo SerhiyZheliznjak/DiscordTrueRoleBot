@@ -11,6 +11,10 @@ export class StackGod extends Nomination {
         this.msg = 'То певно той що джунглі персувати помагав\nНайбільша кількість скирт';
     }
 
+    public getScoreText(): string {
+        return 'Наскиртовано: ' + this.getScore() + ' таборів';
+    }
+
     protected scorePoint(match, player_slot) {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);

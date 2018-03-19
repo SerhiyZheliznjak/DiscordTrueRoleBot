@@ -11,6 +11,10 @@ export class OponentOwsMoney extends Nomination {
         this.msg = 'Суперник гроші винен\n0 вбивств у 3х чи більше матчах';
     }
 
+    public getScoreText(): string {
+        return 'Жодного вбивства у: ' + this.getScore() + ' матчах';
+    }
+
     protected scorePoint(match, player_slot) {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);

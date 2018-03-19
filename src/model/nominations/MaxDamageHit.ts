@@ -12,6 +12,10 @@ export class MaxDamageHit extends Nomination {
         this.msg = 'Йобне раз, але сильно. Вбив %s антимагів одиним ударом!';
     }
 
+    public getScoreText(): string {
+        return 'Шкоди за удар: ' + this.getScore();
+    }
+
     public getScore() {
         const dmgArr = this.getPoints().map(p => parseInt(p.p2 + ''));
         return Math.max(...dmgArr);

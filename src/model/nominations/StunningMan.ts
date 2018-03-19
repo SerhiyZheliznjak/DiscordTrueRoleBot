@@ -10,6 +10,10 @@ export class StunningMan extends Nomination {
         this.msg = 'Він такий приголомшливий!\nНайдовше часу протримав суперників приголомшеними';
     }
 
+    public getScoreText(): string {
+        return 'Протримав ворогів у приголомшені: ' + this.getScore() + ' секунд';
+    }
+
     protected scorePoint(match, player_slot) {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);

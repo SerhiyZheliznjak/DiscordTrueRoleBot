@@ -12,6 +12,10 @@ export class PingMaster extends Nomination {
         + 'Напінгав 50 і більше разів у матчі';
     }
 
+    public getScoreText(): string {
+        return 'Пінганув: ' + this.getScore() + ' разів';
+    }
+
     public getScore() {
         const pings = this.points.map(p => parseInt(p.p2 + ''));
         return Math.max(...pings);

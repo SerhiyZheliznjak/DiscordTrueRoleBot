@@ -11,6 +11,10 @@ export class MotherOfGod extends Nomination {
             'Має 0 смертей у 3х або більше матчах';
     }
 
+    public getScoreText(): string {
+        return 'Не вмер жодного разу у: ' + this.getScore() + ' матчах';
+    }
+
     protected scorePoint(match, player_slot) {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);

@@ -12,6 +12,10 @@ export class Parkinson extends Nomination {
             + 'Найбільше дій за хвилину у одному з матчів';
     }
 
+    public getScoreText(): string {
+        return 'Дій за хвилину: ' + this.getScore();
+    }
+
     public getScore() {
         const apmArr = this.getPoints().map(p => parseInt(p.p2 + ''));
         return Math.max(...apmArr);

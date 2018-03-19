@@ -11,6 +11,10 @@ export class WinnerForLife extends Nomination {
         this.msg = 'Всі хочуть його в тіму, а хто не хоче той просто заздрит\nБільше 10ти перемог';
     }
 
+    public getScoreText(): string {
+        return 'Виграно матчів: ' + this.getScore();
+    }
+
     protected scorePoint(match, player_slot) {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);

@@ -7,7 +7,11 @@ export class DenyGod extends Nomination {
         super(points);
         this.name = 'Заперечувач';
         this.minScore = 10;
-        this.msg = 'Сам не гам і ворогу не дам!\nЗаперечив найбільше кріпів за одну гру';
+        this.msg = 'Сам не гам і ворогу не дам!';
+    }
+
+    public getScoreText(): string {
+        return 'Заперечено кріпів за одну гру: ' + this.getScore();
     }
 
     public getScore() {

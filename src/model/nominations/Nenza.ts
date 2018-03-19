@@ -11,6 +11,10 @@ export class Nenza extends Nomination {
         this.msg = 'Бачу тапок в закупі - report, ff, afk';
     }
 
+    public getScoreText(): string {
+        return 'Писав херню в чат: ' + this.getScore() + ' разів';
+    }
+
     protected scorePoint(match: MatchJson, player_slot: number): number {
         if (match && match.chat) {
             const nenzaMsg = match.chat.filter(msg => msg.player_slot === player_slot)

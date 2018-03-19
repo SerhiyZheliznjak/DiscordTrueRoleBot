@@ -11,6 +11,10 @@ export class ThisTimeItWillWork extends Nomination {
         this.msg = 'То не просто так в народі кажуть - складай на байбек з молоду\nБайбекнувся і виграв';
     }
 
+    public getScoreText(): string {
+        return 'Сума викупів у виграних матчах: ' + this.getScore();
+    }
+
     protected scorePoint(match, player_slot): number {
         if (!!match) {
             const player: PlayerJson = DotaParser.getPlayerInfo(match, player_slot);

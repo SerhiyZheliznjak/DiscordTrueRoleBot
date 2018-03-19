@@ -8,7 +8,11 @@ export class Donor extends Nomination {
         super(points);
         this.name = 'Донор';
         this.minScore = 3;
-        this.msg = 'Благородне діло, но не в доті\nВіддав першу кров найбільше разів';
+        this.msg = 'Благородне діло, но не в доті';
+    }
+
+    public getScoreText(): string {
+        return 'Віддано першої крові: ' + this.getScore();
     }
 
     protected scorePoint(match, player_slot) {

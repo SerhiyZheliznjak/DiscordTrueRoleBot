@@ -11,6 +11,10 @@ export class Looser extends Nomination {
             'Переживає смугу програшів';
     }
 
+    public getScoreText(): string {
+        return 'Програно матчів: ' + this.getScore();
+    }
+
     protected scorePoint(match, player_slot) {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);

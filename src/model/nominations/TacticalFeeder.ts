@@ -11,6 +11,10 @@ export class TacticalFeeder extends Nomination {
         this.msg = 'Мета реально працює\nВмер не менше 10 разів, але виграв матч';
     }
 
+    public getScoreText(): string {
+        return 'Виграно матчів фідженням: ' + this.getScore();
+    }
+
     protected scorePoint(match, player_slot): number {
         if (!!match) {
             const player: PlayerJson = DotaParser.getPlayerInfo(match, player_slot);

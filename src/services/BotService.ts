@@ -199,7 +199,7 @@ export default class BotService {
                 pair.p2.personaname + ': ' + pair.p1.nomination.getName(),
                 pair.p1.nomination.getMessage(),
                 pair.p2.avatarmedium,
-                'Рахунок: ' + pair.p1.nomination.getScoreText(),
+                pair.p1.nomination.getScoreText(),
                 pair.p2.profileurl
             ));
     }
