@@ -8,7 +8,7 @@ export class ThisTimeItWillWork extends Nomination {
         super(points);
         this.name = 'Шяс піде';
         this.minScore = 5;
-        this.msg = 'То не просто так в народі кажуть - складай на байбек з молоду';
+        this.msg = 'То не просто так в народі кажуть - складай на байбек з молоду\nБайбекнувся і виграв';
     }
 
     protected scorePoint(match, player_slot): number {

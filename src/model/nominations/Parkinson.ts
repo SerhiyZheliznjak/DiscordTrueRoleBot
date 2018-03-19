@@ -8,7 +8,8 @@ export class Parkinson extends Nomination {
         super(points);
         this.name = 'Паркінсон';
         this.minScore = 100;
-        this.msg = 'Як крілик, бо не факт що крілики каждий раз попадають там де цілились';
+        this.msg = 'Як крілик, бо не факт що крілики каждий раз попадають там де цілились\n'
+            + 'Найбільше дій за хвилину у одному з матчів';
     }
 
     public getScore() {

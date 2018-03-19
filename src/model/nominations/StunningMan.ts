@@ -7,7 +7,7 @@ export class StunningMan extends Nomination {
         super(points);
         this.name = 'Гупало Василь';
         this.minScore = 100;
-        this.msg = 'Він такий приголомшливий!';
+        this.msg = 'Він такий приголомшливий!\nНайдовше часу протримав суперників приголомшеними';
     }
 
     protected scorePoint(match, player_slot) {

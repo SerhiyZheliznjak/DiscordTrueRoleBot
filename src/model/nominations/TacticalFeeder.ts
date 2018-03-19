@@ -8,7 +8,7 @@ export class TacticalFeeder extends Nomination {
         super(points);
         this.name = 'Тактичний Фідер';
         this.minScore = 1;
-        this.msg = 'Мета реально працює';
+        this.msg = 'Мета реально працює\nВмер не менше 10 разів, але виграв матч';
     }
 
     protected scorePoint(match, player_slot): number {

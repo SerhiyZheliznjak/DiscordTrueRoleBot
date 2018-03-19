@@ -7,7 +7,7 @@ export class FirstBloodOwner extends Nomination {
         super(points);
         this.name = 'Власнить першу кров';
         this.minScore = 3;
-        this.msg = 'Є різні методи то пролити... Вам розказувати чи самі знаєте?';
+        this.msg = 'Є різні методи то пролити... Вам розказувати чи самі знаєте?\nПролив найбільше першої крові';
     }
 
     protected scorePoint(match, player_slot) {
