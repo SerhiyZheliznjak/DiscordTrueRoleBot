@@ -6,7 +6,7 @@ export class ChickeSoupLover extends Nomination {
     constructor(protected points: Array<Pair<string, number | string>> = []) {
         super(points);
         this.name = 'Збирає на росіл';
-        this.minScore = 1;
+        this.minScore = 3;
         this.msg = 'А як ще пояснити нащо йому всі ті кури?';
     }
 

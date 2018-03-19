@@ -8,7 +8,8 @@ export class JungleOppressor extends Nomination {
         super(points);
         this.name = 'Гнобитель Джунглів';
         this.minScore = 1;
-        this.msg = 'Пацани не шарю що ви там робите, але я цілі джунглі пресую!';
+        this.msg = 'Пацани не шарю що ви там робите, але я цілі джунглі пресую!\n'
+            + 'Наніс більше шкоди лісним кріпам ніж героям, кріпам і будівлям разом взятим';
     }
 
     protected scorePoint(match, player_slot) {

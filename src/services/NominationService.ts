@@ -63,14 +63,10 @@ export default class NominationService {
     Observable.from(this.dotaIds)
       .flatMap((account_id: number) =>
         Observable.zip(this.getFreshRecentMatchesForPlayer(account_id), this.dataStore.getRecentMatchesForPlayer(account_id)))
-      .map((playerMatches: PlayerRecentMatches[]) => this.getOnlyFreshNewMatches(playerMatches))
-      .flatMap(playersWithNewMatches => this.mapToPlayerWithFullMatches(playersWithNewMatches))
+      .map((playerMatches: PlayerRecentMatches[]) => this.getNewMatches(playerMatches[0], playerMatches[1]))
+      .flatMap(playerWithNewMatches => this.mapToPlayerWithFullMatches(playerWithNewMatches))
       .reduce((arr: PlayerFullMatches[], pfm: PlayerFullMatches) => [...arr, pfm], [])
-      .subscribe((playersMatches: PlayerFullMatches[]) => {
-        const scoreBoard = new ScoreBoard();
-        playersMatches.forEach(pfm => scoreBoard.scorePlayer(pfm.account_id, pfm.matches));
-        this.awardWinners(scoreBoard);
-      });
+      .subscribe((playersMatches: PlayerFullMatches[]) => this.countResults(playersMatches));
   }
 
   private mapToPlayerWithFullMatches(prm: PlayerRecentMatches): Observable<PlayerFullMatches> {
@@ -92,7 +88,7 @@ export default class NominationService {
     return nowInSeconds - recentMatch.start_time < Constants.MATCH_DUE_TIME_SEC;
   }
 
-  private hasNewMatches(freshMatches?: PlayerRecentMatches, storedMatches?: PlayerRecentMatches): boolean {
+  private hasNewMatches(freshMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): boolean {
     let hasNewMatch = false;
     if (this.noMatches(storedMatches)) {
       hasNewMatch = !this.noMatches(freshMatches);
@@ -113,44 +109,48 @@ export default class NominationService {
     return notStored.length > 0;
   }
 
-  private getOnlyFreshNewMatches(playerMatches: PlayerRecentMatches[]): PlayerRecentMatches {
-    if (this.hasNewMatches(...playerMatches)) {
-      this.dataStore.updatePlayerRecentMatch(playerMatches[0].account_id, playerMatches[0].recentMatchesIds);
-      return playerMatches[0];
+  private getNewMatches(freshMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): PlayerRecentMatches {
+    if (this.hasNewMatches(freshMatches, storedMatches)) {
+      this.dataStore.updatePlayerRecentMatch(freshMatches.account_id, freshMatches.recentMatchesIds);
+      return freshMatches;
     }
-    return new PlayerRecentMatches(playerMatches[0].account_id, []);
+    return new PlayerRecentMatches(freshMatches.account_id, []);
   }
 
-  private awardWinners(scoreBoard: ScoreBoard): void {
-    this.dataStore.nominationsResults.subscribe(wonNominations => {
-      const newNomintionsClaimed: NominationResult[] = [];
+  private countResults(playersMatches: PlayerFullMatches[]): void {
+    const scoreBoard = new ScoreBoard();
+    playersMatches.forEach(pfm => scoreBoard.scorePlayer(pfm.account_id, pfm.matches));
+
+    this.dataStore.hallOfFame.subscribe(hallOfFame => {
+      const newNominationsClaimed: NominationResult[] = [];
       for (const nominationName of scoreBoard.nominationsResults.keys()) {
         const newWinner = scoreBoard.nominationsResults.get(nominationName);
         if (newWinner.account_id !== Constants.UNCLAIMED && newWinner.nomination.isScored()) {
-          const storedWinner = wonNominations.get(nominationName);
+          const storedWinner = hallOfFame.get(nominationName);
           if (this.isClaimedNomination(newWinner, storedWinner)) {
-            newNomintionsClaimed.push(newWinner);
+            newNominationsClaimed.push(newWinner);
           }
         }
       }
-      if (!!newNomintionsClaimed.length) {
-        for (const nominationResult of scoreBoard.nominationsResults.values()) {
-          this.dataStore.updateNominationResult(nominationResult);
-        }
-        this.claimedNominationsObserver.next(newNomintionsClaimed);
-      }
+      this.awardWinners(newNominationsClaimed);
     });
   }
 
-  private isClaimedNomination(newWinner: NominationResult, storedWinner: NominationResult): boolean {
-    return !storedWinner
-      || newWinner.nomination.hasHigherScoreThen(storedWinner.nomination)
-      || this.isOutOfDueDate(newWinner, storedWinner);
+  private awardWinners(newNominationsClaimed: NominationResult[]): void {
+      if (!!newNominationsClaimed.length) {
+        for (const nominationResult of newNominationsClaimed) {
+          this.dataStore.updateNominationResult(nominationResult);
+        }
+        this.claimedNominationsObserver.next(newNominationsClaimed);
+      }
   }
 
-  private isOutOfDueDate(newWinner: NominationResult, storedWinner: NominationResult) {
-    return newWinner.nomination.timeClaimed - storedWinner.nomination.timeClaimed >= Constants.NOMINATION_DUE_INTERVAL
-      && newWinner.account_id !== storedWinner.account_id
-      && newWinner.nomination.getScore() !== storedWinner.nomination.getScore();
+  private isClaimedNomination(newWinner: NominationResult, storedWinner: NominationResult): boolean {
+    return !storedWinner || this.isOutOfDueDate(storedWinner)
+      || newWinner.nomination.hasHigherScoreThen(storedWinner.nomination);
+  }
+
+  private isOutOfDueDate(storedWinner: NominationResult) {
+    return new Date().getTime() - storedWinner.nomination.timeClaimed >= Constants.NOMINATION_DUE_INTERVAL;
   }
 }

@@ -8,7 +8,7 @@ export class WinnerForLife extends Nomination {
         super(points);
         this.name = 'Пабідітіль па жизні';
         this.minScore = 10;
-        this.msg = 'Всі хочуть його в тіму, а хто не хоче той просто заздрит';
+        this.msg = 'Всі хочуть його в тіму, а хто не хоче той просто заздрит\nБільше 10ти перемог';
     }
 
     protected scorePoint(match, player_slot) {

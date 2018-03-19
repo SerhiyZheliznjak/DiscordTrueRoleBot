@@ -7,8 +7,9 @@ export class PingMaster extends Nomination {
     constructor(protected points: Array<Pair<string, number|string>> = []) {
         super(points);
         this.name = 'Майстер Пінг';
-        this.minScore = 100;
-        this.msg = 'Мабуть, він вірить в силу пінга, а також телекінез, магію і Святого Миколая';
+        this.minScore = 50;
+        this.msg = 'Мабуть, він вірить в силу пінга, а також телекінез, магію і Святого Миколая\n'
+        + 'Напінгав 50 і більше разів у матчі';
     }
 
     public getScore() {

@@ -24,6 +24,7 @@ export default class StorageConvertionUtil {
 
     public static convertToNominationResultJson(nominationResult: NominationResult): NominationResultJson {
         return new NominationResultJson(
+            nominationResult.nomination.getKey(),
             nominationResult.nomination.getName(),
             nominationResult.account_id,
             nominationResult.nomination.getScore(),
@@ -31,19 +32,19 @@ export default class StorageConvertionUtil {
         );
     }
 
-    public static convertToWonNominations(nominationsWinnersJson: NominationResultJson[]): Map<string, NominationResult> {
+    public static convertToWonNominations(nominationsWinnersJson: NominationResultJson[]): Map<number, NominationResult> {
         return nominationsWinnersJson.reduce((map, nwj) => {
             if (this.isValidNominationResult(nwj)) {
                 const nomination = NominationFactory.createByName(nwj.nominationName);
                 nomination.addPoint(Constants.WINNING_MATCH_ID, nwj.score);
                 nomination.timeClaimed = nwj.timeClaimed;
                 const nw = new NominationResult(nwj.owner_account_id, nomination);
-                map.set(nwj.nominationName, nw);
+                map.set(nwj.key, nw);
             } else {
                 console.error('Corrupted nomination result ', nwj);
             }
             return map;
-        }, new Map<string, NominationResult>());
+        }, new Map<number, NominationResult>());
     }
 
     public static convertToPlayerObserved(registeredPlayersJson: RegisteredPlayerJson[]): Map<number, string> {

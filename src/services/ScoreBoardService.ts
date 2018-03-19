@@ -8,11 +8,11 @@ import Constants from "../Constants";
 export default class ScoreBoardService {
     constructor() { }
 
-    public initNominationResults(): Map<string, NominationResult> {
+    public initNominationResults(): Map<number, NominationResult> {
         return Nominations.all.reduce((map, nomination) => {
-            map.set(nomination.getName(), new NominationResult(Constants.UNCLAIMED, nomination));
+            map.set(nomination.getKey(), new NominationResult(Constants.UNCLAIMED, nomination));
             return map;
-        }, new Map<string, NominationResult>());
+        }, new Map<number, NominationResult>());
     }
 
     public getPlayerScores(account_id: number, fullMatches: MatchJson[]): Nomination[] {

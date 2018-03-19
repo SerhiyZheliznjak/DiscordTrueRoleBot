@@ -8,7 +8,7 @@ export class StackGod extends Nomination {
         super(points);
         this.name = 'Скиртувальник 1го розряду';
         this.minScore = 20;
-        this.msg = 'То певно той що джунглі персувати помагав';
+        this.msg = 'То певно той що джунглі персувати помагав\nНайбільша кількість скирт';
     }
 
     protected scorePoint(match, player_slot) {

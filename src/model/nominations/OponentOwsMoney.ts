@@ -7,8 +7,8 @@ export class OponentOwsMoney extends Nomination {
     constructor(protected points: Array<Pair<string, number | string>> = []) {
         super(points);
         this.name = 'Не вбий суперника свого';
-        this.minScore = 5;
-        this.msg = 'Суперник гроші винен';
+        this.minScore = 3;
+        this.msg = 'Суперник гроші винен\n0 вбивств у 3х чи більше матчах';
     }
 
     protected scorePoint(match, player_slot) {
