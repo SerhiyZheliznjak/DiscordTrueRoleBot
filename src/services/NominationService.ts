@@ -1,7 +1,5 @@
 import { Observable, Subscription, Observer } from 'rxjs';
 import DataStore from './DataStore';
-import { MatchJson, RecentMatchJson } from '../dota-api/DotaJsonTypings';
-import Pair from '../model/Pair';
 import Nominations from '../model/Nominations';
 import ScoreBoard from '../model/ScoreBoard';
 import Nomination from '../model/Nomination';
@@ -10,6 +8,7 @@ import NominationResult from '../model/NominationResult';
 import Constants from '../Constants';
 import PlayerRecentMatches from '../model/PlayerRecentMatches';
 import PlayerFullMatches from '../model/PlayerFullMatches';
+import NominationUtils from '../utils/NominationUtils';
 
 export default class NominationService {
   private subscription: Subscription;
@@ -19,9 +18,9 @@ export default class NominationService {
 
   constructor(
     private dataStore: DataStore = new DataStore(),
-    private dotaApi: DotaApi = new DotaApi()
+    private dotaApi: DotaApi = new DotaApi(),
+    private nominationUtils = new NominationUtils()
   ) {
-    console.log('Initialized NominationService');
     this.recentGamesObserver = {
       next: () => this.nextCheck(),
       error: () => { },
@@ -54,16 +53,20 @@ export default class NominationService {
 
   private getFreshRecentMatchesForPlayer(account_id: number): Observable<PlayerRecentMatches> {
     return this.dotaApi.getRecentMatches(account_id).map(recentMatches => {
-      const freshMatches = recentMatches.filter(rm => this.isFreshMatch(rm)).map(m => m.match_id);
+      const freshMatches = recentMatches.filter(rm => this.nominationUtils.isFreshMatch(rm)).map(m => m.match_id);
       return new PlayerRecentMatches(account_id, freshMatches);
     });
   }
 
-  private nextCheck() {
+  private nextCheck(): void {
     Observable.from(this.dotaIds)
       .flatMap((account_id: number) =>
         Observable.zip(this.getFreshRecentMatchesForPlayer(account_id), this.dataStore.getRecentMatchesForPlayer(account_id)))
-      .map((playerMatches: PlayerRecentMatches[]) => this.getNewMatches(playerMatches[0], playerMatches[1]))
+      .map((playerMatches: PlayerRecentMatches[]) => {
+        const newMatches = this.nominationUtils.getNewMatches(playerMatches[0], playerMatches[1]);
+        this.dataStore.updatePlayerRecentMatch(newMatches.account_id, newMatches.recentMatchesIds);
+        return newMatches;
+      })
       .flatMap(playerWithNewMatches => this.mapToPlayerWithFullMatches(playerWithNewMatches))
       .reduce((arr: PlayerFullMatches[], pfm: PlayerFullMatches) => [...arr, pfm], [])
       .subscribe((playersMatches: PlayerFullMatches[]) => this.countResults(playersMatches));
@@ -75,82 +78,27 @@ export default class NominationService {
     }
     return Observable.from(prm.recentMatchesIds)
       .flatMap(match_id => this.dataStore.getMatch(match_id))
-      .reduce((pfm: PlayerFullMatches, match) => {
-        if (match) {
-          pfm.matches.push(match);
-        }
-        return pfm;
-      }, new PlayerFullMatches(prm.account_id, []));
-  }
-
-  private isFreshMatch(recentMatch: RecentMatchJson): boolean {
-    const nowInSeconds = new Date().getTime() / 1000;
-    return nowInSeconds - recentMatch.start_time < Constants.MATCH_DUE_TIME_SEC;
-  }
-
-  private hasNewMatches(freshMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): boolean {
-    let hasNewMatch = false;
-    if (this.noMatches(storedMatches)) {
-      hasNewMatch = !this.noMatches(freshMatches);
-    } else {
-      if (!this.noMatches(freshMatches)) {
-        hasNewMatch = this.freshMatchesNotStored(freshMatches, storedMatches);
-      }
-    }
-    return hasNewMatch;
-  }
-
-  private noMatches(playerMatches: PlayerRecentMatches): boolean {
-    return !playerMatches || !playerMatches.recentMatchesIds || !playerMatches.recentMatchesIds.length;
-  }
-
-  private freshMatchesNotStored(freshMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): boolean {
-    const notStored = freshMatches.recentMatchesIds.filter(match_id => storedMatches.recentMatchesIds.indexOf(match_id) < 0);
-    return notStored.length > 0;
-  }
-
-  private getNewMatches(freshMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): PlayerRecentMatches {
-    if (this.hasNewMatches(freshMatches, storedMatches)) {
-      this.dataStore.updatePlayerRecentMatch(freshMatches.account_id, freshMatches.recentMatchesIds);
-      return freshMatches;
-    }
-    return new PlayerRecentMatches(freshMatches.account_id, []);
+      .reduce(
+        (pfm: PlayerFullMatches, match) => this.nominationUtils.getPlayerFullMatches(pfm, match),
+        new PlayerFullMatches(prm.account_id, [])
+      );
   }
 
   private countResults(playersMatches: PlayerFullMatches[]): void {
-    const scoreBoard = new ScoreBoard();
-    playersMatches.forEach(pfm => scoreBoard.scorePlayer(pfm.account_id, pfm.matches));
-
     this.dataStore.hallOfFame.subscribe(hallOfFame => {
-      const newNominationsClaimed: NominationResult[] = [];
-      for (const nominationName of scoreBoard.nominationsResults.keys()) {
-        const newWinner = scoreBoard.nominationsResults.get(nominationName);
-        if (newWinner.account_id !== Constants.UNCLAIMED && newWinner.nomination.isScored()) {
-          const storedWinner = hallOfFame.get(nominationName);
-          if (this.isClaimedNomination(newWinner, storedWinner)) {
-            newNominationsClaimed.push(newWinner);
-          }
-        }
+      const scoreBoard = new ScoreBoard();
+      playersMatches.forEach(pfm => scoreBoard.scorePlayer(pfm.account_id, pfm.matches));
+      const newNominationsClaimed = this.nominationUtils.getNewRecords(hallOfFame, scoreBoard.nominationsResults);
+      if (!!newNominationsClaimed.length) {
+        this.awardWinners(newNominationsClaimed);
       }
-      this.awardWinners(newNominationsClaimed);
     });
   }
 
   private awardWinners(newNominationsClaimed: NominationResult[]): void {
-      if (!!newNominationsClaimed.length) {
-        for (const nominationResult of newNominationsClaimed) {
-          this.dataStore.updateNominationResult(nominationResult);
-        }
-        this.claimedNominationsObserver.next(newNominationsClaimed);
-      }
-  }
-
-  private isClaimedNomination(newWinner: NominationResult, storedWinner: NominationResult): boolean {
-    return !storedWinner || this.isOutOfDueDate(storedWinner)
-      || newWinner.nomination.hasHigherScoreThen(storedWinner.nomination);
-  }
-
-  private isOutOfDueDate(storedWinner: NominationResult) {
-    return new Date().getTime() - storedWinner.nomination.timeClaimed >= Constants.NOMINATION_DUE_INTERVAL;
+    for (const nominationResult of newNominationsClaimed) {
+      this.dataStore.updateNominationResult(nominationResult);
+    }
+    this.claimedNominationsObserver.next(newNominationsClaimed);
   }
 }

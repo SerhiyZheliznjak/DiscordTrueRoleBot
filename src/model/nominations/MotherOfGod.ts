@@ -12,7 +12,7 @@ export class MotherOfGod extends Nomination {
     }
 
     public getScoreText(): string {
-        return 'Не вмер жодного разу у: ' + this.getScore() + ' матчах';
+        return 'Матчі без смертей: ' + this.getScore();
     }
 
     protected scorePoint(match, player_slot) {

@@ -13,7 +13,7 @@ export class PingMaster extends Nomination {
     }
 
     public getScoreText(): string {
-        return 'Пінганув: ' + this.getScore() + ' разів';
+        return 'Кількість пінгів: ' + this.getScore();
     }
 
     public getScore() {

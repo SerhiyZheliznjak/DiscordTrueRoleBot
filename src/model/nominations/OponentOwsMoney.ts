@@ -12,7 +12,7 @@ export class OponentOwsMoney extends Nomination {
     }
 
     public getScoreText(): string {
-        return 'Жодного вбивства у: ' + this.getScore() + ' матчах';
+        return 'Матчів без вбивств: ' + this.getScore();
     }
 
     protected scorePoint(match, player_slot) {

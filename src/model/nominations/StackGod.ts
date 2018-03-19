@@ -12,7 +12,7 @@ export class StackGod extends Nomination {
     }
 
     public getScoreText(): string {
-        return 'Наскиртовано: ' + this.getScore() + ' таборів';
+        return 'Наскиртовано таборів: ' + this.getScore();
     }
 
     protected scorePoint(match, player_slot) {

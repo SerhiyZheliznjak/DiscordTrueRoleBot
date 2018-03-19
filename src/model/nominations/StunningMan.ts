@@ -11,7 +11,7 @@ export class StunningMan extends Nomination {
     }
 
     public getScoreText(): string {
-        return 'Протримав ворогів у приголомшені: ' + this.getScore() + ' секунд';
+        return 'Протримав ворогів у приголомшені: ' + this.getScore() + 'сек';
     }
 
     protected scorePoint(match, player_slot) {

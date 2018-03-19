@@ -12,7 +12,7 @@ export class Nenza extends Nomination {
     }
 
     public getScoreText(): string {
-        return 'Писав херню в чат: ' + this.getScore() + ' разів';
+        return 'Кількість написаної херні в чаті: ' + this.getScore();
     }
 
     protected scorePoint(match: MatchJson, player_slot: number): number {
