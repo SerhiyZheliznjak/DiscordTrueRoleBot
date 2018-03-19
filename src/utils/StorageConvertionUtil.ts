@@ -28,7 +28,7 @@ export default class StorageConvertionUtil {
             nominationResult.nomination.getName(),
             nominationResult.account_id,
             nominationResult.nomination.getScore(),
-            new Date().getTime()
+            nominationResult.nomination.timeClaimed
         );
     }
 

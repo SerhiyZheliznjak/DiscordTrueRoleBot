@@ -2,14 +2,14 @@ import Pair from "./Pair";
 import { MatchJson } from "../dota-api/DotaJsonTypings";
 
 export default class Nomination {
-    public timeClaimed: number;
     protected name: string;
     protected minScore: number;
     protected msg: string;
 
-    constructor(protected points: Array<Pair<string, string | number>> = []) {
-        this.timeClaimed = new Date().getTime();
-    }
+    constructor(
+        protected points: Array<Pair<string, string | number>> = [],
+        public timeClaimed: number = new Date().getTime()
+    ) { }
 
     public getKey(): number {
         return this.name.split("").reduce((a, b) => {
