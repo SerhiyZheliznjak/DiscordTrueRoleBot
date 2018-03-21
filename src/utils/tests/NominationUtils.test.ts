@@ -44,7 +44,7 @@ describe(`NominationUtils`, () => {
 
     it(`should return false for hasNewMatches when stored matches aren't empty and recent are`, () => {
         storedMatches.recentMatchesIds.push(...[0, 1, 2, 3, 4]);
-        expect(utils.hasNewMatches(recentMatches, storedMatches)).toBeTruthy();
+        expect(utils.hasNewMatches(recentMatches, storedMatches)).toBeFalsy();
     });
 
     it(`should hasNewMatches`, () => {
