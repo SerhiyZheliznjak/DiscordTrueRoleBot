@@ -65,7 +65,7 @@ describe(`NominationUtils`, () => {
 
     function setupTestData() {
         process.env.MONGODB_URI = 'Mongo/db';
-        oldMatches = require('../test-data/OstapRecentMatches.json').map(m => Object.assign({}, m));
+        oldMatches = require('../../test-data/OstapRecentMatches.json').map(m => Object.assign({}, m));
         recentMatches = new PlayerRecentMatches(7, []);
         storedMatches = new PlayerRecentMatches(7, []);
     }

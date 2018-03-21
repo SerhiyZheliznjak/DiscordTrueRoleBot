@@ -6,7 +6,7 @@
     "build": "tsc",
     "dev": "tsc --watch & nodemon",
     "start": "tsc && node ../DiscordTrueRoleDeployment/src/bot.js",
-    "test": "nodemon --exec jasmine-ts \"./src/tests/**/*.test.ts\""
+    "test": "nodemon --exec jasmine-ts \"./src/**/*.test.ts\""
   },
   "author": "Serhiy Zheliznyak",
   "license": "ISC",
