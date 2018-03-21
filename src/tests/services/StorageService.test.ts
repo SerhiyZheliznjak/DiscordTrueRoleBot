@@ -1,5 +1,5 @@
-import StorageService from "../../src/services/StorageService";
-import Constants from "../../src/Constants";
+import StorageService from "../../services/StorageService";
+import Constants from "../../Constants";
 
 describe(`StorageService`, () => {
 
@@ -76,6 +76,7 @@ describe(`StorageService`, () => {
     }
 
     function setupTestData() {
+        process.env.MONGODB_URI = 'Mongo/db';
         recentMatches = { table: [{ match_id: 898989898 }] };
         winners = {table: [{account_id: 998989}]};
     }

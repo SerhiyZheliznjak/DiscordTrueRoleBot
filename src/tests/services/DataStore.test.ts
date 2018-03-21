@@ -1,6 +1,6 @@
-import  from '../../src/';
+import DataStore from "../../services/DataStore";
 
-describe(``, () => {
+describe(`DataStore`, () => {
     beforeEach(() => {
         setupTestData();
         setupMocks();

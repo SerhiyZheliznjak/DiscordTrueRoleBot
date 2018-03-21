@@ -1,6 +1,6 @@
-import NominationService from "../../src/services/NominationService";
+import NominationService from "../../services/NominationService";
 import { Observable, Observer } from "rxjs";
-import { MatchJson } from "../../src/dota-api/DotaJsonTypings";
+import { MatchJson } from "../../dota-api/DotaJsonTypings";
 
 describe(`NominationService`, () => {
     let service;

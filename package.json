@@ -4,9 +4,9 @@
   "main": "bot.js",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch & nodemon dist",
-    "start": "tsc && node ./dist/bot.js",
-    "test": "jasmine-ts \"./tests/**/*.test.ts\""
+    "dev": "tsc --watch & nodemon",
+    "start": "tsc && node ../DiscordTrueRoleDeployment/src/bot.js",
+    "test": "nodemon --exec jasmine-ts \"./src/tests/**/*.test.ts\""
   },
   "author": "Serhiy Zheliznyak",
   "license": "ISC",

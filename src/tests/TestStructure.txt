@@ -1,9 +1,11 @@
-import DataStore from "../../src/services/DataStore";
+import  from '../../src/';
 
-describe(`DataStore`, () => {
+describe(``, () => {
+    let testedStuff;
     beforeEach(() => {
         setupTestData();
         setupMocks();
+        testedStuff = new ();
     });
 
     it(`should `, () => {
@@ -21,6 +23,6 @@ describe(`DataStore`, () => {
     }
 
     function setupTestData() {
-
+        process.env.MONGODB_URI = 'Mongo/db';
     }
 });

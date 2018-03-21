@@ -1,4 +1,4 @@
-import DotaApi from '../../src/dota-api/DotaApi';
+import DotaApi from '../../dota-api/DotaApi';
 import { Observable } from 'rxjs';
 
 let dotaApi: DotaApi;
@@ -12,15 +12,6 @@ describe(`DotaApi`, () => {
     });
     it(`should queue request`, () => {
         dotaApi.getMatch(89898).subscribe(() => {});
-        dotaApi.getMatch(89898).subscribe(() => {});
-        dotaApi.getMatch(777).subscribe(() => {});
-        expect(DotaApi.queue.length).toBe(2);
-        expect(DotaApi.queue[0].observers.length).toBe(2);
-        expect(DotaApi.queue[1].observers.length).toBe(1);
-    });
-
-    it(`should share only one request queue`, () => {
-        new DotaApi(RxHttpRequestMock).getMatch(89898).subscribe(() => {});
         dotaApi.getMatch(89898).subscribe(() => {});
         dotaApi.getMatch(777).subscribe(() => {});
         expect(DotaApi.queue.length).toBe(2);
