@@ -51,6 +51,6 @@ export default class Nomination {
         return this.getScore() >= this.minScore;
     }
     protected scorePoint(match: MatchJson, player_slot: number): string | number {
-        return null;
+        throw new Error('Should be implemented by child classes');
     }
 }

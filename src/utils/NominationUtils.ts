@@ -12,24 +12,14 @@ export default class NominationUtils {
     }
 
     public hasNewMatches(freshMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): boolean {
-        let hasNewMatch = false;
         if (this.noMatches(storedMatches)) {
-            hasNewMatch = !this.noMatches(freshMatches);
+            return !this.noMatches(freshMatches);
         } else {
             if (!this.noMatches(freshMatches)) {
-                hasNewMatch = this.freshMatchesNotStored(freshMatches, storedMatches);
+                return this.freshMatchesNotStored(freshMatches, storedMatches);
             }
         }
-        return hasNewMatch;
-    }
-
-    public noMatches(playerMatches: PlayerRecentMatches): boolean {
-        return !playerMatches || !playerMatches.recentMatchesIds || !playerMatches.recentMatchesIds.length;
-    }
-
-    public freshMatchesNotStored(freshMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): boolean {
-        const notStored = freshMatches.recentMatchesIds.filter(match_id => storedMatches.recentMatchesIds.indexOf(match_id) < 0);
-        return notStored.length > 0;
+        return false;
     }
 
     public getNewMatches(recentMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): PlayerRecentMatches {
@@ -40,12 +30,9 @@ export default class NominationUtils {
     }
 
     public isClaimedNomination(newWinner: NominationResult, storedWinner: NominationResult): boolean {
-        return !storedWinner || this.isOutOfDueDate(storedWinner)
+        return !storedWinner
+            || this.isOutOfDueDate(storedWinner)
             || newWinner.nomination.hasHigherScoreThen(storedWinner.nomination);
-    }
-
-    public isOutOfDueDate(storedWinner: NominationResult) {
-        return new Date().getTime() - storedWinner.nomination.timeClaimed >= Constants.NOMINATION_DUE_INTERVAL;
     }
 
     public getNewRecords(hallOfFame: Map<number, NominationResult>, newResults: Map<number, NominationResult>): NominationResult[] {
@@ -53,8 +40,7 @@ export default class NominationUtils {
         for (const nominationName of newResults.keys()) {
             const newWinner = newResults.get(nominationName);
             if (newWinner.account_id !== Constants.UNCLAIMED && newWinner.nomination.isScored()) {
-                const storedWinner = hallOfFame.get(nominationName);
-                if (this.isClaimedNomination(newWinner, storedWinner)) {
+                if (this.isClaimedNomination(newWinner, hallOfFame.get(nominationName))) {
                     newNominationsClaimed.push(newWinner);
                 }
             }
@@ -67,5 +53,18 @@ export default class NominationUtils {
             pfm.matches.push(match);
         }
         return pfm;
+    }
+
+    private freshMatchesNotStored(freshMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): boolean {
+        const notStored = freshMatches.recentMatchesIds.filter(match_id => storedMatches.recentMatchesIds.indexOf(match_id) < 0);
+        return notStored.length > 0;
+    }
+
+    private noMatches(playerMatches: PlayerRecentMatches): boolean {
+        return !playerMatches || !playerMatches.recentMatchesIds || !playerMatches.recentMatchesIds.length;
+    }
+
+    private isOutOfDueDate(storedWinner: NominationResult) {
+        return new Date().getTime() - storedWinner.nomination.timeClaimed >= Constants.NOMINATION_DUE_INTERVAL;
     }
 }

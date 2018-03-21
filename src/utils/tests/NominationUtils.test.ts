@@ -2,16 +2,23 @@ import {} from 'jasmine';
 import NominationUtils from '../../utils/NominationUtils';
 import { RecentMatchJson } from '../../dota-api/DotaJsonTypings';
 import PlayerRecentMatches from '../../model/PlayerRecentMatches';
+import Nomination from '../../model/Nomination';
+import { Nenza } from '../../model/nominations/Nenza';
+import NominationResult from '../../model/NominationResult';
+import Constants from '../../Constants';
 
 describe(`NominationUtils`, () => {
     let utils: NominationUtils;
     let oldMatches;
     let recentMatches: PlayerRecentMatches;
     let storedMatches: PlayerRecentMatches;
+    let newWinner: NominationResult;
+    let hallOfFameWinner: NominationResult;
+    let hallOfFame: Map<number, NominationResult>;
+    let newResults: Map<number, NominationResult>;
 
     beforeEach(() => {
         setupTestData();
-        setupMocks();
         utils = new NominationUtils();
     });
 
@@ -47,26 +54,110 @@ describe(`NominationUtils`, () => {
         expect(utils.hasNewMatches(recentMatches, storedMatches)).toBeFalsy();
     });
 
-    it(`should hasNewMatches`, () => {
+    it(`should return false for hasNewMatches when all recent matches are stored`, () => {
+        storedMatches.recentMatchesIds.push(...[0, 1, 2, 3, 4]);
+        recentMatches.recentMatchesIds.push(...storedMatches.recentMatchesIds);
 
+        expect(utils.hasNewMatches(recentMatches, storedMatches)).toBeFalsy();
     });
 
-    it(`should hasNewMatches`, () => {
+    it(`should return true for hasNewMatches when at least one recent matche isn't stored`, () => {
+        storedMatches.recentMatchesIds.push(...[0, 1, 2, 3, 4]);
+        recentMatches.recentMatchesIds.push(...storedMatches.recentMatchesIds);
+        recentMatches.recentMatchesIds.push(5);
 
+        expect(utils.hasNewMatches(recentMatches, storedMatches)).toBeTruthy();
     });
 
-    it(`should hasNewMatches`, () => {
-
+    it(`should getNewMatches return all recent matches if any of it new`, () => {
+        storedMatches.recentMatchesIds.push(...[0, 1, 2, 3, 4]);
+        recentMatches.recentMatchesIds.push(5, 6);
+        expect(utils.getNewMatches(recentMatches, storedMatches)).toEqual(recentMatches);
     });
 
-    function setupMocks() {
+    it(`should getNewMatches return empty PlayerRecentMatches if there are no new matches`, () => {
+        storedMatches.recentMatchesIds.push(...[0, 1, 2, 3, 4]);
+        recentMatches.recentMatchesIds.push(...storedMatches.recentMatchesIds);
 
-    }
+        expect(utils.getNewMatches(recentMatches, storedMatches)).toEqual(new PlayerRecentMatches(recentMatches.account_id, []));
+    });
+
+    it(`should return true for isClaimedNomination when not in hallOfFame`, () => {
+        expect(utils.isClaimedNomination(newWinner, undefined)).toBeTruthy();
+    });
+
+    it(`should return true for isClaimedNomination when hallOfFame winner is out of due date`, () => {
+        hallOfFameWinner.nomination.timeClaimed = new Date().getTime() - Constants.NOMINATION_DUE_INTERVAL;
+
+        expect(utils.isClaimedNomination(newWinner, hallOfFameWinner)).toBeTruthy();
+    });
+
+    it(`should return true for isClaimedNomination when hallOfFame winner has no score and new winner has`, () => {
+        newWinner.nomination.addPoint('5', 45);
+
+        expect(utils.isClaimedNomination(newWinner, hallOfFameWinner)).toBeTruthy();
+    });
+
+    it(`should return true for isClaimedNomination when hallOfFame winner has lower score then new winner has`, () => {
+        newWinner.nomination.addPoint('5', 45);
+        hallOfFameWinner.nomination.addPoint('5', 44);
+
+        expect(utils.isClaimedNomination(newWinner, hallOfFameWinner)).toBeTruthy();
+    });
+
+    it(`should return flase for isClaimedNomination when hallOfFame winner has same score then new winner has`, () => {
+        newWinner.nomination.addPoint('5', 45);
+        hallOfFameWinner.nomination.addPoint('5', 45);
+
+        expect(utils.isClaimedNomination(newWinner, hallOfFameWinner)).toBeFalsy();
+    });
+
+    it(`should return flase for isClaimedNomination when hallOfFame winner has score and new winner has not`, () => {
+        hallOfFameWinner.nomination.addPoint('5', 46);
+
+        expect(utils.isClaimedNomination(newWinner, hallOfFameWinner)).toBeFalsy();
+    });
+
+    it(`should return empty array for getNewRecords if new results are empty`, () => {
+        hallOfFame.set(0, hallOfFameWinner);
+        expect(utils.getNewRecords(hallOfFame, newResults)).toEqual([]);
+    });
+
+    it(`should return empty array for getNewRecords if new results aren't scored`, () => {
+        hallOfFame.set(0, hallOfFameWinner);
+        newResults.set(1, newWinner);
+        newResults.set(2, newWinner);
+        newResults.set(3, newWinner);
+        expect(utils.getNewRecords(hallOfFame, newResults)).toEqual([]);
+    });
+
+    it(`should return empty array for getNewRecords if new winner id equals unclaimed`, () => {
+        hallOfFame.set(0, hallOfFameWinner);
+        newWinner.account_id = Constants.UNCLAIMED;
+        newWinner.nomination.addPoint('0', 100500);
+        newResults.set(1, newWinner);
+        newResults.set(2, newWinner);
+        newResults.set(3, newWinner);
+        expect(utils.getNewRecords(hallOfFame, newResults)).toEqual([]);
+    });
+
+    it(`should return winners for getNewRecords`, () => {
+        hallOfFame.set(0, hallOfFameWinner);
+        newWinner.nomination.addPoint('0', 100500);
+        newResults.set(1, newWinner);
+        newResults.set(2, newWinner);
+        newResults.set(3, hallOfFameWinner);
+        expect(utils.getNewRecords(hallOfFame, newResults)).toEqual([newWinner, newWinner]);
+    });
 
     function setupTestData() {
         process.env.MONGODB_URI = 'Mongo/db';
         oldMatches = require('../../test-data/OstapRecentMatches.json').map(m => Object.assign({}, m));
         recentMatches = new PlayerRecentMatches(7, []);
         storedMatches = new PlayerRecentMatches(7, []);
+        newWinner = new NominationResult(7, new Nenza());
+        hallOfFameWinner = new NominationResult(7, new Nenza());
+        hallOfFame = new Map();
+        newResults = new Map();
     }
 });
