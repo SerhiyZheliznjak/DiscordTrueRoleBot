@@ -45,7 +45,9 @@ export default class NominationService {
 
   public mapRecentMatchesToNew(recentMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): PlayerRecentMatches {
     const newMatches = this.nominationUtils.getNewMatches(recentMatches, storedMatches);
-    this.dataStore.updatePlayerRecentMatch(newMatches.account_id, newMatches.recentMatchesIds);
+    if (newMatches.recentMatchesIds.length) {
+      this.dataStore.updatePlayerRecentMatch(newMatches.account_id, newMatches.recentMatchesIds);
+    }
     return newMatches;
   }
 

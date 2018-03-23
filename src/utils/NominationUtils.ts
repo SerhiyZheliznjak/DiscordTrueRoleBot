@@ -22,7 +22,7 @@ export default class NominationUtils {
         return false;
     }
 
-    public getNewMatches(recentMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): PlayerRecentMatches {
+    public  getNewMatches(recentMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): PlayerRecentMatches {
         if (this.hasNewMatches(recentMatches, storedMatches)) {
             return recentMatches;
         }
