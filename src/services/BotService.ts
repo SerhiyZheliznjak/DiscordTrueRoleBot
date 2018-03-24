@@ -7,9 +7,13 @@ import NominationResult from '../model/NominationResult';
 import StorageService from './StorageService';
 import Constants from '../Constants';
 import Pair from '../model/Pair';
+import NominationResultJson from '../model/json/NominationResultJson';
+import Nominations from '../model/Nominations';
+import Nomination from '../model/Nomination';
 
 export default class BotService {
     private retardMap = new Map();
+    private nominationKeysMap: Map<string, string>;
     private claimedNominationsSubscription: Subscription;
     private chanel;
 
@@ -20,6 +24,10 @@ export default class BotService {
         private storageService: StorageService = new StorageService()
     ) {
         this.chanel = this.client.channels.find('type', 'text');
+        this.nominationKeysMap = Nominations.all.reduce((map: Map<string, string>, nomination: Nomination) => {
+            map.set(nomination.constructor.name, nomination.getName());
+            return map;
+        }, new Map());
     }
 
     public processMesage(msg: Message): void {
@@ -36,11 +44,17 @@ export default class BotService {
         if (msg.content.toLocaleLowerCase() === 'registerall') {
             this.registerall(msg);
         }
-        if (msg.content.toLowerCase().startsWith("watch ")) {
+        if (msg.content.toLowerCase().startsWith('watch')) {
             this.addWatch(msg);
         }
         if (msg.content.toLocaleLowerCase() === 'watchlist') {
             this.showRegistered(msg);
+        }
+        if (msg.content.toLowerCase().startsWith('нагадай ключі')) {
+            this.showNominationKeys(msg);
+        }
+        if (msg.content.toLowerCase().startsWith('хто там ')) {
+            this.getNominationResult(msg);
         }
     }
 
@@ -206,5 +220,28 @@ export default class BotService {
 
     private getNominationWithPlayerProfile(claimedNomination: NominationResult): Observable<Pair<NominationResult, ProfileJson>> {
         return this.dataStore.getProfile(claimedNomination.account_id).map(profile => new Pair(claimedNomination, profile));
+    }
+
+    private showNominationKeys(msg: Message): void {
+        this.dataStore.hallOfFame.subscribe((hallOfFame: Map<number, NominationResultJson>) => {
+            let keys = '';
+            for (const key of hallOfFame.keys()) {
+                keys += key + ': ' + hallOfFame.get(key).nominationName + '\n';
+            }
+            msg.reply(keys);
+        });
+    }
+
+    private getNominationResult(msg: Message): void {
+        const arr = msg.content.toLowerCase().split(' ');
+        if (arr.length === 3) {
+            this.dataStore.hallOfFame.subscribe((hallOfFame: Map<number, NominationResultJson>) => {
+                if (arr[2] === 'all') {
+                    // maybe I will finish it at some point
+                }
+            });
+        } else {
+            this.retardPlusPlus(msg);
+        }
     }
 }
