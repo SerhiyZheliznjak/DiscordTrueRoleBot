@@ -6,6 +6,8 @@ import Nomination from '../../model/Nomination';
 import { Nenza } from '../../model/nominations/Nenza';
 import NominationResult from '../../model/NominationResult';
 import Constants from '../../Constants';
+import { WinnerForLife } from '../../model/nominations/WinnerForLife';
+import NominationResultJson from '../../model/json/NominationResultJson';
 
 describe(`NominationUtils`, () => {
     let utils: NominationUtils;
@@ -13,8 +15,8 @@ describe(`NominationUtils`, () => {
     let recentMatches: PlayerRecentMatches;
     let storedMatches: PlayerRecentMatches;
     let newWinner: NominationResult;
-    let hallOfFameWinner: NominationResult;
-    let hallOfFame: Map<number, NominationResult>;
+    let hallOfFameWinner: NominationResultJson;
+    let hallOfFame: Map<number, NominationResultJson>;
     let newResults: Map<number, NominationResult>;
 
     beforeEach(() => {
@@ -87,7 +89,7 @@ describe(`NominationUtils`, () => {
     });
 
     it(`should return true for isClaimedNomination when hallOfFame winner is out of due date`, () => {
-        hallOfFameWinner.nomination.timeClaimed = new Date().getTime() - Constants.NOMINATION_DUE_INTERVAL;
+        hallOfFameWinner.timeClaimed = new Date().getTime() - Constants.NOMINATION_DUE_INTERVAL;
 
         expect(utils.isClaimedNomination(newWinner, hallOfFameWinner)).toBeTruthy();
     });
@@ -100,20 +102,29 @@ describe(`NominationUtils`, () => {
 
     it(`should return true for isClaimedNomination when hallOfFame winner has lower score then new winner has`, () => {
         newWinner.nomination.addPoint('5', 45);
-        hallOfFameWinner.nomination.addPoint('5', 44);
+        hallOfFameWinner.score = 44;
 
         expect(utils.isClaimedNomination(newWinner, hallOfFameWinner)).toBeTruthy();
     });
 
-    it(`should return flase for isClaimedNomination when hallOfFame winner has same score then new winner has`, () => {
+    it(`should return flase for isClaimedNomination when hallOfFame winner has same score as new winner has`, () => {
         newWinner.nomination.addPoint('5', 45);
-        hallOfFameWinner.nomination.addPoint('5', 45);
+        hallOfFameWinner.score = 45;
 
         expect(utils.isClaimedNomination(newWinner, hallOfFameWinner)).toBeFalsy();
     });
 
+    it(`should return flase for isClaimedNomination when it's the same result for same player, but just recalculated`, () => {
+        [newWinner, hallOfFameWinner].forEach((winner, i) => {
+            winner = new NominationResult(314684987, new WinnerForLife());
+            winner.nomination.addPoint('444', 13);
+            winner.nomination.timeClaimed = new Date().getTime() - (i * 1000 * 60 * 30);
+        });
+        expect(utils.isClaimedNomination(newWinner, hallOfFameWinner)).toBeFalsy();
+    });
+
     it(`should return flase for isClaimedNomination when hallOfFame winner has score and new winner has not`, () => {
-        hallOfFameWinner.nomination.addPoint('5', 46);
+        hallOfFameWinner.score = 46;
 
         expect(utils.isClaimedNomination(newWinner, hallOfFameWinner)).toBeFalsy();
     });
@@ -144,9 +155,11 @@ describe(`NominationUtils`, () => {
     it(`should return winners for getNewRecords`, () => {
         hallOfFame.set(0, hallOfFameWinner);
         newWinner.nomination.addPoint('0', 100500);
+        const almostWinner = new NominationResult(hallOfFameWinner.owner_account_id, new Nenza());
+        almostWinner.nomination.addPoint('0', hallOfFameWinner.score);
         newResults.set(1, newWinner);
         newResults.set(2, newWinner);
-        newResults.set(3, hallOfFameWinner);
+        newResults.set(3, almostWinner);
         expect(utils.getNewRecords(hallOfFame, newResults)).toEqual([newWinner, newWinner]);
     });
 
@@ -156,7 +169,17 @@ describe(`NominationUtils`, () => {
         recentMatches = new PlayerRecentMatches(7, []);
         storedMatches = new PlayerRecentMatches(7, []);
         newWinner = new NominationResult(7, new Nenza());
-        hallOfFameWinner = new NominationResult(7, new Nenza());
+        hallOfFameWinner = new NominationResultJson(1005629726, 'Nenza', 7, 0, new Date().getTime());
+         // {
+    //     "_id": {
+    //         "$oid": "5ab555635ccb13ced433ca05"
+    //     },
+    //     "key": -347474430,
+    //     "nominationName": "Пабідітіль па жизні",
+    //     "owner_account_id": 314684987,
+    //     "score": 13,
+    //     "timeClaimed": 1521913843753
+    // }
         hallOfFame = new Map();
         newResults = new Map();
     }

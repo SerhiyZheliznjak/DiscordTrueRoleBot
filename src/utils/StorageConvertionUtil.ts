@@ -32,19 +32,15 @@ export default class StorageConvertionUtil {
         );
     }
 
-    public static convertToWonNominations(nominationsWinnersJson: NominationResultJson[]): Map<number, NominationResult> {
-        return nominationsWinnersJson.reduce((map, nwj) => {
+    public static convertToWonNominations(hallOfFame: NominationResultJson[]): Map<number, NominationResultJson> {
+        return hallOfFame.reduce((map, nwj) => {
             if (this.isValidNominationResult(nwj)) {
-                const nomination = NominationFactory.createByName(nwj.nominationName);
-                nomination.addPoint(Constants.WINNING_MATCH_ID, nwj.score);
-                nomination.timeClaimed = nwj.timeClaimed;
-                const nw = new NominationResult(nwj.owner_account_id, nomination);
-                map.set(nwj.key, nw);
+                map.set(nwj.key, nwj);
             } else {
                 console.error('Corrupted nomination result ', nwj);
             }
             return map;
-        }, new Map<number, NominationResult>());
+        }, new Map<number, NominationResultJson>());
     }
 
     public static convertToPlayerObserved(registeredPlayersJson: RegisteredPlayerJson[]): Map<number, string> {

@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 import { RecentMatchJson } from "../dota-api/DotaJsonTypings";
 import Constants from "../Constants";
 import NominationResult from "../model/NominationResult";
+import NominationResultJson from "../model/json/NominationResultJson";
 
 export default class NominationUtils {
     public isFreshMatch(recentMatch: RecentMatchJson): boolean {
@@ -22,20 +23,20 @@ export default class NominationUtils {
         return false;
     }
 
-    public  getNewMatches(recentMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): PlayerRecentMatches {
+    public getNewMatches(recentMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): PlayerRecentMatches {
         if (this.hasNewMatches(recentMatches, storedMatches)) {
             return recentMatches;
         }
         return new PlayerRecentMatches(recentMatches.account_id, []);
     }
 
-    public isClaimedNomination(newWinner: NominationResult, storedWinner: NominationResult): boolean {
-        return !storedWinner
+    public isClaimedNomination(newWinner: NominationResult, storedWinner: NominationResultJson): boolean {
+        return this.noStoredWinner(storedWinner)
             || this.isOutOfDueDate(storedWinner)
-            || newWinner.nomination.hasHigherScoreThen(storedWinner.nomination);
+            || newWinner.nomination.getScore() > storedWinner.score;
     }
 
-    public getNewRecords(hallOfFame: Map<number, NominationResult>, newResults: Map<number, NominationResult>): NominationResult[] {
+    public getNewRecords(hallOfFame: Map<number, NominationResultJson>, newResults: Map<number, NominationResult>): NominationResult[] {
         const newNominationsClaimed: NominationResult[] = [];
         for (const nominationName of newResults.keys()) {
             const newWinner = newResults.get(nominationName);
@@ -64,7 +65,11 @@ export default class NominationUtils {
         return !playerMatches || !playerMatches.recentMatchesIds || !playerMatches.recentMatchesIds.length;
     }
 
-    private isOutOfDueDate(storedWinner: NominationResult) {
-        return new Date().getTime() - storedWinner.nomination.timeClaimed >= Constants.NOMINATION_DUE_INTERVAL;
+    private noStoredWinner(storedWinner: NominationResultJson): boolean {
+        return !storedWinner;
+    }
+
+    private isOutOfDueDate(storedWinner: NominationResultJson) {
+        return new Date().getTime() - storedWinner.timeClaimed >= Constants.NOMINATION_DUE_INTERVAL;
     }
 }

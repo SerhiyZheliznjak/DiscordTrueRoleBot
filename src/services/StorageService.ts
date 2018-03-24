@@ -23,7 +23,7 @@ export default class StorageService {
             );
     }
 
-    public getWinners(): Observable<Map<number, NominationResult>> {
+    public getWinners(): Observable<Map<number, NominationResultJson>> {
         return this.find<NominationResultJson>(Constants.HALL_OF_FAME_COLLECTION)
             .map(json => StorageConvertionUtil.convertToWonNominations(json));
     }

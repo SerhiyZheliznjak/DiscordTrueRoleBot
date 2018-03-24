@@ -9,6 +9,7 @@ import Constants from '../Constants';
 import PlayerRecentMatches from '../model/PlayerRecentMatches';
 import PlayerFullMatches from '../model/PlayerFullMatches';
 import NominationUtils from '../utils/NominationUtils';
+import NominationResultJson from '../model/json/NominationResultJson';
 
 export default class NominationService {
   private subscription: Subscription;
@@ -70,15 +71,10 @@ export default class NominationService {
     });
   }
 
-  public countResults(playersMatches: PlayerFullMatches[]): void {
-    this.dataStore.hallOfFame.subscribe(hallOfFame => {
-      const scoreBoard = new ScoreBoard();
-      playersMatches.forEach(pfm => scoreBoard.scorePlayer(pfm.account_id, pfm.matches));
-      const newNominationsClaimed = this.nominationUtils.getNewRecords(hallOfFame, scoreBoard.nominationsResults);
-      if (!!newNominationsClaimed.length) {
-        this.awardWinners(newNominationsClaimed);
-      }
-    });
+  public getNewResults(playersMatches: PlayerFullMatches[], hallOfFame: Map<number, NominationResultJson>): NominationResult[] {
+    const scoreBoard = new ScoreBoard();
+    playersMatches.forEach(pfm => scoreBoard.scorePlayer(pfm.account_id, pfm.matches));
+    return this.nominationUtils.getNewRecords(hallOfFame, scoreBoard.nominationsResults);
   }
 
   public awardWinners(newNominationsClaimed: NominationResult[]): void {
@@ -95,7 +91,14 @@ export default class NominationService {
       .map((playerMatches: PlayerRecentMatches[]) => this.mapRecentMatchesToNew(playerMatches[0], playerMatches[1]))
       .flatMap((playerWithNewMatches: PlayerRecentMatches) => this.mapToPlayerWithFullMatches(playerWithNewMatches))
       .reduce((arr: PlayerFullMatches[], pfm: PlayerFullMatches) => [...arr, pfm], [])
-      .subscribe((playersMatches: PlayerFullMatches[]) => this.countResults(playersMatches));
+      .subscribe((playersMatches: PlayerFullMatches[]) => {
+        this.dataStore.hallOfFame.subscribe(hallOfFame => {
+          const newNominationsClaimed = this.getNewResults(playersMatches, hallOfFame);
+          if (!!newNominationsClaimed.length) {
+            this.awardWinners(newNominationsClaimed);
+          }
+        });
+      });
   }
 
   private getDotaIds(playersMap: Map<number, string>): number[] {

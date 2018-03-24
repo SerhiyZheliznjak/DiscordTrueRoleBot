@@ -5,12 +5,11 @@ import { Observable } from "rxjs";
 import DotaApi from "../dota-api/DotaApi";
 import Nomination from "../model/Nomination";
 import PlayerRecentMatches from "../model/PlayerRecentMatches";
+import NominationResultJson from "../model/json/NominationResultJson";
 
 export default class DataStore {
     public static maxMatches: number;
-    private static playersRecentMatchesCacheMap: Map<number, number[]> = new Map();
     private static matchesCacheMap: Map<number, MatchJson> = new Map();
-    private static nominationsResultsCacheMap: Map<number, NominationResult> = new Map();
     private static profilesMap: Map<number, ProfileJson>;
     private static registeredPlayersCache: Map<number, string> = new Map();
 
@@ -27,14 +26,8 @@ export default class DataStore {
         this.storage.updateRecentMatchesForPlayer(account_id, matchesIds);
     }
 
-    public get hallOfFame(): Observable<Map<number, NominationResult>> {
-        if (DataStore.nominationsResultsCacheMap.size === 0) {
-            return this.storage.getWinners().map(map => {
-                DataStore.nominationsResultsCacheMap = map;
-                return map;
-            });
-        }
-        return Observable.of(DataStore.nominationsResultsCacheMap);
+    public get hallOfFame(): Observable<Map<number, NominationResultJson>> {
+        return this.storage.getWinners();
     }
 
     public updateNominationResult(nominationResult: NominationResult): void {
