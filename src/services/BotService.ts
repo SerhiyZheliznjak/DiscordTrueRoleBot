@@ -235,11 +235,17 @@ export default class BotService {
     private getNominationResult(msg: Message): void {
         const arr = msg.content.toLowerCase().split(' ');
         if (arr.length === 3) {
-            this.dataStore.hallOfFame.subscribe((hallOfFame: Map<number, NominationResultJson>) => {
-                if (arr[2] === 'all') {
-                    // maybe I will finish it at some point
-                }
-            });
+            const nominationName = this.nominationKeysMap.get(arr[2]);
+            if (nominationName) {
+                this.dataStore.hallOfFame.subscribe((hallOfFame: Map<number, NominationResultJson>) => {
+                    for (const key of hallOfFame.keys()) {
+                        if (hallOfFame.get(key).nominationName === nominationName) {
+                            // msg.reply(this.getRichEmbed(hallOfFame.get(key).nominationName,
+                        // ));
+                        }
+                    }
+                });
+            }
         } else {
             this.retardPlusPlus(msg);
         }
