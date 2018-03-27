@@ -199,7 +199,7 @@ export default class BotService {
         const richEmbed = new RichEmbed();
         richEmbed.setTitle(title);
         richEmbed.setDescription(description);
-        richEmbed.setImage(avatarUrl);
+        richEmbed.setThumbnail(avatarUrl);
         richEmbed.setFooter(footer);
         if (url) {
             richEmbed.setURL(url);
