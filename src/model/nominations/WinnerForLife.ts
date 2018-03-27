@@ -4,7 +4,7 @@ import Constants from "../../Constants";
 import Pair from "../Pair";
 
 export class WinnerForLife extends Nomination {
-    constructor(protected points: Array<Pair<string, number | string>> = []) {
+    constructor(protected points: Array<Pair<number, number | string>> = []) {
         super(points);
         this.name = 'Пабідітіль па жизні';
         this.minScore = 10;
@@ -13,6 +13,10 @@ export class WinnerForLife extends Nomination {
 
     public getScoreText(): string {
         return 'Виграно матчів: ' + this.getScore();
+    }
+
+    public getScoreDescription(): string {
+        return ' виграти матчів ';
     }
 
     protected scorePoint(match, player_slot) {

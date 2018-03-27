@@ -184,6 +184,7 @@ export class PlayerJson {
         number
     ];
     tower_damage: number;
+    teamfight_participation: number;
     xp_per_min: number;
     xp_reasons: {};
     xp_t: [

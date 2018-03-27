@@ -3,7 +3,7 @@ import { DotaParser } from "../../services/DotaParser";
 import Pair from "../Pair";
 
 export class StunningMan extends Nomination {
-    constructor(protected points: Array<Pair<string, number | string>> = []) {
+    constructor(protected points: Array<Pair<number, number | string>> = []) {
         super(points);
         this.name = 'Гупало Василь';
         this.minScore = 100;
@@ -12,6 +12,10 @@ export class StunningMan extends Nomination {
 
     public getScoreText(): string {
         return 'Протримав ворогів у приголомшені: ' + this.getScore() + 'сек';
+    }
+
+    public getScoreDescription(): string {
+        return ' протримати ворогів у приголомшенні ';
     }
 
     protected scorePoint(match, player_slot) {

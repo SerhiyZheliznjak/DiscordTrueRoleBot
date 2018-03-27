@@ -4,7 +4,7 @@ import Pair from "../Pair";
 import { PlayerJson } from "../../dota-api/DotaJsonTypings";
 
 export class TacticalFeeder extends Nomination {
-    constructor(protected points: Array<Pair<string, number | string>> = []) {
+    constructor(protected points: Array<Pair<number, number | string>> = []) {
         super(points);
         this.name = 'Тактичний Фідер';
         this.minScore = 1;
@@ -13,6 +13,10 @@ export class TacticalFeeder extends Nomination {
 
     public getScoreText(): string {
         return 'Виграно матчів фідженням: ' + this.getScore();
+    }
+
+    public getScoreDescription(): string {
+        return ' виграти матчів безбожно фідячи ворога ';
     }
 
     protected scorePoint(match, player_slot): number {

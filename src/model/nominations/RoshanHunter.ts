@@ -2,20 +2,20 @@ import Nomination from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
 import Pair from "../Pair";
 
-export class ChickeSoupLover extends Nomination {
+export class RoshanHunter extends Nomination {
     constructor(protected points: Array<Pair<number, number | string>> = []) {
         super(points);
-        this.name = 'Збирає на росіл';
+        this.name = 'Рошан-хуян';
         this.minScore = 3;
-        this.msg = 'А як ще пояснити нащо йому всі ті кури?';
+        this.msg = 'Не такий страшний Рошан як його малюють';
     }
 
     public getScoreText(): string {
-        return 'Вбито кур\'єрів: ' + this.getScore();
+        return 'Вбито Рошанів: ' + this.getScore();
     }
 
     public getScoreDescription(): string {
-        return ' вбити кур\'єрів ';
+        return ' вбити рошанів ';
     }
 
     protected scorePoint(match, player_slot) {
@@ -23,6 +23,6 @@ export class ChickeSoupLover extends Nomination {
             return 0;
         }
         const player = DotaParser.getPlayerInfo(match, player_slot);
-        return player && player.courier_kills ? player.courier_kills : 0;
+        return player && player.roshan_kills ? player.roshan_kills : 0;
     }
 }

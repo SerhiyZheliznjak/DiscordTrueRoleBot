@@ -7,7 +7,7 @@ export default class Nomination {
     protected msg: string;
 
     constructor(
-        protected points: Array<Pair<string, string | number>> = [],
+        protected points: Array<Pair<number, string | number>> = [],
         public timeClaimed: number = new Date().getTime()
     ) { }
 
@@ -18,19 +18,20 @@ export default class Nomination {
         }, 0);
     }
 
-    public getName() {
+    public getName(): string {
         return this.name;
     }
-    public scoreMatch(match, player_slot) {
+
+    public scoreMatch(match: MatchJson, player_slot: number): void {
         this.addPoint(match.match_id, this.scorePoint(match, player_slot));
     }
-    public addPoint(match_id: string, point: string | number) {
+    public addPoint(match_id: number, point: string | number) {
         this.points.push(new Pair(match_id, point));
         while (this.points.length > 20) {
             this.points.shift();
         }
     }
-    public getPoints() {
+    public getPoints(): Array<Pair<number, string | number>> {
         return this.points;
     }
     public getScore(): number {
@@ -41,15 +42,20 @@ export default class Nomination {
     public getScoreText(): string {
         return '' + this.getScore();
     }
-    public getMessage() {
+    public getMessage(): string {
         return this.msg;
     }
-    public hasHigherScoreThen(that) {
-        return this.getScore() > that.getScore();
+    public compare(that: Nomination): number {
+        return that.getScore() - this.getScore();
     }
     public isScored(): boolean {
         return this.getScore() >= this.minScore;
     }
+
+    public getScoreDescription(): string {
+        throw new Error('Should be implemented by child classes');
+    }
+
     protected scorePoint(match: MatchJson, player_slot: number): string | number {
         throw new Error('Should be implemented by child classes');
     }

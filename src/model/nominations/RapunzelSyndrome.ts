@@ -5,7 +5,7 @@ import Pair from "../Pair";
 import { MatchJson } from "../../dota-api/DotaJsonTypings";
 
 export class RapunzelSyndrome extends Nomination {
-    constructor(protected points: Array<Pair<string, number | string>> = []) {
+    constructor(protected points: Array<Pair<number, number | string>> = []) {
         super(points);
         this.name = 'Синдром Рапунзель';
         this.minScore = 1;
@@ -14,6 +14,10 @@ export class RapunzelSyndrome extends Nomination {
 
     public getScoreText(): string {
         return 'Добито веж: ' + this.getScore();
+    }
+
+    public getScoreDescription(): string {
+        return ' добити веж ';
     }
 
     protected scorePoint(match, player_slot): number {

@@ -95,20 +95,20 @@ describe(`NominationUtils`, () => {
     });
 
     it(`should return true for isClaimedNomination when hallOfFame winner has no score and new winner has`, () => {
-        newWinner.nomination.addPoint('5', 45);
+        newWinner.nomination.addPoint(5, 45);
 
         expect(utils.isClaimedNomination(newWinner, hallOfFameWinner)).toBeTruthy();
     });
 
     it(`should return true for isClaimedNomination when hallOfFame winner has lower score then new winner has`, () => {
-        newWinner.nomination.addPoint('5', 45);
+        newWinner.nomination.addPoint(5, 45);
         hallOfFameWinner.score = 44;
 
         expect(utils.isClaimedNomination(newWinner, hallOfFameWinner)).toBeTruthy();
     });
 
     it(`should return flase for isClaimedNomination when hallOfFame winner has same score as new winner has`, () => {
-        newWinner.nomination.addPoint('5', 45);
+        newWinner.nomination.addPoint(5, 45);
         hallOfFameWinner.score = 45;
 
         expect(utils.isClaimedNomination(newWinner, hallOfFameWinner)).toBeFalsy();
@@ -117,7 +117,7 @@ describe(`NominationUtils`, () => {
     it(`should return flase for isClaimedNomination when it's the same result for same player, but just recalculated`, () => {
         [newWinner, hallOfFameWinner].forEach((winner, i) => {
             winner = new NominationResult(314684987, new WinnerForLife());
-            winner.nomination.addPoint('444', 13);
+            winner.nomination.addPoint(444, 13);
             winner.nomination.timeClaimed = new Date().getTime() - (i * 1000 * 60 * 30);
         });
         expect(utils.isClaimedNomination(newWinner, hallOfFameWinner)).toBeFalsy();
@@ -145,7 +145,7 @@ describe(`NominationUtils`, () => {
     it(`should return empty array for getNewRecords if new winner id equals unclaimed`, () => {
         hallOfFame.set(0, hallOfFameWinner);
         newWinner.account_id = Constants.UNCLAIMED;
-        newWinner.nomination.addPoint('0', 100500);
+        newWinner.nomination.addPoint(0, 100500);
         newResults.set(1, newWinner);
         newResults.set(2, newWinner);
         newResults.set(3, newWinner);
@@ -154,9 +154,9 @@ describe(`NominationUtils`, () => {
 
     it(`should return winners for getNewRecords`, () => {
         hallOfFame.set(0, hallOfFameWinner);
-        newWinner.nomination.addPoint('0', 100500);
+        newWinner.nomination.addPoint(0, 100500);
         const almostWinner = new NominationResult(hallOfFameWinner.owner_account_id, new Nenza());
-        almostWinner.nomination.addPoint('0', hallOfFameWinner.score);
+        almostWinner.nomination.addPoint(0, hallOfFameWinner.score);
         newResults.set(1, newWinner);
         newResults.set(2, newWinner);
         newResults.set(3, almostWinner);

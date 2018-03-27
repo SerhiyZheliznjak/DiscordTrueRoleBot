@@ -4,7 +4,7 @@ import Constants from "../../Constants";
 import Pair from "../Pair";
 
 export class PingMaster extends Nomination {
-    constructor(protected points: Array<Pair<string, number|string>> = []) {
+    constructor(protected points: Array<Pair<number, number|string>> = []) {
         super(points);
         this.name = 'Майстер Пінг';
         this.minScore = 50;
@@ -14,6 +14,10 @@ export class PingMaster extends Nomination {
 
     public getScoreText(): string {
         return 'Кількість пінгів: ' + this.getScore();
+    }
+
+    public getScoreDescription(): string {
+        return ' напінгати ';
     }
 
     public getScore() {

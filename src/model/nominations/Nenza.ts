@@ -4,7 +4,7 @@ import Pair from "../Pair";
 import { MatchJson } from "../../dota-api/DotaJsonTypings";
 
 export class Nenza extends Nomination {
-    constructor(protected points: Array<Pair<string, number | string>> = []) {
+    constructor(protected points: Array<Pair<number, number | string>> = []) {
         super(points);
         this.name = 'Ненза';
         this.minScore = 1;
@@ -13,6 +13,10 @@ export class Nenza extends Nomination {
 
     public getScoreText(): string {
         return 'Кількість написаної херні в чаті: ' + this.getScore();
+    }
+
+    public getScoreDescription(): string {
+        return ' понаписувати херні ';
     }
 
     protected scorePoint(match: MatchJson, player_slot: number): number {

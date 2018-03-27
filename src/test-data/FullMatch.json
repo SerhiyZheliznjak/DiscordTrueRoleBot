@@ -2116,7 +2116,7 @@
                 "invoker_deafening_blast": 2,
                 "invoker_ice_wall": 1
             },
-            "account_id": null,
+            "account_id": 1,
             "actions": {
                 "1": 3418,
                 "2": 162,
@@ -6142,7 +6142,7 @@
                 "pudge_meat_hook": 37,
                 "pudge_dismember": 19
             },
-            "account_id": null,
+            "account_id": 2,
             "actions": {
                 "1": 4264,
                 "4": 293,
@@ -10875,7 +10875,7 @@
                 "slark_pounce": 45,
                 "slark_shadow_dance": 12
             },
-            "account_id": 238574711,
+            "account_id": 3,
             "actions": {
                 "1": 8915,
                 "2": 12,

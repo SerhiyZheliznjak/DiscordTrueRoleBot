@@ -25,7 +25,7 @@ export default class BotService {
     ) {
         this.chanel = this.client.channels.find('type', 'text');
         this.nominationKeysMap = Nominations.all.reduce((map: Map<string, string>, nomination: Nomination) => {
-            map.set(nomination.constructor.name, nomination.getName());
+            map.set(nomination.constructor.name.toLowerCase(), nomination.getName());
             return map;
         }, new Map());
     }
@@ -53,8 +53,8 @@ export default class BotService {
         if (msg.content.toLowerCase().startsWith('нагадай ключі')) {
             this.showNominationKeys(msg);
         }
-        if (msg.content.toLowerCase().startsWith('хто там ')) {
-            this.getNominationResult(msg);
+        if (msg.content.toLowerCase().startsWith('хто топ ')) {
+            this.getTopN(msg);
         }
     }
 
@@ -101,6 +101,7 @@ export default class BotService {
                 retardCount.shift();
             }
         }
+        console.log('retard++');
     }
 
     private shutUpYouRRetard(msg: Message): void {
@@ -194,7 +195,7 @@ export default class BotService {
         }
     }
 
-    private getRichEmbed(title: string, description: string, avatarUrl: string, footer: string, url?: string): RichEmbed {
+    private getRichEmbed(title: string, description: string, avatarUrl?: string, footer?: string, url?: string): RichEmbed {
         const richEmbed = new RichEmbed();
         richEmbed.setTitle(title);
         richEmbed.setDescription(description);
@@ -224,30 +225,55 @@ export default class BotService {
 
     private showNominationKeys(msg: Message): void {
         this.dataStore.hallOfFame.subscribe((hallOfFame: Map<number, NominationResultJson>) => {
-            let keys = '';
+            let keys = '\n';
+            const keyClassNameMap = Nominations.getKeyClassNameMap();
             for (const key of hallOfFame.keys()) {
-                keys += key + ': ' + hallOfFame.get(key).nominationName + '\n';
+                const className = keyClassNameMap.get(key);
+                keys += className + ':\t' + hallOfFame.get(key).nominationName + '\n';
             }
             msg.reply(keys);
         });
     }
 
-    private getNominationResult(msg: Message): void {
-        const arr = msg.content.toLowerCase().split(' ');
-        if (arr.length === 3) {
-            const nominationName = this.nominationKeysMap.get(arr[2]);
+    private getTopN(msg: Message): void {
+        const arr = this.parseTopNMessage(msg);
+        if (arr.length !== 0) {
+            const n = arr.length === 3 ? 3 : parseInt(arr[2]); // return top 3 by default
+            const className = arr.length === 3 ? arr[2] : arr[3];
+            const nominationName = className.toLowerCase();
             if (nominationName) {
-                this.dataStore.hallOfFame.subscribe((hallOfFame: Map<number, NominationResultJson>) => {
-                    for (const key of hallOfFame.keys()) {
-                        if (hallOfFame.get(key).nominationName === nominationName) {
-                            // msg.reply(this.getRichEmbed(hallOfFame.get(key).nominationName,
-                        // ));
-                        }
-                    }
+                this.nominationService.getTopN(nominationName, n).subscribe(topRes => {
+                    const accountIdsSet = topRes.map(r => r.account_id)
+                        .filter((account_id: number, pos: number, self: number[]) => self.indexOf(account_id) === pos);
+                    Observable.from(accountIdsSet)
+                        .flatMap(account_id => this.dataStore.getProfile(account_id))
+                        .reduce((profileMap: Map<number, string>, profile: ProfileJson) => {
+                            profileMap.set(profile.account_id, profile.name);
+                            return profileMap;
+                        }, new Map())
+                        .subscribe((profileMap: Map<number, string>) => {
+                            const firstNomination =  topRes[0].nomination;
+                            let msgText = 'Ці герої зуміли' + firstNomination.getScoreDescription() + '\n';
+                            topRes.forEach((tr: NominationResult, index: number) => {
+                                const place = index + 1;
+                                msgText += place + ') ' + profileMap.get(tr.account_id) + ': ' + tr.nomination.getScore() + '\n';
+                            });
+                            this.chanel.send('', this.getRichEmbed(firstNomination.getName(), msgText, undefined, '#Тайтаке.'));
+                        });
                 });
+            } else {
+                this.retardPlusPlus(msg);
             }
+        }
+    }
+
+    private parseTopNMessage(msg: Message): string[] {
+        const arr = msg.content.toLowerCase().split(' ');
+        if (arr.length === 3 || arr.length === 4) {
+            return arr;
         } else {
             this.retardPlusPlus(msg);
         }
+        return [];
     }
 }

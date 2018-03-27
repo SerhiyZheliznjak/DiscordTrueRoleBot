@@ -4,7 +4,7 @@ import Constants from "../../Constants";
 import Pair from "../Pair";
 
 export class OponentOwsMoney extends Nomination {
-    constructor(protected points: Array<Pair<string, number | string>> = []) {
+    constructor(protected points: Array<Pair<number, number | string>> = []) {
         super(points);
         this.name = 'Не вбий суперника свого';
         this.minScore = 3;
@@ -13,6 +13,10 @@ export class OponentOwsMoney extends Nomination {
 
     public getScoreText(): string {
         return 'Матчів без вбивств: ' + this.getScore();
+    }
+
+    public getScoreDescription(): string {
+        return ' не вбити жодного суперника ';
     }
 
     protected scorePoint(match, player_slot) {

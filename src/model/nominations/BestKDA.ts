@@ -4,7 +4,7 @@ import Constants from "../../Constants";
 import Pair from "../Pair";
 
 export class BestKDA extends Nomination {
-    constructor(protected points: Array<Pair<string, number | string>> = []) {
+    constructor(protected points: Array<Pair<number, number | string>> = []) {
         super(points);
         this.name = 'А шо то в вас? KDA?';
         this.minScore = 1;
@@ -23,7 +23,11 @@ export class BestKDA extends Nomination {
             }
             return max;
         }, '0/0/0');
-        return 'ВСП: ' + bestKDA;
+        return 'Накадеашив: ' + bestKDA;
+    }
+
+    public getScoreDescription(): string {
+        return ' накадеашити ';
     }
 
     protected scorePoint(match, player_slot): string {

@@ -4,7 +4,7 @@ import Constants from "../../Constants";
 import Pair from "../Pair";
 
 export class JungleOppressor extends Nomination {
-    constructor(protected points: Array<Pair<string, number | string>> = []) {
+    constructor(protected points: Array<Pair<number, number | string>> = []) {
         super(points);
         this.name = 'Гнобитель Джунглів';
         this.minScore = 1;
@@ -14,6 +14,10 @@ export class JungleOppressor extends Nomination {
 
     public getScoreText(): string {
         return 'Кількість матчів з цим "досягненням": ' + this.getScore();
+    }
+
+    public getScoreDescription(): string {
+        return ' гнобити джунглі протягом числа матчів ';
     }
 
     protected scorePoint(match, player_slot) {

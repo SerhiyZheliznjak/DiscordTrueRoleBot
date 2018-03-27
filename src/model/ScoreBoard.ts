@@ -4,23 +4,30 @@ import { MatchJson } from "../dota-api/DotaJsonTypings";
 import ScoreBoardService from "../services/ScoreBoardService";
 
 export default class ScoreBoard {
-    public nominationsResults: Map<number, NominationResult>;
+    private nominationsResults: Map<number, NominationResult[]>;
 
     constructor(private scoreBoardService: ScoreBoardService = new ScoreBoardService()) {
         this.nominationsResults = this.scoreBoardService.initNominationResults();
     }
 
     public scorePlayer(account_id: number, fullMatches: MatchJson[]): void {
-        this.applyPlayerScores(account_id, this.scoreBoardService.getPlayerScores(account_id, fullMatches));
+        this.scoreBoardService.applyPlayerData(account_id, fullMatches, this.nominationsResults);
     }
 
-    private applyPlayerScores(account_id: number, nominations: Nomination[]): void {
-        nominations.forEach(challengerNominationResult => {
-            const bestResultSoFar = this.nominationsResults.get(challengerNominationResult.getKey());
-            if (challengerNominationResult.hasHigherScoreThen(bestResultSoFar.nomination)) {
-                bestResultSoFar.account_id = account_id;
-                bestResultSoFar.nomination = challengerNominationResult;
-            }
-        });
+    public getFirstPlaces(): Map<number, NominationResult> {
+        const winners = new Map<number, NominationResult>();
+        for (const nominationKey of this.nominationsResults.keys()) {
+            const sortedResults = this.nominationsResults.get(nominationKey).sort((a, b) => a.nomination.compare(b.nomination));
+            winners.set(nominationKey, sortedResults[0]);
+        }
+        return winners;
+    }
+
+    public getTopN(n: number): Map<number, NominationResult[]> {
+        return this.scoreBoardService.getTopN(n, this.nominationsResults);
+    }
+
+    public hasScores(nominationKey: number): boolean {
+        return this.nominationsResults.get(nominationKey).reduce((scored, nom) => scored || nom.nomination.isScored(), false);
     }
 }

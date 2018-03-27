@@ -18,6 +18,9 @@ import { Nenza } from "./nominations/Nenza";
 import { StunningMan } from "./nominations/StunningMan";
 import { TacticalFeeder } from "./nominations/TacticalFeeder";
 import { ThisTimeItWillWork } from "./nominations/ThisTimeItWillWork";
+import { RoshanHunter } from "./nominations/RoshanHunter";
+import { TeamFighter } from "./nominations/TeamFighter";
+import { Pacifist } from "./nominations/Pacifist";
 
 export default class Nominations {
     public static get all(): Nomination[] {
@@ -40,7 +43,21 @@ export default class Nominations {
             new Nenza(),
             new StunningMan(),
             new TacticalFeeder(),
-            new ThisTimeItWillWork()
+            new ThisTimeItWillWork(),
+            new RoshanHunter(),
+            new TeamFighter(),
+            new Pacifist()
         ];
+    }
+
+    public static getByClassName(className: string): Nomination {
+        return Nominations.all.find(nomination => nomination.constructor.name.toLowerCase() === className.toLowerCase());
+    }
+
+    public static getKeyClassNameMap(): Map<number, string> {
+        return Nominations.all.reduce((map, nomination) => {
+            map.set(nomination.getKey(), nomination.constructor.name);
+            return map;
+        }, new Map());
     }
 }

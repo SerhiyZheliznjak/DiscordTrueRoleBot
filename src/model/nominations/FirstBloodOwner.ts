@@ -3,7 +3,7 @@ import { DotaParser } from "../../services/DotaParser";
 import Pair from "../Pair";
 
 export class FirstBloodOwner extends Nomination {
-    constructor(protected points: Array<Pair<string, number | string>> = []) {
+    constructor(protected points: Array<Pair<number, number | string>> = []) {
         super(points);
         this.name = 'Власнить першу кров';
         this.minScore = 3;
@@ -12,6 +12,10 @@ export class FirstBloodOwner extends Nomination {
 
     public getScoreText(): string {
         return 'Пролито першої крові: ' + this.getScore();
+    }
+
+    public getScoreDescription(): string {
+        return ' пролити першої крові ';
     }
 
     protected scorePoint(match, player_slot) {

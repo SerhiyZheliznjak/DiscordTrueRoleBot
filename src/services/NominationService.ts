@@ -16,6 +16,7 @@ export default class NominationService {
   private recentGamesObserver: Observer<number>;
   private claimedNominationsObserver: Observer<NominationResult[]>;
   private dotaIds: number[];
+  private scoreBoard: ScoreBoard;
 
   constructor(
     private dataStore: DataStore = new DataStore(),
@@ -35,6 +36,28 @@ export default class NominationService {
     this.subscription = Observable.interval(Constants.WATCH_INTERVAL).subscribe(this.recentGamesObserver);
     this.recentGamesObserver.next(0);
     return Observable.create(claimedNominationsObserver => this.claimedNominationsObserver = claimedNominationsObserver);
+  }
+
+  public getTopN(nominationClassName: string, n: number = 3): Observable<NominationResult[]> {
+    if (!Nominations.getByClassName(nominationClassName)) {
+      console.log('no such nomination className: ', nominationClassName);
+      return;
+    }
+    const nominationKey = Nominations.getByClassName(nominationClassName).getKey();
+    if (this.scoreBoard && this.scoreBoard.hasScores(nominationKey)) {
+      console.log('using scored scoreboard');
+      return Observable.of(this.scoreBoard.getTopN(n).get(nominationKey));
+    } else {
+      console.log('getting new scoreboard');
+      return Observable.from(this.dotaIds)
+        .flatMap((account_id: number) => this.getFreshRecentMatchesForPlayer(account_id))
+        .flatMap((playerWithNewMatches: PlayerRecentMatches) => this.mapToPlayerWithFullMatches(playerWithNewMatches))
+        .reduce((arr: PlayerFullMatches[], pfm: PlayerFullMatches) => [...arr, pfm], []).map(playersMatches => {
+          this.scoreBoard = new ScoreBoard();
+          playersMatches.forEach(pfm => this.scoreBoard.scorePlayer(pfm.account_id, pfm.matches));
+          return this.scoreBoard.getTopN(n).get(nominationKey);
+        });
+    }
   }
 
   public stopNominating(): void {
@@ -72,9 +95,9 @@ export default class NominationService {
   }
 
   public getNewResults(playersMatches: PlayerFullMatches[], hallOfFame: Map<number, NominationResultJson>): NominationResult[] {
-    const scoreBoard = new ScoreBoard();
-    playersMatches.forEach(pfm => scoreBoard.scorePlayer(pfm.account_id, pfm.matches));
-    return this.nominationUtils.getNewRecords(hallOfFame, scoreBoard.nominationsResults);
+    this.scoreBoard = new ScoreBoard();
+    playersMatches.forEach(pfm => this.scoreBoard.scorePlayer(pfm.account_id, pfm.matches));
+    return this.nominationUtils.getNewRecords(hallOfFame, this.scoreBoard.getFirstPlaces());
   }
 
   public awardWinners(newNominationsClaimed: NominationResult[]): void {
@@ -85,12 +108,7 @@ export default class NominationService {
   }
 
   public nextCheck(dotaIds: number[]): void {
-    Observable.from(dotaIds)
-      .flatMap((account_id: number) =>
-        Observable.zip(this.getFreshRecentMatchesForPlayer(account_id), this.dataStore.getRecentMatchesForPlayer(account_id)))
-      .map((playerMatches: PlayerRecentMatches[]) => this.mapRecentMatchesToNew(playerMatches[0], playerMatches[1]))
-      .flatMap((playerWithNewMatches: PlayerRecentMatches) => this.mapToPlayerWithFullMatches(playerWithNewMatches))
-      .reduce((arr: PlayerFullMatches[], pfm: PlayerFullMatches) => [...arr, pfm], [])
+    this.getPlayerFullMatches(dotaIds)
       .subscribe((playersMatches: PlayerFullMatches[]) => {
         this.dataStore.hallOfFame.subscribe(hallOfFame => {
           const newNominationsClaimed = this.getNewResults(playersMatches, hallOfFame);
@@ -99,6 +117,15 @@ export default class NominationService {
           }
         });
       });
+  }
+
+  private getPlayerFullMatches(dotaIds: number[]): Observable<PlayerFullMatches[]> {
+    return Observable.from(dotaIds)
+      .flatMap((account_id: number) =>
+        Observable.zip(this.getFreshRecentMatchesForPlayer(account_id), this.dataStore.getRecentMatchesForPlayer(account_id)))
+      .map((playerMatches: PlayerRecentMatches[]) => this.mapRecentMatchesToNew(playerMatches[0], playerMatches[1]))
+      .flatMap((playerWithNewMatches: PlayerRecentMatches) => this.mapToPlayerWithFullMatches(playerWithNewMatches))
+      .reduce((arr: PlayerFullMatches[], pfm: PlayerFullMatches) => [...arr, pfm], []);
   }
 
   private getDotaIds(playersMap: Map<number, string>): number[] {

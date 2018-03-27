@@ -4,7 +4,7 @@ import Pair from "../Pair";
 import { PlayerJson } from "../../dota-api/DotaJsonTypings";
 
 export class ThisTimeItWillWork extends Nomination {
-    constructor(protected points: Array<Pair<string, number | string>> = []) {
+    constructor(protected points: Array<Pair<number, number | string>> = []) {
         super(points);
         this.name = 'Шяс піде';
         this.minScore = 5;
@@ -13,6 +13,10 @@ export class ThisTimeItWillWork extends Nomination {
 
     public getScoreText(): string {
         return 'Сума викупів у виграних матчах: ' + this.getScore();
+    }
+
+    public getScoreDescription(): string {
+        return ' викупитись і виграти ';
     }
 
     protected scorePoint(match, player_slot): number {

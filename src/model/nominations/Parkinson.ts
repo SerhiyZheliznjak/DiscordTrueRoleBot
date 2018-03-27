@@ -4,7 +4,7 @@ import Constants from "../../Constants";
 import Pair from "../Pair";
 
 export class Parkinson extends Nomination {
-    constructor(protected points: Array<Pair<string, number | string>> = []) {
+    constructor(protected points: Array<Pair<number, number | string>> = []) {
         super(points);
         this.name = 'Паркінсон';
         this.minScore = 100;
@@ -19,6 +19,10 @@ export class Parkinson extends Nomination {
     public getScore() {
         const apmArr = this.getPoints().map(p => parseInt(p.p2 + ''));
         return Math.max(...apmArr);
+    }
+
+    public getScoreDescription(): string {
+        return ' понацикувати за хвилину ';
     }
 
     protected scorePoint(match, player_slot) {
