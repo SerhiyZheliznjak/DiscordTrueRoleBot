@@ -248,7 +248,7 @@ export default class BotService {
                     Observable.from(accountIdsSet)
                         .flatMap(account_id => this.dataStore.getProfile(account_id))
                         .reduce((profileMap: Map<number, string>, profile: ProfileJson) => {
-                            profileMap.set(profile.account_id, profile.name);
+                            profileMap.set(profile.account_id, profile.personaname);
                             return profileMap;
                         }, new Map())
                         .subscribe((profileMap: Map<number, string>) => {
@@ -256,7 +256,7 @@ export default class BotService {
                             let msgText = 'Ці герої зуміли' + firstNomination.getScoreDescription() + '\n';
                             topRes.forEach((tr: NominationResult, index: number) => {
                                 const place = index + 1;
-                                msgText += place + ') ' + profileMap.get(tr.account_id) + ': ' + tr.nomination.getScore() + '\n';
+                                msgText += place + ') ' + profileMap.get(tr.account_id) + ':\t' + tr.nomination.getScoreText() + '\n';
                             });
                             this.chanel.send('', this.getRichEmbed(firstNomination.getName(), msgText, undefined, '#Тайтаке.'));
                         });
