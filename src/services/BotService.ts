@@ -258,7 +258,7 @@ export default class BotService {
                                 const place = index + 1;
                                 msgText += place + ') ' + profileMap.get(tr.account_id) + ':\t' + tr.nomination.getScoreText() + '\n';
                             });
-                            msg.reply(this.getRichEmbed(firstNomination.getName(), msgText, undefined, '#Тайтаке.'));
+                            this.chanel.send('', this.getRichEmbed(firstNomination.getName(), msgText, undefined, '#Тайтаке.'));
                         });
                 });
             } else {
