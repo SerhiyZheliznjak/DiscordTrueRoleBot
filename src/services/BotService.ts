@@ -10,12 +10,16 @@ import Pair from '../model/Pair';
 import NominationResultJson from '../model/json/NominationResultJson';
 import Nominations from '../model/Nominations';
 import Nomination from '../model/Nomination';
+import { CommandBase } from '../model/Command';
+import { ShowTop } from '../model/commands/ShowTop';
+import { CommandsProcessor } from './CommandsProcessor';
 
 export default class BotService {
-    private retardMap = new Map();
     private nominationKeysMap: Map<string, string>;
     private claimedNominationsSubscription: Subscription;
     private chanel;
+    private processors: Map<string, CommandBase>;
+    private commandsProcessor: CommandsProcessor;
 
     constructor(
         private client: Client,
@@ -28,25 +32,15 @@ export default class BotService {
             map.set(nomination.constructor.name.toLowerCase(), nomination.getName());
             return map;
         }, new Map());
+        this.commandsProcessor = new CommandsProcessor(this.client);
     }
 
     public processMesage(msg: Message): void {
-        if (msg.author.bot) {
-            return;
-        }
-        if (this.isRetard(msg.author.id)) {
-            this.shutUpYouRRetard(msg);
-            return;
-        }
-        if (msg.content.toLocaleLowerCase() === 'restart') {
-            this.restart(msg);
-        }
+        this.commandsProcessor.process(msg);
         if (msg.content.toLocaleLowerCase() === 'registerall') {
             this.registerall(msg);
         }
-        if (msg.content.toLowerCase().startsWith('watch')) {
-            this.addWatch(msg);
-        }
+
         if (msg.content.toLocaleLowerCase() === 'watchlist') {
             this.showRegistered(msg);
         }
@@ -56,10 +50,6 @@ export default class BotService {
         if (msg.content.toLowerCase().startsWith('хто топ ')) {
             this.getTopN(msg);
         }
-    }
-
-    public forgiveRetards(): void {
-        Observable.interval(Constants.FORGIVE_RETARDS_INTERVAL).subscribe(() => this.retardMap = new Map());
     }
 
     public startNominating() {
@@ -73,42 +63,8 @@ export default class BotService {
         });
     }
 
-    private isRetard(authorId: string): boolean {
-        const retardCount = this.retardMap.get(authorId);
-        if (retardCount && retardCount.length > 3 && retardCount) {
-            return retardCount.reduce((r, c, i) => {
-                const next = retardCount[i + 1];
-                if (next) {
-                    return r > next - c ? next - c : r;
-                }
-                return r;
-            }) < 60 * 1000;
-        }
-        return false;
-    }
+    private registerCommand(): void {
 
-    private retardPlusPlus(msg: Message): void {
-        const authorId = msg.author.id;
-        if (!this.retardMap.get(authorId)) {
-            this.retardMap.set(authorId, []);
-        }
-        const retardCount = this.retardMap.get(authorId);
-        retardCount.push(new Date().getTime());
-        if (retardCount.length > 3) {
-            if (this.isRetard(authorId)) {
-                (this.client.channels.find('type', 'text') as any).send('@everyone Чат, небезпека - розумововідсталий!');
-            } else {
-                retardCount.shift();
-            }
-        }
-        console.log('retard++');
-    }
-
-    private shutUpYouRRetard(msg: Message): void {
-        const shutRetard = ['Стягнув', 'Ти такий розумний', 'Помовчи трохи', 'Т-с-с-с-с-с-с',
-            'Біжи далеко', 'Ти можеш трохи тихо побути?', 'Ціхо', 'Каца!', 'Таааась тась тась',
-            'Люди, йдіть сі подивіть', 'Інколи краще жувати', 'Ти то серйозно?', 'Молодець'];
-        msg.reply(shutRetard[Math.floor(Math.random() * shutRetard.length)]);
     }
 
     private registerall(msg: Message): void {
@@ -152,40 +108,6 @@ export default class BotService {
             this.retardPlusPlus(msg);
             msg.reply('хуйочліст');
         }
-    }
-
-    private addWatch(msg: Message): void {
-        if (msg.mentions.users.array().length === 0) {
-            msg.reply('Тобі показати як вставити своє ім\'я в повідомлення?');
-            this.retardPlusPlus(msg);
-        } else if (msg.mentions.users.array().length > 1) {
-            msg.reply('Ти зовсім дурне? Як я маю всіх підряд зареєструвати?');
-            this.retardPlusPlus(msg);
-        } else if (msg.content.split(' ').filter(word => word !== '').length !== 3) {
-            msg.reply('Курва... Шо ти пишеш?.. Має бути "watch @КОРИСТУВАЧ DOTA_ID"');
-            this.retardPlusPlus(msg);
-        } else {
-            this.dataStore.getProfile(parseInt(msg.content.match(/ \d+/)[0].trim())).subscribe(playerInfo => {
-                if (!!playerInfo) {
-                    this.dataStore.registeredPlayers.subscribe(playersMap => {
-                        if (playersMap.get(playerInfo.account_id) && !this.isCreator(msg)) {
-                            msg.reply('Вже закріплено за @' + playersMap.get(playerInfo.account_id));
-                            this.retardPlusPlus(msg);
-                        } else {
-                            this.dataStore.registerPlayer(playerInfo.account_id, msg.mentions.users.first().id);
-                            msg.reply('Я стежитиму за тобою, ' + playerInfo.personaname);
-                        }
-                    });
-                } else {
-                    msg.reply('Давай ще раз, але цього разу очима дивись на айді гравця');
-                    this.retardPlusPlus(msg);
-                }
-            });
-        }
-    }
-
-    private isCreator(msg: Message): boolean {
-        return msg.author.id === process.env.creatorId;
     }
 
     private stopNominating(): void {
@@ -236,44 +158,8 @@ export default class BotService {
     }
 
     private getTopN(msg: Message): void {
-        const arr = this.parseTopNMessage(msg);
-        if (arr.length !== 0) {
-            const n = arr.length === 3 ? 3 : parseInt(arr[2]); // return top 3 by default
-            const className = arr.length === 3 ? arr[2] : arr[3];
-            const nominationName = className.toLowerCase();
-            if (nominationName) {
-                this.nominationService.getTopN(nominationName, n).subscribe(topRes => {
-                    const accountIdsSet = topRes.map(r => r.account_id)
-                        .filter((account_id: number, pos: number, self: number[]) => self.indexOf(account_id) === pos);
-                    Observable.from(accountIdsSet)
-                        .flatMap(account_id => this.dataStore.getProfile(account_id))
-                        .reduce((profileMap: Map<number, string>, profile: ProfileJson) => {
-                            profileMap.set(profile.account_id, profile.personaname);
-                            return profileMap;
-                        }, new Map())
-                        .subscribe((profileMap: Map<number, string>) => {
-                            const firstNomination =  topRes[0].nomination;
-                            let msgText = 'Ці герої зуміли' + firstNomination.getScoreDescription() + '\n';
-                            topRes.forEach((tr: NominationResult, index: number) => {
-                                const place = index + 1;
-                                msgText += place + ') ' + profileMap.get(tr.account_id) + ':\t' + tr.nomination.getScoreText() + '\n';
-                            });
-                            this.chanel.send('', this.getRichEmbed(firstNomination.getName(), msgText, undefined, '#Тайтаке.'));
-                        });
-                });
-            } else {
-                this.retardPlusPlus(msg);
-            }
-        }
+        
     }
 
-    private parseTopNMessage(msg: Message): string[] {
-        const arr = msg.content.toLowerCase().split(' ');
-        if (arr.length === 3 || arr.length === 4) {
-            return arr;
-        } else {
-            this.retardPlusPlus(msg);
-        }
-        return [];
-    }
+
 }
