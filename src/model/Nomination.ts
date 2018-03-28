@@ -41,7 +41,7 @@ export default class Nomination {
     }
 
     public scoreToString(): string {
-        return this.getScore().toString();
+        return this.getScore() + '';
     }
 
     public getMessage(): string {
