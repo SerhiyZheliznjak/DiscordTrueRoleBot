@@ -74,7 +74,7 @@ export class ShowTop extends CommandBase {
             return DiscordUtils.getRichEmbed(
                 'Вони зуміли' + firstNomination.getScoreDescription(),
                 DiscordUtils.formatAsBlock(msgText),
-                firstNomination.getThumbURL(),
+                undefined, // firstNomination.getThumbURL(),
                 '#Тайтаке.');
         }
     }

@@ -42,10 +42,9 @@ export class DiscordUtils {
             .map(pair => DiscordUtils.getRichEmbed(
                 pair.p2.personaname + ': ' + pair.p1.nomination.getName(),
                 pair.p1.nomination.getMessage(),
-                pair.p1.nomination.getThumbURL(),
+                pair.p2.avatarmedium,
                 pair.p1.nomination.getScoreText(),
-                pair.p2.profileurl,
-                pair.p2.avatarmedium
+                pair.p2.profileurl
             ));
     }
 
