@@ -25,6 +25,10 @@ export class PingMaster extends Nomination {
         return Math.max(...pings);
     }
 
+    public getThumbURL(): string {
+        return 'https://www.dropbox.com/s/ttfrgwt19jywnzo/MasterPing.jpg?dl=0';
+    }
+
     protected scorePoint(match, player_slot) {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);

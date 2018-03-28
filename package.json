@@ -12,9 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "^11.3.0",
+    "mongodb": "^3.0.3",
+    "npm": "^5.8.0",
     "rx-http-request": "^1.2.0",
-    "rxjs": "^5.5.6",
-    "mongodb": "^3.0.3"
+    "rxjs": "^5.5.6"
   },
   "devDependencies": {
     "@types/jasmine": "^2.8.6",

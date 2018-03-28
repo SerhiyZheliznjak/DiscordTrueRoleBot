@@ -20,6 +20,10 @@ export class MaxDamageHit extends Nomination {
         return ' гепнути за раз ';
     }
 
+    public getThumbURL(): string {
+        return 'https://www.dropbox.com/s/3pl3be829p6cv11/onePunchMan.jpg?dl=0';
+    }
+
     public getScore() {
         const dmgArr = this.getPoints().map(p => parseInt(p.p2 + ''));
         return Math.max(...dmgArr);

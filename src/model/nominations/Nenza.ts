@@ -19,6 +19,10 @@ export class Nenza extends Nomination {
         return ' понаписувати херні ';
     }
 
+    public getThumbURL(): string {
+        return 'https://www.dropbox.com/s/c8afvrkkmt5k8fo/Nenza.jpg?dl=0';
+    }
+
     protected scorePoint(match: MatchJson, player_slot: number): number {
         if (match && match.chat) {
             const nenzaMsg = match.chat.filter(msg => msg.player_slot === player_slot)

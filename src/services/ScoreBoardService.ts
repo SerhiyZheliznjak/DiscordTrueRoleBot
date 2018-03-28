@@ -25,7 +25,6 @@ export default class ScoreBoardService {
         const topN = new Map<number, NominationResult[]>();
         for (const key of nominationsResults.keys()) {
             const sorted = nominationsResults.get(key).sort((a, b) => a.nomination.compare(b.nomination));
-            // topN.set(key, sorted.filter(nr => nr.nomination.isScored()).slice(n - 1));
             topN.set(key, sorted.slice(0, n));
         }
         return topN;

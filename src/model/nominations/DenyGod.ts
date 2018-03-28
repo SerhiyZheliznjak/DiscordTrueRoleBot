@@ -20,7 +20,11 @@ export class DenyGod extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' заперечити кріпів за одну гру ';
+        return ' заперечити кріпів за одну гру';
+    }
+
+    public getThumbURL(): string {
+        return 'https://www.dropbox.com/s/4u2nnqk5h85wyzl/Denier.jpg?dl=0';
     }
 
     protected scorePoint(match, player_slot) {

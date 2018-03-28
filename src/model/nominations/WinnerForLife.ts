@@ -19,6 +19,10 @@ export class WinnerForLife extends Nomination {
         return ' виграти матчів ';
     }
 
+    public getThumbURL(): string {
+        return 'https://www.dropbox.com/s/qo5mfwo84h2k6p8/winnerForLife.jpg?dl=0';
+    }
+
     protected scorePoint(match, player_slot) {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);

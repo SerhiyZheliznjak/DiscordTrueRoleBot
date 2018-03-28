@@ -9,6 +9,7 @@ import { RegisterAll } from "../model/commands/RegisterAll";
 import { WatchList } from "../model/commands/WatchList";
 import { NominationKeysReminder } from "../model/commands/NominationKeysReminder";
 import NominationService from "./NominationService";
+import { DiscordUtils } from "../utils/DiscordUtils";
 
 export class CommandsProcessor extends CommandBase {
     private commandMap = new Map<string, CommandBase>();
@@ -43,7 +44,7 @@ export class CommandsProcessor extends CommandBase {
 
     public process(msg: Message): void {
         const commands =  [...this.commandMap].map(p => p[0]).sort().join('\n');
-        msg.reply(commands);
+        msg.reply(DiscordUtils.formatAsBlock(commands));
     }
 
     public forgiveRetards(): void {

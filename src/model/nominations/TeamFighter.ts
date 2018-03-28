@@ -23,6 +23,10 @@ export class TeamFighter extends Nomination {
         return ' приймати участь у командних бійках ';
     }
 
+    public getThumbURL(): string {
+        return 'https://www.dropbox.com/s/z9nqjmd63uem5sg/Team_Fighterlogo_square.png?dl=0';
+    }
+
     protected scorePoint(match, player_slot) {
         if (!match) {
             return 0;

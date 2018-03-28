@@ -25,6 +25,10 @@ export class Parkinson extends Nomination {
         return ' понацикувати за хвилину ';
     }
 
+    public getThumbURL(): string {
+        return 'https://www.dropbox.com/s/it8lg5dq0hrowq2/parkinson.jpg?dl=0';
+    }
+
     protected scorePoint(match, player_slot) {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);

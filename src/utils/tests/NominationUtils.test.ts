@@ -170,16 +170,6 @@ describe(`NominationUtils`, () => {
         storedMatches = new PlayerRecentMatches(7, []);
         newWinner = new NominationResult(7, new Nenza());
         hallOfFameWinner = new NominationResultJson(1005629726, 'Nenza', 7, 0, new Date().getTime());
-         // {
-    //     "_id": {
-    //         "$oid": "5ab555635ccb13ced433ca05"
-    //     },
-    //     "key": -347474430,
-    //     "nominationName": "Пабідітіль па жизні",
-    //     "owner_account_id": 314684987,
-    //     "score": 13,
-    //     "timeClaimed": 1521913843753
-    // }
         hallOfFame = new Map();
         newResults = new Map();
     }

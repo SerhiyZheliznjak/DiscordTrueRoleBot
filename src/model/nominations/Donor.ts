@@ -19,6 +19,10 @@ export class Donor extends Nomination {
         return ' віддатись на першу кров ';
     }
 
+    public getThumbURL(): string {
+        return 'https://www.dropbox.com/s/7jbzwdhy6ncvlt8/DONOR.jpg?dl=0';
+    }
+
     protected scorePoint(match, player_slot) {
         if (!match) {
             return 0;

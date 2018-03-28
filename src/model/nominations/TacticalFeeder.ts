@@ -19,6 +19,10 @@ export class TacticalFeeder extends Nomination {
         return ' виграти матчів безбожно фідячи ворога ';
     }
 
+    public getThumbURL(): string {
+        return 'https://www.dropbox.com/s/x5hm81dy3y2gq0r/TacticalFeeder.png?dl=0';
+    }
+
     protected scorePoint(match, player_slot): number {
         if (!!match) {
             const player: PlayerJson = DotaParser.getPlayerInfo(match, player_slot);

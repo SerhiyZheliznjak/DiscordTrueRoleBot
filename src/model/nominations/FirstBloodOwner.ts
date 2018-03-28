@@ -18,6 +18,10 @@ export class FirstBloodOwner extends Nomination {
         return ' пролити першої крові ';
     }
 
+    public getThumbURL(): string {
+        return 'https://www.dropbox.com/s/e4yuqx7yafnfutg/FirstBlood.jpg?dl=0';
+    }
+
     protected scorePoint(match, player_slot) {
         if (!match) {
             return 0;

@@ -18,6 +18,10 @@ export class StunningMan extends Nomination {
         return ' протримати ворогів у приголомшенні ';
     }
 
+    public getThumbURL(): string {
+        return 'https://www.dropbox.com/s/7hp4kz65g51r1nt/stunner.png?dl=0';
+    }
+
     protected scorePoint(match, player_slot) {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);

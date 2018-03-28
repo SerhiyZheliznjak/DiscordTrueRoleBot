@@ -39,9 +39,11 @@ export default class Nomination {
             return p != null && p.p2 != null ? r + parseInt(p.p2 + '') : r;
         }, 0);
     }
-    public getScoreText(): string {
-        return '' + this.getScore();
+
+    public scoreToString(): string {
+        return this.getScore().toString();
     }
+
     public getMessage(): string {
         return this.msg;
     }
@@ -52,7 +54,15 @@ export default class Nomination {
         return this.getScore() >= this.minScore;
     }
 
+    public getScoreText(): string {
+        throw new Error('Should be implemented by child classes');
+    }
+
     public getScoreDescription(): string {
+        throw new Error('Should be implemented by child classes');
+    }
+
+    public getThumbURL(): string {
         throw new Error('Should be implemented by child classes');
     }
 

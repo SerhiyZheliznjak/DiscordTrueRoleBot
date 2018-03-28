@@ -15,7 +15,11 @@ export class ChickeSoupLover extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' вбити кур\'єрів ';
+        return ' вбити кур\'єрів';
+    }
+
+    public getThumbURL(): string {
+        return 'https://www.dropbox.com/s/09om8yh99oqzfo6/currierKiller.jpg?dl=0';
     }
 
     protected scorePoint(match, player_slot) {

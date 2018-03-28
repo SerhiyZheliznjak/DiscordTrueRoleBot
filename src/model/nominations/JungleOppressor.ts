@@ -20,6 +20,10 @@ export class JungleOppressor extends Nomination {
         return ' гнобити джунглі протягом числа матчів ';
     }
 
+    public getThumbURL(): string {
+        return 'https://www.dropbox.com/s/o19rh5sjftbi794/Jungler.jpg?dl=0';
+    }
+
     protected scorePoint(match, player_slot) {
         if (!match) {
             return 0;

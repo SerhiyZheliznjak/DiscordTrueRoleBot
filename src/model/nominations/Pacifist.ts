@@ -23,6 +23,10 @@ export class Pacifist extends Nomination {
         return ' приймати участь у відсотку командних бійок ';
     }
 
+    public getThumbURL(): string {
+        return 'https://www.dropbox.com/s/6z5kqi3y2smx2fa/hippie.jpg?dl=0';
+    }
+
     protected scorePoint(match, player_slot) {
         if (!match) {
             return 0;

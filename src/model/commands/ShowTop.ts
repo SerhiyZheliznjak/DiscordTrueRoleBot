@@ -1,11 +1,12 @@
 import { CommandBase } from "../Command";
-import { Message, Client, TextChannel, GuildChannel } from "discord.js";
+import { Message, Client, TextChannel, GuildChannel, RichEmbed } from "discord.js";
 import { Observable } from "rxjs";
 import NominationService from "../../services/NominationService";
 import DataStore from "../../services/DataStore";
 import { ProfileJson } from "../../dota-api/DotaJsonTypings";
 import NominationResult from "../NominationResult";
 import { DiscordUtils } from "../../utils/DiscordUtils";
+import Pair from "../Pair";
 
 export class ShowTop extends CommandBase {
     private queue: Map<string, TextChannel[]>;
@@ -43,22 +44,43 @@ export class ShowTop extends CommandBase {
                             profileMap.set(profile.account_id, profile.personaname);
                             return profileMap;
                         }, new Map())
-                        .subscribe((profileMap: Map<number, string>) => {
-                            const firstNomination = topRes[0].nomination;
-                            let msgText = 'Вони зуміли\n';
-                            topRes.forEach((tr: NominationResult, index: number) => {
-                                const place = index + 1;
-                                msgText += place + ') ' + profileMap.get(tr.account_id) + ':\t' + tr.nomination.getScoreText() + '\n';
-                            });
-                            this.queue.get(args.className).forEach(channel => {
-                                channel.send('', DiscordUtils.getRichEmbed(firstNomination.getName(), msgText, undefined, '#Тайтаке.'));
-                            });
-                        });
+                        .subscribe((profileMap: Map<number, string>) => this.sendTopNMessage(args.className, profileMap, topRes));
                 });
             }
         } else {
             this.retardPlusPlus(msg);
         }
+    }
+
+    public sendTopNMessage(className: string, profileMap: Map<number, string>, topRes: NominationResult[]): void {
+        this.queue.get(className).forEach(channel => {
+            const embed = this.generateEmbed(profileMap, topRes);
+            if (embed) {
+                channel.send('', embed);
+            }
+        });
+    }
+
+    public generateEmbed(profileMap: Map<number, string>, topRes: NominationResult[]): RichEmbed {
+        if (profileMap.size && topRes.length) {
+            const longestProfileName = this.getLongestLength(profileMap);
+            const firstNomination = topRes[0].nomination;
+            let msgText = '';
+            topRes.forEach((tr: NominationResult, index: number) => {
+                const place = index + 1;
+                const name = DiscordUtils.fillWithSpaces(profileMap.get(tr.account_id), longestProfileName);
+                msgText += '#' + place + ' ' + name + ': ' + tr.nomination.getScore() + '\n';
+            });
+            return DiscordUtils.getRichEmbed(
+                'Вони зуміли' + firstNomination.getScoreDescription(),
+                DiscordUtils.formatAsBlock(msgText),
+                firstNomination.getThumbURL(),
+                '#Тайтаке.');
+        }
+    }
+
+    public getLongestLength(profileMap: Map<number, string>): number {
+        return DiscordUtils.getLongestLength([...profileMap].map(p => p[1]));
     }
 
     private parseArgs(msg: Message): TopArgs {

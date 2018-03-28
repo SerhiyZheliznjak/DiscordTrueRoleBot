@@ -25,16 +25,12 @@ describe(`ScoreBoardService`, () => {
         expect(nominationResults.size).toEqual(allNominations.length);
         allNominations.forEach(nomination => {
             const nominationResult = nominationResults.get(nomination.getKey());
-            expect(nominationResult).toBeDefined();
-            expect(nominationResult.length).toBe(1);
-            expect(nominationResult[0].account_id).toBe(Constants.UNCLAIMED);
-            expect(nominationResult[0].nomination.getName()).toEqual(nomination.getName());
-            expect(nominationResult[0].nomination.getScore()).toEqual(nomination.getScore());
+            expect(nominationResult).toEqual([]);
         });
     });
 
     it(`should applyPlayerData`, () => {
-        nominationResults = [new PingMaster(), new Donor(), new Pacifist()].reduce((map, nomination) => {
+        nominationResults = Nominations.all.reduce((map, nomination) => {
             map.set(nomination.getKey(), [new NominationResult(Constants.UNCLAIMED, nomination)]);
             return map;
         }, new Map<number, NominationResult[]>());

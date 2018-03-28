@@ -19,6 +19,10 @@ export class ThisTimeItWillWork extends Nomination {
         return ' викупитись і виграти ';
     }
 
+    public getThumbURL(): string {
+        return 'https://www.dropbox.com/s/ngprb5mcde8f0kf/buyback.png?dl=0';
+    }
+
     protected scorePoint(match, player_slot): number {
         if (!!match) {
             const player: PlayerJson = DotaParser.getPlayerInfo(match, player_slot);
