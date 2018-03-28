@@ -11,9 +11,10 @@ export class DiscordUtils {
             .flatMap(cn => DiscordUtils.getNomiPlayerPair(cn, dataStore))
             .map(pair => {
                 const richEmbed = new RichEmbed();
-                richEmbed.setTitle(pair.p2.personaname + ': ' + pair.p1.nomination.getName());
+                richEmbed.setAuthor(pair.p2.personaname, pair.p2.avatarmedium);
+                richEmbed.setTitle(pair.p1.nomination.getName());
                 richEmbed.setDescription(pair.p1.nomination.getMessage());
-                richEmbed.setThumbnail(pair.p2.avatarmedium);
+                richEmbed.setThumbnail(pair.p1.nomination.getThumbURL());
                 richEmbed.setFooter(pair.p1.nomination.getScoreText());
                 richEmbed.setURL(pair.p2.profileurl);
                 return richEmbed;
