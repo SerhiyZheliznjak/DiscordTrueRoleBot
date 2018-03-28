@@ -20,7 +20,7 @@ export class StackGod extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/97k2fxf5gz404av/Stack.jpg';
+        return 'https://image.ibb.co/fKKSEn/Stack.jpg';
     }
 
     protected scorePoint(match, player_slot) {

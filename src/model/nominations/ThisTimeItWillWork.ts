@@ -20,7 +20,7 @@ export class ThisTimeItWillWork extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/ngprb5mcde8f0kf/buyback.png';
+        return 'https://image.ibb.co/n1AZun/buyback.png';
     }
 
     protected scorePoint(match, player_slot): number {

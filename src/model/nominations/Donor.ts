@@ -20,7 +20,7 @@ export class Donor extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/7jbzwdhy6ncvlt8/DONOR.jpg';
+        return 'https://image.ibb.co/eSTLZn/DONOR.jpg';
     }
 
     protected scorePoint(match, player_slot) {

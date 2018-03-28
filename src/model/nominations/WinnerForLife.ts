@@ -20,7 +20,7 @@ export class WinnerForLife extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/qo5mfwo84h2k6p8/winnerForLife.jpg';
+        return 'https://image.ibb.co/gHGJLS/winner_For_Life.jpg';
     }
 
     protected scorePoint(match, player_slot) {

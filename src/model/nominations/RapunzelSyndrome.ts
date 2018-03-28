@@ -21,7 +21,7 @@ export class RapunzelSyndrome extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/7tijp2qd37enwrf/rapunzel.jpg';
+        return 'https://image.ibb.co/fA4uun/rapunzel.jpg';
     }
 
     protected scorePoint(match, player_slot): number {

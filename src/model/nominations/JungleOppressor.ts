@@ -21,7 +21,7 @@ export class JungleOppressor extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/o19rh5sjftbi794/Jungler.jpg';
+        return 'https://image.ibb.co/b1XsfS/Jungler.jpg';
     }
 
     protected scorePoint(match, player_slot) {

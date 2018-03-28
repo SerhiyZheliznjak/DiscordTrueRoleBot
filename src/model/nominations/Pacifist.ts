@@ -24,7 +24,7 @@ export class Pacifist extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/6z5kqi3y2smx2fa/hippie.jpg';
+        return 'https://image.ibb.co/nqS3n7/hippie.jpg';
     }
 
     protected scorePoint(match, player_slot) {

@@ -19,7 +19,7 @@ export class FirstBloodOwner extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/e4yuqx7yafnfutg/FirstBlood.jpg';
+        return 'https://image.ibb.co/iTHQ0S/First_Blood.jpg';
     }
 
     protected scorePoint(match, player_slot) {

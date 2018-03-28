@@ -20,7 +20,7 @@ export class Looser extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/v16doe6rq6q0l5j/looser.png';
+        return 'https://image.ibb.co/d0aCfS/looser.png';
     }
 
     protected scorePoint(match, player_slot) {

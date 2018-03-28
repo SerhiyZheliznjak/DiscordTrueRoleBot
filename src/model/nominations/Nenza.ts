@@ -20,7 +20,7 @@ export class Nenza extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/c8afvrkkmt5k8fo/Nenza.jpg';
+        return 'https://image.ibb.co/jLzG77/Nenza.jpg';
     }
 
     protected scorePoint(match: MatchJson, player_slot: number): number {

@@ -24,7 +24,7 @@ export class DenyGod extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/4u2nnqk5h85wyzl/Denier.jpg';
+        return 'https://image.ibb.co/gGMk0S/Denier.jpg';
     }
 
     protected scorePoint(match, player_slot) {

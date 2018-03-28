@@ -34,7 +34,7 @@ export class BestKDA extends Nomination {
     }
 
     public getThumbURL(): string {
-        return `https://www.dropbox.com/s/xyi9ctnh2a0pcfa/kda.jpg`;
+        return `https://image.ibb.co/bvMUS7/kda.jpg`;
     }
 
     protected scorePoint(match, player_slot): string {

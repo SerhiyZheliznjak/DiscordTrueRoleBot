@@ -20,7 +20,7 @@ export class OponentOwsMoney extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/5ck534x4gfv6x9a/OpponentOwnsMoney.jpeg';
+        return 'https://image.ibb.co/kXpSEn/Opponent_Owns_Money.jpg';
     }
 
     protected scorePoint(match, player_slot) {

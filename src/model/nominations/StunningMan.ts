@@ -19,7 +19,7 @@ export class StunningMan extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/7hp4kz65g51r1nt/stunner.png';
+        return 'https://image.ibb.co/fTpin7/stunner.png';
     }
 
     protected scorePoint(match, player_slot) {
