@@ -57,6 +57,7 @@ export class ShowTop extends CommandBase {
             const embed = this.generateEmbed(profileMap, topRes);
             if (embed) {
                 channel.send('', embed);
+                this.queue.delete(className);
             }
         });
     }
