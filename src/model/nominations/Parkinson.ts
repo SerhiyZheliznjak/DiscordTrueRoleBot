@@ -22,7 +22,7 @@ export class Parkinson extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' понацикувати за хвилину ';
+        return ' понацикувати за хвилину';
     }
 
     public getThumbURL(): string {

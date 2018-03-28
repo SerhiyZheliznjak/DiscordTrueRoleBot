@@ -16,7 +16,7 @@ export class WinnerForLife extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' виграти матчів ';
+        return ' виграти матчів';
     }
 
     public getThumbURL(): string {

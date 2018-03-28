@@ -15,7 +15,7 @@ export class StunningMan extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' протримати ворогів у приголомшенні ';
+        return ' протримати ворогів у приголомшенні';
     }
 
     public getThumbURL(): string {

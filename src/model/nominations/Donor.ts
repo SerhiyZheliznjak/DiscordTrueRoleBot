@@ -16,7 +16,7 @@ export class Donor extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' віддатись на першу кров ';
+        return ' віддатись на першу кров';
     }
 
     public getThumbURL(): string {

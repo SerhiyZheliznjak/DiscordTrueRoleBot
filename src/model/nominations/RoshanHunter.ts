@@ -15,7 +15,7 @@ export class RoshanHunter extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' вбити рошанів ';
+        return ' вбити рошанів';
     }
 
     public getThumbURL(): string {

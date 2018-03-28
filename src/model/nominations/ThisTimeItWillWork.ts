@@ -16,7 +16,7 @@ export class ThisTimeItWillWork extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' викупитись і виграти ';
+        return ' викупитись і виграти';
     }
 
     public getThumbURL(): string {

@@ -17,7 +17,7 @@ export class MaxDamageHit extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' гепнути за раз ';
+        return ' гепнути за раз';
     }
 
     public getThumbURL(): string {

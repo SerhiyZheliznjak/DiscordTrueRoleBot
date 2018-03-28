@@ -16,7 +16,7 @@ export class OponentOwsMoney extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' не вбити жодного суперника ';
+        return ' не вбити жодного суперника';
     }
 
     public getThumbURL(): string {

@@ -20,7 +20,7 @@ export class TeamFighter extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' приймати участь у командних бійках ';
+        return ' приймати участь у командних бійках';
     }
 
     public getThumbURL(): string {

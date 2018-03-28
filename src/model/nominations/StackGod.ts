@@ -16,7 +16,7 @@ export class StackGod extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' наскиртувати таборів ';
+        return ' наскиртувати таборів';
     }
 
     public getThumbURL(): string {

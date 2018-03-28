@@ -16,7 +16,7 @@ export class TacticalFeeder extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' виграти матчів безбожно фідячи ворога ';
+        return ' виграти матчів безбожно фідячи ворога';
     }
 
     public getThumbURL(): string {

@@ -16,7 +16,7 @@ export class Looser extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' перемогти, тільки навпаки ';
+        return ' перемогти, тільки навпаки';
     }
 
     public getThumbURL(): string {

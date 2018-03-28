@@ -15,7 +15,7 @@ export class FirstBloodOwner extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' пролити першої крові ';
+        return ' пролити першу кров';
     }
 
     public getThumbURL(): string {

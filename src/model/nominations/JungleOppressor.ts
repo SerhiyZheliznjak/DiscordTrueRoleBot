@@ -17,7 +17,7 @@ export class JungleOppressor extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' гнобити джунглі протягом числа матчів ';
+        return ' гнобити джунглі протягом числа матчів';
     }
 
     public getThumbURL(): string {

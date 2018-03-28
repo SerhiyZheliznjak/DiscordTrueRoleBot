@@ -17,7 +17,7 @@ export class PingMaster extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' напінгати ';
+        return ' напінгати';
     }
 
     public getScore() {

@@ -17,7 +17,7 @@ export class RapunzelSyndrome extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' добити веж ';
+        return ' добити веж';
     }
 
     public getThumbURL(): string {

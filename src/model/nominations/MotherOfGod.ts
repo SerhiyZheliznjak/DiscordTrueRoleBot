@@ -16,7 +16,7 @@ export class MotherOfGod extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' літати як метелик, жалити як бджола ';
+        return ' літати як метелик, жалити як бджола';
     }
 
     public getThumbURL(): string {

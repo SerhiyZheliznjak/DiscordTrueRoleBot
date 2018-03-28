@@ -20,7 +20,7 @@ export class Pacifist extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' приймати участь у відсотку командних бійок ';
+        return ' приймати участь у командних бійках';
     }
 
     public getThumbURL(): string {

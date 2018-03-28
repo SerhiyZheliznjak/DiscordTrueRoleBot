@@ -16,7 +16,7 @@ export class Nenza extends Nomination {
     }
 
     public getScoreDescription(): string {
-        return ' понаписувати херні ';
+        return ' понаписувати херні';
     }
 
     public getThumbURL(): string {
