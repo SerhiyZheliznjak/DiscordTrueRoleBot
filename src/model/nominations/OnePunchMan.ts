@@ -4,7 +4,7 @@ import Constants from "../../Constants";
 import { format } from 'util';
 import Pair from "../Pair";
 
-export class MaxDamageHit extends Nomination {
+export class OnePunchMan extends Nomination {
     constructor(protected points: Array<Pair<number, number | string>> = []) {
         super(points);
         this.name = 'Вірастюк';

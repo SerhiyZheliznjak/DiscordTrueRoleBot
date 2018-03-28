@@ -1,4 +1,4 @@
-import { MaxDamageHit } from "./nominations/MaxDamageHit";
+import { OnePunchMan } from "./nominations/OnePunchMan";
 import { FirstBloodOwner } from "./nominations/FirstBloodOwner";
 import { Donor } from "./nominations/Donor";
 import { JungleOppressor } from "./nominations/JungleOppressor";
@@ -26,7 +26,7 @@ import { Freelancer } from "./nominations/Freelancer";
 export default class Nominations {
     public static get all(): Nomination[] {
         return [
-            new MaxDamageHit(),
+            new OnePunchMan(),
             new FirstBloodOwner(),
             new Donor(),
             new JungleOppressor(),
