@@ -69,7 +69,7 @@ export class ShowTop extends CommandBase {
             topRes.forEach((tr: NominationResult, index: number) => {
                 const place = index + 1;
                 const name = DiscordUtils.fillWithSpaces(profileMap.get(tr.account_id), longestProfileName);
-                msgText += '#' + place + ' ' + name + ': ' + tr.nomination.getScore() + '\n';
+                msgText += '#' + place + ' ' + name + ': ' + tr.nomination.scoreToString() + '\n';
             });
             return DiscordUtils.getRichEmbed(
                 'Вони зуміли' + firstNomination.getScoreDescription(),
