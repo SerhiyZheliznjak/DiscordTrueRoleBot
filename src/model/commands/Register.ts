@@ -3,9 +3,6 @@ import { Message, Client } from "discord.js";
 import DataStore from "../../services/DataStore";
 
 export class Register extends CommandBase {
-    constructor(client: Client, private dataStore: DataStore = new DataStore()) {
-        super(client);
-    }
     public process(msg: Message): void {
         if (msg.mentions.users.array().length === 0) {
             msg.reply('Тобі показати як вставити своє ім\'я в повідомлення?');

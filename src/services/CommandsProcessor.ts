@@ -4,15 +4,27 @@ import { Client, Message } from "discord.js";
 import { Register } from "../model/commands/Register";
 import { Observable } from "rxjs";
 import Constants from "../Constants";
+import DataStore from "./DataStore";
+import { RegisterAll } from "../model/commands/RegisterAll";
+import { WatchList } from "../model/commands/WatchList";
+import { NominationKeysReminder } from "../model/commands/NominationKeysReminder";
+import NominationService from "./NominationService";
 
 export class CommandsProcessor extends CommandBase {
     private commandMap = new Map<string, CommandBase>();
 
+    constructor(client: Client, dataStore: DataStore, private nominationService: NominationService) {
+        super(client, dataStore);
+        this.init();
+    }
+
+    public addCommand(command: string, processor: CommandBase): void {
+        this.commandMap.set(command, processor);
+    }
+
     public getCommandParser(msg: Message): CommandBase {
-        if (this.commandMap.size === 0) {
-            this.init();
-        }
-        return this.commandMap.get(this.parseCommandName(msg.content));
+        const commandName = this.parseCommandName(msg.content);
+        return this.commandMap.get(commandName);
     }
 
     public onMessage(msg: Message): void {
@@ -23,9 +35,9 @@ export class CommandsProcessor extends CommandBase {
             this.shutUpYouRRetard(msg);
             return;
         }
-        const command = this.getCommandParser(msg);
-        if (command) {
-            command.process(msg);
+        const processor = this.getCommandParser(msg);
+        if (processor) {
+            processor.process(msg);
         }
     }
 
@@ -43,12 +55,16 @@ export class CommandsProcessor extends CommandBase {
     }
 
     private parseCommandName(content: string): string {
-        return content.split(' ')[0].substring(1).toLowerCase();
+        return content.split(' ')[0].toLowerCase();
     }
 
     private init(): void {
-        this.commandMap.set('register', new Register(this.client));
-        this.commandMap.set('top', new ShowTop(this.client));
+        this.commandMap.set('register', new Register(this.client, this.dataStore));
+        this.commandMap.set('top', new ShowTop(this.client, this.dataStore, this.nominationService));
         this.commandMap.set('commands', this);
+        this.commandMap.set('registerall', new RegisterAll(this.client, this.dataStore));
+        this.commandMap.set('watchlist', new WatchList(this.client, this.dataStore));
+        this.commandMap.set('nominationkeys', new NominationKeysReminder(this.client, this.dataStore));
+        this.forgiveRetards();
     }
 }

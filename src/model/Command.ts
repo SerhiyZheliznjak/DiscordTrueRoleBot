@@ -1,11 +1,12 @@
 import { Message, Client } from 'discord.js';
 import Constants from '../Constants';
+import DataStore from '../services/DataStore';
 
 export abstract class CommandBase implements IProcessor {
 
     protected static retardMap = new Map();
 
-    constructor(protected client: Client) { }
+    constructor(protected client: Client, protected dataStore: DataStore) { }
 
     public abstract process(message: Message): void;
 
@@ -46,7 +47,7 @@ export abstract class CommandBase implements IProcessor {
         const retardCount = CommandBase.retardMap.get(authorId);
         retardCount.push(new Date().getTime());
         if (retardCount.length > 3) {
-            if (CommandBase.isRetard(authorId)) {
+            if (this.isRetard(authorId)) {
                 (this.client.channels.find('type', 'text') as any).send('@everyone Чат, небезпека - розумововідсталий!');
             } else {
                 retardCount.shift();

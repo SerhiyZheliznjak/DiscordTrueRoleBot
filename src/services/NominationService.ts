@@ -39,11 +39,12 @@ export default class NominationService {
   }
 
   public getTopN(nominationClassName: string, n: number = 3): Observable<NominationResult[]> {
-    if (!Nominations.getByClassName(nominationClassName)) {
+    const nomination = Nominations.getByClassName(nominationClassName);
+    if (!nomination) {
       console.log('no such nomination className: ', nominationClassName);
       return;
     }
-    const nominationKey = Nominations.getByClassName(nominationClassName).getKey();
+    const nominationKey = nomination.getKey();
     if (this.scoreBoard && this.scoreBoard.hasScores(nominationKey)) {
       console.log('using scored scoreboard');
       return Observable.of(this.scoreBoard.getTopN(n).get(nominationKey));
