@@ -20,7 +20,7 @@ export class MotherOfGod extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/cb0k6i5uh295q7t/motherOfGod.png?dl=0';
+        return 'https://www.dropbox.com/s/cb0k6i5uh295q7t/motherOfGod.png';
     }
 
     protected scorePoint(match, player_slot) {

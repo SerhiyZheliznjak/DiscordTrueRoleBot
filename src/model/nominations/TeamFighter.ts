@@ -24,7 +24,7 @@ export class TeamFighter extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/z9nqjmd63uem5sg/Team_Fighterlogo_square.png?dl=0';
+        return 'https://www.dropbox.com/s/z9nqjmd63uem5sg/Team_Fighterlogo_square.png';
     }
 
     protected scorePoint(match, player_slot) {

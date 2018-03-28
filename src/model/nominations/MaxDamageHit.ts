@@ -21,7 +21,7 @@ export class MaxDamageHit extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/3pl3be829p6cv11/onePunchMan.jpg?dl=0';
+        return 'https://www.dropbox.com/s/3pl3be829p6cv11/onePunchMan.jpg';
     }
 
     public getScore() {

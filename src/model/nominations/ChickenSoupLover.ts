@@ -19,7 +19,7 @@ export class ChickeSoupLover extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/09om8yh99oqzfo6/currierKiller.jpg?dl=0';
+        return 'https://www.dropbox.com/s/09om8yh99oqzfo6/currierKiller.jpg';
     }
 
     protected scorePoint(match, player_slot) {

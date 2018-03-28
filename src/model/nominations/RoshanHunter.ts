@@ -19,7 +19,7 @@ export class RoshanHunter extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/nng80711fbthpy2/Roshan.jpg?dl=0';
+        return 'https://www.dropbox.com/s/nng80711fbthpy2/Roshan.jpg';
     }
 
     protected scorePoint(match, player_slot) {

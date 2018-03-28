@@ -26,7 +26,7 @@ export class Parkinson extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/it8lg5dq0hrowq2/parkinson.jpg?dl=0';
+        return 'https://www.dropbox.com/s/it8lg5dq0hrowq2/parkinson.jpg';
     }
 
     protected scorePoint(match, player_slot) {

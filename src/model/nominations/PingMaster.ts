@@ -26,7 +26,7 @@ export class PingMaster extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/ttfrgwt19jywnzo/MasterPing.jpg?dl=0';
+        return 'https://www.dropbox.com/s/ttfrgwt19jywnzo/MasterPing.jpg';
     }
 
     protected scorePoint(match, player_slot) {

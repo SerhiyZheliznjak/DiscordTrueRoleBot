@@ -20,7 +20,7 @@ export class TacticalFeeder extends Nomination {
     }
 
     public getThumbURL(): string {
-        return 'https://www.dropbox.com/s/x5hm81dy3y2gq0r/TacticalFeeder.png?dl=0';
+        return 'https://www.dropbox.com/s/x5hm81dy3y2gq0r/TacticalFeeder.png';
     }
 
     protected scorePoint(match, player_slot): number {
