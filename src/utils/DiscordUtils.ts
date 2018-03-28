@@ -6,46 +6,18 @@ import Pair from "../model/Pair";
 import { ProfileJson } from "../dota-api/DotaJsonTypings";
 
 export class DiscordUtils {
-    public static getRichEmbed(
-        title: string,
-        description: string,
-        avatarUrl?: string,
-        footer?: string,
-        url?: string,
-        imageUrl?: string,
-        fields?: MessageEmbedField[]
-    ): RichEmbed {
-        const richEmbed = new RichEmbed();
-        richEmbed.setTitle(title);
-        richEmbed.setDescription(description);
-        if (avatarUrl) {
-            richEmbed.setThumbnail(avatarUrl);
-        }
-        if (footer) {
-            richEmbed.setFooter(footer);
-        }
-        if (url) {
-            richEmbed.setURL(url);
-        }
-        if (imageUrl) {
-            richEmbed.setImage(imageUrl);
-        }
-        if (fields) {
-            fields.forEach(field => richEmbed.addField(field.name, field.value, field.inline));
-        }
-        return richEmbed;
-    }
-
     public static generateMessages(claimedNominations: NominationResult[], dataStore: DataStore): Observable<RichEmbed> {
         return Observable.from(claimedNominations)
             .flatMap(cn => DiscordUtils.getNomiPlayerPair(cn, dataStore))
-            .map(pair => DiscordUtils.getRichEmbed(
-                pair.p2.personaname + ': ' + pair.p1.nomination.getName(),
-                pair.p1.nomination.getMessage(),
-                pair.p2.avatarmedium,
-                pair.p1.nomination.getScoreText(),
-                pair.p2.profileurl
-            ));
+            .map(pair => {
+                const richEmbed = new RichEmbed();
+                richEmbed.setTitle(pair.p2.personaname + ': ' + pair.p1.nomination.getName());
+                richEmbed.setDescription(pair.p1.nomination.getMessage());
+                richEmbed.setThumbnail(pair.p2.avatarmedium);
+                richEmbed.setFooter(pair.p1.nomination.getScoreText());
+                richEmbed.setURL(pair.p2.profileurl);
+                return richEmbed;
+            });
     }
 
     public static getNomiPlayerPair(nomiRes: NominationResult, dataStore: DataStore): Observable<Pair<NominationResult, ProfileJson>> {

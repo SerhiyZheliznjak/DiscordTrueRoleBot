@@ -23,7 +23,7 @@ export class Looser extends Nomination {
         return 'https://image.ibb.co/d0aCfS/looser.png';
     }
 
-    protected scorePoint(match, player_slot) {
+    public scorePoint(match, player_slot) {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);
             return player && player.lose ? player.lose : 0;

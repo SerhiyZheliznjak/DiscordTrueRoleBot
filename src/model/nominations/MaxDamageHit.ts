@@ -32,7 +32,7 @@ export class MaxDamageHit extends Nomination {
         return format(this.msg, this.roundToTwoDec(this.getScore() / Constants.AM_HP));
     }
 
-    protected scorePoint(match, player_slot) {
+    public scorePoint(match, player_slot) {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);
             return !!player && !!player.max_hero_hit && !!player.max_hero_hit.value ? player.max_hero_hit.value : 0;

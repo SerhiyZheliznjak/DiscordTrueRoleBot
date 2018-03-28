@@ -66,7 +66,7 @@ export default class Nomination {
         throw new Error('Should be implemented by child classes');
     }
 
-    protected scorePoint(match: MatchJson, player_slot: number): string | number {
+    public scorePoint(match: MatchJson, player_slot: number): string | number {
         throw new Error('Should be implemented by child classes');
     }
 }

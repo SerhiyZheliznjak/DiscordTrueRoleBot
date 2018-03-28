@@ -29,7 +29,7 @@ export class PingMaster extends Nomination {
         return 'https://image.ibb.co/id89S7/Master_Ping.jpg';
     }
 
-    protected scorePoint(match, player_slot) {
+    public scorePoint(match, player_slot) {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);
             return player && player.pings ? player.pings : 0;

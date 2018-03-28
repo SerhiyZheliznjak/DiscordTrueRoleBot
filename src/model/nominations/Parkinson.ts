@@ -29,7 +29,7 @@ export class Parkinson extends Nomination {
         return 'https://image.ibb.co/jFR7En/parkinson.jpg';
     }
 
-    protected scorePoint(match, player_slot) {
+    public scorePoint(match, player_slot) {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);
             return !!player && player.actions_per_min ? player.actions_per_min : 0;

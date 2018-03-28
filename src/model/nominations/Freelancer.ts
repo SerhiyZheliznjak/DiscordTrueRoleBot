@@ -1,25 +1,26 @@
 import Nomination from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
+import Constants from "../../Constants";
 import Pair from "../Pair";
 
-export class RoshanHunter extends Nomination {
+export class Freelancer extends Nomination {
     constructor(protected points: Array<Pair<number, number | string>> = []) {
         super(points);
-        this.name = 'Рошан-хуян';
-        this.minScore = 3;
-        this.msg = 'Не такий страшний Рошан як його малюють';
+        this.name = 'Хан Соло';
+        this.minScore = 10;
+        this.msg = 'Соло ММР всім ММРам ММР';
     }
 
     public getScoreText(): string {
-        return 'Вбито Рошанів: ' + this.getScore();
+        return 'Зіграно соло матчів: ' + this.getScore();
     }
 
     public getScoreDescription(): string {
-        return ' вбити рошанів';
+        return ' зіграти в соляру';
     }
 
     public getThumbURL(): string {
-        return 'https://image.ibb.co/i8JLZn/Roshan.jpg';
+        return 'https://image.ibb.co/h523n7/Pacifist.jpg';
     }
 
     public scorePoint(match, player_slot) {
@@ -27,6 +28,6 @@ export class RoshanHunter extends Nomination {
             return 0;
         }
         const player = DotaParser.getPlayerInfo(match, player_slot);
-        return player && player.roshan_kills ? player.roshan_kills : 0;
+        return player && player.party_size && player.party_size === 1 ? 1 : 0;
     }
 }

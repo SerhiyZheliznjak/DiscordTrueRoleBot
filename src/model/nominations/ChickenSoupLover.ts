@@ -22,7 +22,7 @@ export class ChickeSoupLover extends Nomination {
         return 'https://image.ibb.co/hE8LZn/currier_Killer.jpg';
     }
 
-    protected scorePoint(match, player_slot) {
+    public scorePoint(match, player_slot) {
         if (!match) {
             return 0;
         }

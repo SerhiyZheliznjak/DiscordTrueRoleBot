@@ -22,7 +22,7 @@ export class FirstBloodOwner extends Nomination {
         return 'https://image.ibb.co/iTHQ0S/First_Blood.jpg';
     }
 
-    protected scorePoint(match, player_slot) {
+    public scorePoint(match, player_slot) {
         if (!match) {
             return 0;
         }

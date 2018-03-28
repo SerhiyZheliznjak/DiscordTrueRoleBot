@@ -27,7 +27,7 @@ export class TeamFighter extends Nomination {
         return 'https://image.ibb.co/kNZuun/Team_Fighterlogo_square.png';
     }
 
-    protected scorePoint(match, player_slot) {
+    public scorePoint(match, player_slot) {
         if (!match) {
             return 0;
         }

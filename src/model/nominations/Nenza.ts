@@ -23,7 +23,7 @@ export class Nenza extends Nomination {
         return 'https://image.ibb.co/jLzG77/Nenza.jpg';
     }
 
-    protected scorePoint(match: MatchJson, player_slot: number): number {
+    public scorePoint(match: MatchJson, player_slot: number): number {
         if (match && match.chat) {
             const nenzaMsg = match.chat.filter(msg => msg.player_slot === player_slot)
                 .filter(msg => {

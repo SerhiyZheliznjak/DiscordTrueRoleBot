@@ -23,7 +23,7 @@ export class ThisTimeItWillWork extends Nomination {
         return 'https://image.ibb.co/n1AZun/buyback.png';
     }
 
-    protected scorePoint(match, player_slot): number {
+    public scorePoint(match, player_slot): number {
         if (!!match) {
             const player: PlayerJson = DotaParser.getPlayerInfo(match, player_slot);
             return player && player.buyback_count && player.win === 1 ? player.buyback_count : 0;

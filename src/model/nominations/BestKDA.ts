@@ -37,7 +37,7 @@ export class BestKDA extends Nomination {
         return `https://image.ibb.co/bvMUS7/kda.jpg`;
     }
 
-    protected scorePoint(match, player_slot): string {
+    public scorePoint(match, player_slot): string {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);
             const matchResult = player.win === 1 ? Constants.WON : Constants.LOST;

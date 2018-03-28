@@ -23,7 +23,7 @@ export class OponentOwsMoney extends Nomination {
         return 'https://image.ibb.co/kXpSEn/Opponent_Owns_Money.jpg';
     }
 
-    protected scorePoint(match, player_slot) {
+    public scorePoint(match, player_slot) {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);
             return !!player && player.kills === 0 ? 1 : 0;

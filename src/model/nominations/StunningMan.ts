@@ -22,7 +22,7 @@ export class StunningMan extends Nomination {
         return 'https://image.ibb.co/fTpin7/stunner.png';
     }
 
-    protected scorePoint(match, player_slot) {
+    public scorePoint(match, player_slot) {
         if (!!match) {
             const player = DotaParser.getPlayerInfo(match, player_slot);
             return player && player.stuns ? player.stuns : 0;

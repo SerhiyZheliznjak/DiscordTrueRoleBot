@@ -149,6 +149,7 @@ export class PlayerJson {
     ];
     obs_placed: number;
     party_id: number;
+    party_size: number;
     permanent_buffs: [
         {}
     ];

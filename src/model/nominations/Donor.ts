@@ -23,7 +23,7 @@ export class Donor extends Nomination {
         return 'https://image.ibb.co/eSTLZn/DONOR.jpg';
     }
 
-    protected scorePoint(match, player_slot) {
+    public scorePoint(match, player_slot) {
         if (!match) {
             return 0;
         }

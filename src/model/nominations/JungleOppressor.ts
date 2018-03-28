@@ -24,7 +24,7 @@ export class JungleOppressor extends Nomination {
         return 'https://image.ibb.co/b1XsfS/Jungler.jpg';
     }
 
-    protected scorePoint(match, player_slot) {
+    public scorePoint(match, player_slot) {
         if (!match) {
             return 0;
         }

@@ -23,7 +23,7 @@ export class TacticalFeeder extends Nomination {
         return 'https://image.ibb.co/gVKin7/Tactical_Feeder.png';
     }
 
-    protected scorePoint(match, player_slot): number {
+    public scorePoint(match, player_slot): number {
         if (!!match) {
             const player: PlayerJson = DotaParser.getPlayerInfo(match, player_slot);
             return player && player.deaths && player.deaths > 10 && player.win === 1 ? 1 : 0;

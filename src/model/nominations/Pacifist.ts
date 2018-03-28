@@ -27,7 +27,7 @@ export class Pacifist extends Nomination {
         return 'https://image.ibb.co/nqS3n7/hippie.jpg';
     }
 
-    protected scorePoint(match, player_slot) {
+    public scorePoint(match, player_slot) {
         if (!match) {
             return 0;
         }

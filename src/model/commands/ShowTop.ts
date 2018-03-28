@@ -72,11 +72,12 @@ export class ShowTop extends CommandBase {
                 const name = DiscordUtils.fillWithSpaces(profileMap.get(tr.account_id), longestProfileName);
                 msgText += '#' + place + ' ' + name + ': ' + tr.nomination.scoreToString() + '\n';
             });
-            return DiscordUtils.getRichEmbed(
-                'Вони зуміли' + firstNomination.getScoreDescription(),
-                DiscordUtils.formatAsBlock(msgText),
-                undefined, // firstNomination.getThumbURL(),
-                '#Тайтаке.');
+            const richEmbed = new RichEmbed();
+            richEmbed.setTitle('Вони зуміли' + firstNomination.getScoreDescription());
+            richEmbed.setDescription(DiscordUtils.formatAsBlock(msgText));
+            richEmbed.setThumbnail(firstNomination.getThumbURL());
+            richEmbed.setFooter('#Тайтаке.');
+            return richEmbed;
         }
     }
 
