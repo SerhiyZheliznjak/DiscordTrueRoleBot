@@ -22,6 +22,8 @@ import { RoshanHunter } from "./nominations/RoshanHunter";
 import { TeamFighter } from "./nominations/TeamFighter";
 import { Pacifist } from "./nominations/Pacifist";
 import { Freelancer } from "./nominations/Freelancer";
+import { Rapist } from "./nominations/Rapist";
+import { BadRapist } from "./nominations/BadRapist";
 
 export default class Nominations {
     public static get all(): Nomination[] {
@@ -48,7 +50,9 @@ export default class Nominations {
             new RoshanHunter(),
             new TeamFighter(),
             new Pacifist(),
-            new Freelancer()
+            new Freelancer(),
+            new Rapist(),
+            new BadRapist()
         ];
     }
 

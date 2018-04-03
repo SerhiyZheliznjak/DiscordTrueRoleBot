@@ -233,6 +233,7 @@ export class PlayerJson {
     item_win: {};
     item_usage: {};
     purchase_tpscroll: {};
+    purchase_rapier: number;
     actions_per_min: number;
     life_state_dead: number;
     rank_tier: number;
