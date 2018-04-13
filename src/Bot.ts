@@ -5,7 +5,7 @@ import BotService from './services/BotService';
 const client: Client = new Client();
 let botService: BotService;
 
-client.login(process.env.test);
+client.login(process.env.peacedota);
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);

@@ -6,7 +6,7 @@ export class Looser extends Nomination {
     constructor(protected points: Array<Pair<number, number | string>> = []) {
         super(points);
         this.name = 'Шота не йде';
-        this.minScore = 10;
+        this.minScore = 15;
         this.msg = 'Всьо то саме що пабідітіль, от тільки не то щоб його в тіму хтіли, та й не дуже то заздрят\n' +
             'Переживає смугу програшів';
     }

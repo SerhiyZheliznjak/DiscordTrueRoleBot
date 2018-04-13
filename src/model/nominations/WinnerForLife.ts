@@ -7,7 +7,7 @@ export class WinnerForLife extends Nomination {
     constructor(protected points: Array<Pair<number, number | string>> = []) {
         super(points);
         this.name = 'Пабідітіль па жизні';
-        this.minScore = 10;
+        this.minScore = 15;
         this.msg = 'Всі хочуть його в тіму, а хто не хоче той просто заздрит\nБільше 10ти перемог';
     }
 
