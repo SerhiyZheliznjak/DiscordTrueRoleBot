@@ -16,5 +16,5 @@ export default class Constants {
     public static get FORGIVE_RETARDS_INTERVAL(): number { return 1000 * 60 * 60 * 24; }
     public static get NOMINATION_DUE_INTERVAL(): number { return 1000 * 60 * 60 * 24 * 7 * 4; } // 4 weeks
     public static get MATCH_DUE_TIME_SEC(): number { return 60 * 60 * 24 * 7 * 4; } // 4 weeks
-    public static get WATCH_INTERVAL(): number { return 1000 * 60 * 30; }
+    public static get WATCH_INTERVAL(): number { return 1000 * 60 * 60 * 24; }
 }
