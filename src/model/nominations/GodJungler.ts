@@ -9,7 +9,7 @@ export class GodJungler extends Nomination {
         this.name = 'Лісник від Бога (нє)';
         this.minScore = 3;
         this.msg = 'Якісь кріпи незбалансовані!\n'
-            + 'Вмер від нейтрального кріпа більше 3х разів';
+            + 'Вмер від нейтрального кріпа не менше 3х разів';
     }
 
     public getScoreText(): string {
