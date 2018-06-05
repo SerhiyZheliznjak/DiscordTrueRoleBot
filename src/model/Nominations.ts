@@ -24,6 +24,7 @@ import { Pacifist } from "./nominations/Pacifist";
 import { Freelancer } from "./nominations/Freelancer";
 import { Rapist } from "./nominations/Rapist";
 import { BadRapist } from "./nominations/BadRapist";
+import { GodJungler } from "./nominations/GodJungler";
 
 export default class Nominations {
     public static get all(): Nomination[] {
@@ -52,7 +53,8 @@ export default class Nominations {
             new Pacifist(),
             new Freelancer(),
             new Rapist(),
-            new BadRapist()
+            new BadRapist(),
+            new GodJungler()
         ];
     }
 

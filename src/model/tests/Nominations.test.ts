@@ -3,7 +3,7 @@ import Nominations from '../Nominations';
 
 describe(``, () => {
     it(`should get list of all nominations`, () => {
-        expect(Nominations.all.length).toBe(25);
+        expect(Nominations.all.length).toBe(26);
     });
 
     it(`should have nominations with getScoreText implemented`, () => {
