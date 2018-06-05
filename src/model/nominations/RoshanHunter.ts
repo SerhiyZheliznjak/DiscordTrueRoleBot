@@ -23,10 +23,10 @@ export class RoshanHunter extends Nomination {
     }
 
     public scorePoint(match, player_slot) {
-        if (!match) {
+        const player = DotaParser.getPlayerInfo(match, player_slot);
+        if (!player) {
             return 0;
         }
-        const player = DotaParser.getPlayerInfo(match, player_slot);
         return player && player.roshan_kills ? player.roshan_kills : 0;
     }
 }

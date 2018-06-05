@@ -28,10 +28,10 @@ export class DenyGod extends Nomination {
     }
 
     public scorePoint(match, player_slot) {
-        if (!match) {
+        const player = DotaParser.getPlayerInfo(match, player_slot);
+        if (!player) {
             return 0;
         }
-        const player = DotaParser.getPlayerInfo(match, player_slot);
         return player && player.denies ? player.denies : 0;
     }
 }

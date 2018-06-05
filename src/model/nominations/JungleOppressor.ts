@@ -25,9 +25,6 @@ export class JungleOppressor extends Nomination {
     }
 
     public scorePoint(match, player_slot) {
-        if (!match) {
-            return 0;
-        }
         const player = DotaParser.getPlayerInfo(match, player_slot);
         if (!player || !player.damage) {
             return 0;

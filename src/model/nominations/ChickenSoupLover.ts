@@ -23,10 +23,10 @@ export class ChickeSoupLover extends Nomination {
     }
 
     public scorePoint(match, player_slot) {
-        if (!match) {
+        const player = DotaParser.getPlayerInfo(match, player_slot);
+        if (!player) {
             return 0;
         }
-        const player = DotaParser.getPlayerInfo(match, player_slot);
         return player && player.courier_kills ? player.courier_kills : 0;
     }
 }

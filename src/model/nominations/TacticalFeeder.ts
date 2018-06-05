@@ -24,8 +24,8 @@ export class TacticalFeeder extends Nomination {
     }
 
     public scorePoint(match, player_slot): number {
-        if (!!match) {
-            const player: PlayerJson = DotaParser.getPlayerInfo(match, player_slot);
+        const player: PlayerJson = DotaParser.getPlayerInfo(match, player_slot);
+        if (!!player) {
             return player && player.deaths && player.deaths > 10 && player.win === 1 ? 1 : 0;
         }
         return 0;

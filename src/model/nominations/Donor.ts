@@ -24,11 +24,11 @@ export class Donor extends Nomination {
     }
 
     public scorePoint(match, player_slot) {
-        if (!match) {
+        const objectives = DotaParser.getObjectives(match);
+        if (!objectives) {
             return 0;
         }
-        const objectives = DotaParser.getObjectives(match);
-        const fbObjective = !!objectives ? objectives.find(obj => obj.type === Constants.OBJECTIVE_FB) : undefined;
+        const fbObjective = objectives.find(obj => obj.type === Constants.OBJECTIVE_FB);
         return !!fbObjective ? fbObjective.key === player_slot ? 1 : 0 : 0;
     }
 }

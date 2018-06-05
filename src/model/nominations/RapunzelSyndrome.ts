@@ -25,8 +25,8 @@ export class RapunzelSyndrome extends Nomination {
     }
 
     public scorePoint(match, player_slot): number {
-        if (!!match) {
-            const player = DotaParser.getPlayerInfo(match, player_slot);
+        const player = DotaParser.getPlayerInfo(match, player_slot);
+        if (!!player) {
             return player && player.tower_kills > 5 ? player.tower_kills : 0;
         }
         return 0;

@@ -23,8 +23,8 @@ export class StunningMan extends Nomination {
     }
 
     public scorePoint(match, player_slot) {
-        if (!!match) {
-            const player = DotaParser.getPlayerInfo(match, player_slot);
+        const player = DotaParser.getPlayerInfo(match, player_slot);
+        if (!!player) {
             return player && player.stuns ? player.stuns : 0;
         }
         return 0;

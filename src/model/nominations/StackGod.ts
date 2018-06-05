@@ -24,8 +24,8 @@ export class StackGod extends Nomination {
     }
 
     public scorePoint(match, player_slot) {
-        if (!!match) {
-            const player = DotaParser.getPlayerInfo(match, player_slot);
+        const player = DotaParser.getPlayerInfo(match, player_slot);
+        if (!!player) {
             return !!player && player.camps_stacked ? player.camps_stacked : 0;
         }
         return 0;

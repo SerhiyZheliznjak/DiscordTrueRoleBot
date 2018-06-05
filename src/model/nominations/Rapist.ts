@@ -23,8 +23,8 @@ export class Rapist extends Nomination {
     }
 
     public scorePoint(match, player_slot) {
-        if (!!match) {
-            const player = DotaParser.getPlayerInfo(match, player_slot);
+        const player = DotaParser.getPlayerInfo(match, player_slot);
+        if (!!player) {
             return player && player.purchase_rapier && player.win === 1 ? player.purchase_rapier : 0;
         }
         return 0;

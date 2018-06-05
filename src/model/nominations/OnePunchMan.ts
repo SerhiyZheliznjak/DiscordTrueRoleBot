@@ -33,8 +33,8 @@ export class OnePunchMan extends Nomination {
     }
 
     public scorePoint(match, player_slot) {
-        if (!!match) {
-            const player = DotaParser.getPlayerInfo(match, player_slot);
+        const player = DotaParser.getPlayerInfo(match, player_slot);
+        if (!!player) {
             return !!player && !!player.max_hero_hit && !!player.max_hero_hit.value ? player.max_hero_hit.value : 0;
         }
         return 0;

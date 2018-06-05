@@ -24,8 +24,8 @@ export class ThisTimeItWillWork extends Nomination {
     }
 
     public scorePoint(match, player_slot): number {
-        if (!!match) {
-            const player: PlayerJson = DotaParser.getPlayerInfo(match, player_slot);
+        const player: PlayerJson = DotaParser.getPlayerInfo(match, player_slot);
+        if (!!player) {
             return player && player.buyback_count && player.win === 1 ? player.buyback_count : 0;
         }
         return 0;

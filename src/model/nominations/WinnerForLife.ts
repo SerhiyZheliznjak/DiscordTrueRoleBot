@@ -24,8 +24,8 @@ export class WinnerForLife extends Nomination {
     }
 
     public scorePoint(match, player_slot) {
-        if (!!match) {
-            const player = DotaParser.getPlayerInfo(match, player_slot);
+        const player = DotaParser.getPlayerInfo(match, player_slot);
+        if (!!player) {
             return player && player.win ? player.win : 0;
         }
         return 0;

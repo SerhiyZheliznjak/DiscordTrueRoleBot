@@ -38,8 +38,8 @@ export class BestKDA extends Nomination {
     }
 
     public scorePoint(match, player_slot): string {
-        if (!!match) {
-            const player = DotaParser.getPlayerInfo(match, player_slot);
+        const player = DotaParser.getPlayerInfo(match, player_slot);
+        if (!!player) {
             const matchResult = player.win === 1 ? Constants.WON : Constants.LOST;
             return !!player && player.kills !== null && player.deaths !== null && player.assists !== null
                 ? player.kills + '/' + player.deaths + '/' + player.assists + '/' + matchResult

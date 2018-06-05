@@ -24,8 +24,8 @@ export class OponentOwsMoney extends Nomination {
     }
 
     public scorePoint(match, player_slot) {
-        if (!!match) {
-            const player = DotaParser.getPlayerInfo(match, player_slot);
+        const player = DotaParser.getPlayerInfo(match, player_slot);
+        if (!!player) {
             return !!player && player.kills === 0 ? 1 : 0;
         }
         return 0;
