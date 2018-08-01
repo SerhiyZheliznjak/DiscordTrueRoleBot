@@ -1,7 +1,7 @@
 import { RxHttpRequest } from 'rx-http-request';
 import { Observable, Subscription, Observer } from 'rxjs';
 import { format } from 'util';
-import { RecentMatchJson, PlayerProfileJson, MatchJson } from './DotaJsonTypings';
+import { RecentMatchJson, PlayerProfileJson, MatchJson, WinLossJson } from './DotaJsonTypings';
 
 class QueuedRequest {
   constructor(public url: string, public observers: Array<Observer<any>>, public retryCount: number, public observable: Observable<any>) { }
@@ -57,6 +57,10 @@ export default class DotaApi {
 
   public getMatch(match_id: number): Observable<MatchJson> {
     return this.queueRequest(DotaApi.getMatchUrl(match_id));
+  }
+
+  public getWinLoss(account_id: number): Observable<WinLossJson> {
+    return this.queueRequest(format('https://api.opendota.com/api/players/%s/wl', account_id));
   }
 
   private moveQueue() {

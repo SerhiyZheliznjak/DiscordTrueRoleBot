@@ -13,11 +13,11 @@ export class RapunzelSyndrome extends Nomination {
     }
 
     public getScoreText(): string {
-        return 'Добито веж: ' + this.getScore();
+        return 'Добито більше 5ти веж за матч: ' + this.getScore();
     }
 
     public getScoreDescription(): string {
-        return ' добити веж';
+        return ' добити більше 5ти веж';
     }
 
     public getThumbURL(): string {
@@ -27,7 +27,7 @@ export class RapunzelSyndrome extends Nomination {
     public scorePoint(match, player_slot): number {
         const player = DotaParser.getPlayerInfo(match, player_slot);
         if (!!player) {
-            return player && player.tower_kills > 5 ? player.tower_kills : 0;
+            return player && player.tower_kills > 5 ? 1 : 0;
         }
         return 0;
     }

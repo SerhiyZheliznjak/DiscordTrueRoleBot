@@ -1,5 +1,5 @@
 import NominationResult from "../model/NominationResult";
-import { MatchJson, ProfileJson, PlayerProfileJson } from "../dota-api/DotaJsonTypings";
+import { MatchJson, ProfileJson, WinLossJson } from "../dota-api/DotaJsonTypings";
 import StorageService from "./StorageService";
 import { Observable } from "rxjs";
 import DotaApi from "../dota-api/DotaApi";
@@ -98,5 +98,9 @@ export default class DataStore {
 
     public registerPlayer(account_id: number, discordId: string): void {
         this.storage.registerPlayer(account_id, discordId);
+    }
+
+    public getWinLoss(account_id: number): Observable<WinLossJson> {
+        return this.dotaApi.getWinLoss(account_id);
     }
 }

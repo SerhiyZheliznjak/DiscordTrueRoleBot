@@ -291,3 +291,8 @@ export class RecentMatchJson {
     leaver_status: number;
     party_size: number;
 }
+
+export class WinLossJson {
+    win: number;
+    loose: number;
+}

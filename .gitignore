@@ -2,3 +2,4 @@ config
 node_modules
 storage
 dist
+.vscode/settings.json

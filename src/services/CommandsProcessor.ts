@@ -10,6 +10,7 @@ import { WatchList } from "../model/commands/WatchList";
 import { NominationKeysReminder } from "../model/commands/NominationKeysReminder";
 import NominationService from "./NominationService";
 import { DiscordUtils } from "../utils/DiscordUtils";
+import { WinRate } from "../model/commands/WinRateCommand";
 
 export class CommandsProcessor extends CommandBase {
     private commandMap = new Map<string, CommandBase>();
@@ -66,6 +67,7 @@ export class CommandsProcessor extends CommandBase {
         this.commandMap.set('registerall', new RegisterAll(this.client, this.dataStore));
         this.commandMap.set('watchlist', new WatchList(this.client, this.dataStore));
         this.commandMap.set('nominationkeys', new NominationKeysReminder(this.client, this.dataStore));
+        this.commandMap.set('winrate', new WinRate(this.client, this.dataStore));
         this.forgiveRetards();
     }
 }
