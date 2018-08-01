@@ -294,5 +294,5 @@ export class RecentMatchJson {
 
 export class WinLossJson {
     win: number;
-    loose: number;
+    lose: number;
 }

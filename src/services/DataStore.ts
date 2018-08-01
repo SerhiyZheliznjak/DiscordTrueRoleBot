@@ -3,14 +3,13 @@ import { MatchJson, ProfileJson, WinLossJson } from "../dota-api/DotaJsonTypings
 import StorageService from "./StorageService";
 import { Observable } from "rxjs";
 import DotaApi from "../dota-api/DotaApi";
-import Nomination from "../model/Nomination";
 import PlayerRecentMatches from "../model/PlayerRecentMatches";
 import NominationResultJson from "../model/json/NominationResultJson";
 
 export default class DataStore {
     public static maxMatches: number;
     private static matchesCacheMap: Map<number, MatchJson> = new Map();
-    private static profilesMap: Map<number, ProfileJson>;
+    private static profilesMap: Map<number, ProfileJson>  = new Map();
     private static registeredPlayersCache: Map<number, string> = new Map();
 
     constructor(
@@ -65,21 +64,14 @@ export default class DataStore {
         }
     }
 
-    public get profilesCache(): Map<number, ProfileJson> {
-        if (!DataStore.profilesMap) {
-            DataStore.profilesMap = new Map<number, ProfileJson>();
-        }
-        return DataStore.profilesMap;
-    }
-
     public getProfile(account_id: number): Observable<ProfileJson> {
-        const profile = this.profilesCache.get(account_id);
+        const profile =  DataStore.profilesMap.get(account_id);
         if (profile) {
             return Observable.of(profile);
         } else {
             return this.dotaApi.getPlayerProfile(account_id)
                 .map(p => {
-                    this.profilesCache.set(account_id, profile);
+                    DataStore.profilesMap.set(account_id, p.profile);
                     return p.profile;
                 });
         }

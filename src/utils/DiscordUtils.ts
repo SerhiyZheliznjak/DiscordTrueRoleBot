@@ -36,12 +36,4 @@ export class DiscordUtils {
     public static formatAsBlock(text: string): string {
         return '```bash\n' + text + '\n```';
     }
-
-    public static getWinRateMessage(msg: string): RichEmbed {
-        const richEmbed = new RichEmbed();
-        richEmbed.setTitle('Відсоток перемог:');
-        richEmbed.setDescription(msg);
-        richEmbed.setFooter('#тайтаке');
-        return richEmbed;
-    }
 }

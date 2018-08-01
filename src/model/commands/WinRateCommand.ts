@@ -9,7 +9,7 @@ export class WinRate extends CommandBase {
 
     public process(msg: Message): void {
         const arr = this.getArgs(msg.content.toLowerCase());
-        if ( !this.alreadyProcessing) {
+        if (this.alreadyProcessing) {
             msg.reply('Я знав що так буде, retardPlusPlus()');
             this.retardPlusPlus(msg);
             return;
@@ -17,7 +17,7 @@ export class WinRate extends CommandBase {
         if (arr.length === 0) {
             this.alreadyProcessing = true;
             this.dataStore.registeredPlayers.subscribe((registeredPlayers: Map<number, string>) => {
-                const profileIds = Object.keys(registeredPlayers).map(stringId => +stringId);
+                const profileIds = Array.from(registeredPlayers.keys());
                 Observable.forkJoin(
                     profileIds.map(
                         account_id => this.mapAccountIdToWinRate(
@@ -34,20 +34,22 @@ export class WinRate extends CommandBase {
 
     private mapAccountIdToWinRate(account_id: number, winLoss: Observable<WinLossJson>): Observable<AccountWinRate> {
         return winLoss.map(wl => {
-            const winrate = (wl.win * 100) / (wl.loose + wl.win);
-            return new AccountWinRate(account_id, winrate);
+            const winrate = wl.win / (wl.lose + wl.win);
+            return new AccountWinRate(account_id, Math.round(winrate * 10000) / 100);
         });
     }
 
     private sendMessage(msg: Message, accWinRates: AccountWinRate[]): void {
         Observable.forkJoin(accWinRates.map(awr => this.populateWithName(awr)))
-        .subscribe(winrates => {
-            const winratesMsg = winrates.reduce((message, wr) => {
-                return message + wr.name + ': ' + wr.winRate + '\n';
-            }, '');
-            msg.reply(DiscordUtils.getWinRateMessage(winratesMsg));
-            this.alreadyProcessing = false;
-        });
+            .subscribe(winrates => {
+                const winratesMsg = winrates.sort((a, b) => b.winRate - a.winRate)
+                .reduce((message, wr) => {
+                    const sign = wr.winRate > 50 ? '+' : '-';
+                    return message + sign + ' ' + wr.winRate + '%: ' + wr.name + '\n';
+                }, '```diff\n');
+                msg.reply(winratesMsg + '#тайтаке```');
+                this.alreadyProcessing = false;
+            });
     }
 
     private populateWithName(awr: AccountWinRate): Observable<AccountWinRate> {
