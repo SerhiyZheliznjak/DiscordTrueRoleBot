@@ -85,7 +85,7 @@ export class WinRate extends CommandBase {
     private mapAccountIdToWinRate(account_id: number, winLoss: Observable<WinLossJson>): Observable<AccountWinRate> {
         return winLoss.map(wl => {
             const winrate = wl.win / (wl.lose + wl.win);
-            return new AccountWinRate(account_id, Math.round(winrate * 10000) / 100);
+            return new AccountWinRate(account_id, Math.round(winrate * 10000) / 100, wl.win + wl.lose);
         });
     }
 
@@ -96,7 +96,7 @@ export class WinRate extends CommandBase {
                     .reduce((message, wr) => {
                         const sign = wr.winRate > 50 ? '+' : '-';
                         const winRate = isNaN(wr.winRate) ? '-' : wr.winRate;
-                        return message + sign + ' ' + winRate + '%: ' + wr.name + '\n';
+                        return message + sign + ' ' + winRate + '% з ' + wr.count + ': ' + wr.name + '\n';
                     }, '```diff\n' + messageHeader + '\n');
                 msg.reply(winratesMsg + '#тайтаке```');
                 this.unlock();
@@ -112,5 +112,5 @@ export class WinRate extends CommandBase {
 }
 
 class AccountWinRate {
-    constructor(public account_id: number, public winRate: number, public name?: string) { }
+    constructor(public account_id: number, public winRate: number, public count: number, public name?: string) { }
 }
