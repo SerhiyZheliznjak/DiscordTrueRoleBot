@@ -15,6 +15,10 @@ export class CreatorCommand extends CommandBase {
         super(client, dataStore);
     }
 
+    public helpText(): string {
+        return 'то щоб Творець міг перезапустити';
+    }
+
     public process(msg: Message): void {
         if (this.isCreator(msg)) {
             this.processCb(msg);

@@ -5,10 +5,29 @@ import DataStore from '../services/DataStore';
 export abstract class CommandBase implements IProcessor {
 
     protected static retardMap = new Map();
+    protected locked = false;
 
     constructor(protected client: Client, protected dataStore: DataStore) { }
 
     public abstract process(message: Message): void;
+
+    public abstract helpText(): string;
+
+    protected lock(): void {
+        this.locked = true;
+    }
+
+    protected unlock(): void {
+        this.locked = false;
+    }
+
+    protected isLocked(msg: Message): boolean {
+        if (this.locked) {
+            msg.reply('Ваш запит дуже важливий для нас, будь ласка очікуйте на лінії');
+            this.retardPlusPlus(msg);
+        }
+        return this.locked;
+    }
 
     protected isCreator(message: Message): boolean {
         return message.author.id === process.env.creatorId;

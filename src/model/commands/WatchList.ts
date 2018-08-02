@@ -18,4 +18,8 @@ export class WatchList extends CommandBase {
             msg.reply('хуйочліст');
         }
     }
+
+    public helpText(): string {
+        return 'то тільки для Творця';
+    }
 }

@@ -32,4 +32,8 @@ export class Register extends CommandBase {
             });
         }
     }
+
+    public helpText(): string {
+        return 'watch @КОРИСТУВАЧ DOTA_ID';
+    }
 }

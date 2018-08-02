@@ -27,4 +27,8 @@ export class RegisterAll extends CommandBase {
             });
         }
     }
+
+    public helpText(): string {
+        return 'то тільки для Творця';
+    }
 }

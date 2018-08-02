@@ -11,6 +11,7 @@ export default class DataStore {
     private static matchesCacheMap: Map<number, MatchJson> = new Map();
     private static profilesMap: Map<number, ProfileJson>  = new Map();
     private static registeredPlayersCache: Map<number, string> = new Map();
+    private static heroes: Map<string, number> = new Map();
 
     constructor(
         private dotaApi: DotaApi = new DotaApi(),
@@ -92,7 +93,23 @@ export default class DataStore {
         this.storage.registerPlayer(account_id, discordId);
     }
 
-    public getWinLoss(account_id: number): Observable<WinLossJson> {
-        return this.dotaApi.getWinLoss(account_id);
+    public getWinLoss(account_id: number, hero_id?: number, with_ids?: number[], without_ids?: number[]): Observable<WinLossJson> {
+        return this.dotaApi.getWinLoss(account_id, hero_id, with_ids, without_ids);
+    }
+
+    public getHeroId(name: string): Observable<number> {
+        if (DataStore.heroes.size === 0) {
+            return this.getHeroes().map(map => map.get(name));
+        } else {
+            return Observable.of(DataStore.heroes.get(name));
+        }
+    }
+
+    public getHeroes(): Observable<Map<string, number>> {
+        if (DataStore.heroes.size === 0) {
+            return this.dotaApi.getHeroes().map(heroes => heroes.reduce((map, h) => map.set(h.localized_name, h.id), DataStore.heroes));
+        } else {
+            return Observable.of(DataStore.heroes);
+        }
     }
 }

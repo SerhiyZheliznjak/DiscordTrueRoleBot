@@ -1,7 +1,7 @@
 import { RxHttpRequest } from 'rx-http-request';
 import { Observable, Subscription, Observer } from 'rxjs';
 import { format } from 'util';
-import { RecentMatchJson, PlayerProfileJson, MatchJson, WinLossJson } from './DotaJsonTypings';
+import { RecentMatchJson, PlayerProfileJson, MatchJson, WinLossJson, HeroJson } from './DotaJsonTypings';
 
 class QueuedRequest {
   constructor(public url: string, public observers: Array<Observer<any>>, public retryCount: number, public observable: Observable<any>) { }
@@ -59,8 +59,30 @@ export default class DotaApi {
     return this.queueRequest(DotaApi.getMatchUrl(match_id));
   }
 
-  public getWinLoss(account_id: number): Observable<WinLossJson> {
-    return this.queueRequest(format('https://api.opendota.com/api/players/%s/wl', account_id));
+  public getWinLoss(account_id: number, hero_id?: number, with_ids?: number[], without_ids?: number[]): Observable<WinLossJson> {
+    let query = format('https://api.opendota.com/api/players/%s/wl', account_id);
+    query += this.hasQueryParameters(hero_id, with_ids, without_ids) ? '?' : '';
+    if (hero_id) {
+      query += "hero_id=" + hero_id + '&';
+    }
+    if (with_ids) {
+      with_ids.forEach(id => query += 'included_account_id=' + id + '&');
+    }
+    if (without_ids) {
+      without_ids.forEach(id => query += 'excluded_account_id=' + id + '&');
+    }
+    return this.queueRequest(query);
+  }
+
+  public getHeroes(): Observable<HeroJson[]> {
+    return this.queueRequest('https://api.opendota.com/api/heroes');
+  }
+
+  private hasQueryParameters(...args): boolean {
+    if (args.find(arg => !!arg)) {
+      return true;
+    }
+    return false;
   }
 
   private moveQueue() {

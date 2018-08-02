@@ -11,6 +11,7 @@ import { NominationKeysReminder } from "../model/commands/NominationKeysReminder
 import NominationService from "./NominationService";
 import { DiscordUtils } from "../utils/DiscordUtils";
 import { WinRate } from "../model/commands/WinRateCommand";
+import { HeroNames } from "../model/commands/HeroNames";
 
 export class CommandsProcessor extends CommandBase {
     private commandMap = new Map<string, CommandBase>();
@@ -44,8 +45,12 @@ export class CommandsProcessor extends CommandBase {
     }
 
     public process(msg: Message): void {
-        const commands =  [...this.commandMap].map(p => p[0]).sort().join('\n');
+        const commands =  [...this.commandMap].map(p => p[0] + ' - ' + p[1].helpText()).sort().join('\n\n');
         msg.reply(DiscordUtils.formatAsBlock(commands));
+    }
+
+    public helpText(): string {
+        return 'повертає перелік усіх доступних команд';
     }
 
     public forgiveRetards(): void {
@@ -68,6 +73,7 @@ export class CommandsProcessor extends CommandBase {
         this.commandMap.set('watchlist', new WatchList(this.client, this.dataStore));
         this.commandMap.set('nominationkeys', new NominationKeysReminder(this.client, this.dataStore));
         this.commandMap.set('winrate', new WinRate(this.client, this.dataStore));
+        this.commandMap.set('heronames', new HeroNames(this.client, this.dataStore));
         this.forgiveRetards();
     }
 }
