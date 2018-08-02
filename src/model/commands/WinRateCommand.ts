@@ -30,56 +30,71 @@ export class WinRate extends CommandBase {
 
     public helpText(): string {
         return 'winrate all? HERO_NAME? without? @MENTION\nякщо не вказати all то порахує лише для того хто то викликав команду;\n'
-        + 'HERO_NAME опційне, рахуватиме ігри на цьому герої;\n'
-        + '@MENTION дискорд згадка з якими гравцями рахувати ігри, можна кілька;\nwithout опційне буде рахувати ігри без згаданих гравців.';
+            + 'HERO_NAME опційне, рахуватиме ігри на цьому герої;\n'
+            + '@MENTION дискорд згадка з якими гравцями рахувати ігри, можна кілька;\n'
+            + 'without опційне буде рахувати ігри без згаданих гравців.';
     }
 
     private countWinRate(msg: Message, registeredPlayers: Map<number, string>, hero_id?: number, heroName?: string) {
         const msgContent = msg.content.toLowerCase();
         const args = this.getArgs(msgContent);
-        const mentions = args.filter(a => a.startsWith('<@')).map(m => m.match(/\d+/)[0]);
+        const mentions = this.getIdsFromMentions(args);
+        const with_ids: string[] = this.getWithOrWithouts(msgContent, registeredPlayers);
+        const without_ids: string[] = this.getWithOrWithouts(msgContent, registeredPlayers, false);
         let accountIdsToCount: number[];
-        let mentionedIds: number[];
-        let with_ids: number[];
-        let without_ids: number[];
         let messageHeader = 'Вінрейт ';
 
         if (heroName) {
             messageHeader += 'на ' + heroName + ' ';
         }
 
-        if (args.indexOf('all') > -1) {
+        if (args.indexOf('all') > -1 || args.length === 0 || with_ids.length === 0) {
             accountIdsToCount = Array.from(registeredPlayers.keys());
-        } else {
-            accountIdsToCount = this.getAccountId([msg.member.id], registeredPlayers);
-        }
-
-        if (mentions.length === 0) {
-            mentionedIds = [];
-        } else {
-            mentionedIds = this.getAccountId(mentions, registeredPlayers);
-            if (msgContent.indexOf('without') > -1) {
-                without_ids = mentionedIds;
-                messageHeader += ' без ';
-            } else {
-                with_ids = mentionedIds;
-                messageHeader += ' з ';
+        } else if (mentions.length > 0) {
+            if (with_ids.length) {
+                messageHeader += this.getMentionedNamesString(msg, with_ids);
             }
-            messageHeader += Array.from(msg.mentions.members.values()).map(member => member.displayName).join(', ') ;
+            if (without_ids.length) {
+                messageHeader += 'без ' + this.getMentionedNamesString(msg, without_ids);
+            }
+            accountIdsToCount = this.getDotaAccountId([with_ids.shift()], registeredPlayers);
         }
 
         Observable.forkJoin(
-            accountIdsToCount.map(
-                account_id => this.mapAccountIdToWinRate(account_id, this.dataStore.getWinLoss(account_id, hero_id, with_ids, without_ids)
+            accountIdsToCount.map(account_id => this.mapAccountIdToWinRate(
+                account_id,
+                this.dataStore.getWinLoss(
+                    account_id, hero_id,
+                    this.getDotaAccountId(with_ids, registeredPlayers),
+                    this.getDotaAccountId(without_ids, registeredPlayers)
                 )
-            )
+            ))
         ).subscribe((accWinRate: AccountWinRate[]) => this.sendMessage(msg, accWinRate, messageHeader));
     }
 
-    private getAccountId(discordIds: string[], registeredPlayers: Map<number, string>): number[] {
+    private getMentionedNamesString(msg: Message, mentioned: string[]): string {
+        return Array.from(msg.mentions.members.values())
+            .filter(member => mentioned.indexOf(member.id) > -1)
+            .map(member => member.displayName).join(', ');
+    }
+
+    private getWithOrWithouts(msgContent: string, registeredPlayers: Map<number, string>, include = true): string[] {
+        const index = include ? 0 : 1;
+        const mentions = msgContent.split(' without ')[index];
+        if (!!mentions) {
+            return this.getIdsFromMentions(mentions.split(' '));
+        }
+        return [];
+    }
+
+    private getIdsFromMentions(args: string[]): string[] {
+        return args.filter(a => a.startsWith('<@')).map(m => m.match(/\d+/)[0]);
+    }
+
+    private getDotaAccountId(discordIds: string[], registeredPlayers: Map<number, string>): number[] {
         return Array.from(registeredPlayers.entries())
-        .filter(kv => discordIds.indexOf(kv[1]) > -1)
-        .map(kv => kv[0]);
+            .filter(kv => discordIds.indexOf(kv[1]) > -1)
+            .map(kv => kv[0]);
     }
 
     private mapAccountIdToWinRate(account_id: number, winLoss: Observable<WinLossJson>): Observable<AccountWinRate> {
@@ -92,13 +107,14 @@ export class WinRate extends CommandBase {
     private sendMessage(msg: Message, accWinRates: AccountWinRate[], messageHeader: string): void {
         Observable.forkJoin(accWinRates.map(awr => this.populateWithName(awr)))
             .subscribe(winrates => {
-                const winratesMsg = winrates.sort((a, b) => b.winRate - a.winRate)
+                const winratesMsg = winrates.sort()
                     .reduce((message, wr) => {
                         const sign = wr.winRate > 50 ? '+' : '-';
                         const winRate = isNaN(wr.winRate) ? '-' : wr.winRate;
-                        return message + sign + ' ' + winRate + '% з ' + wr.count + ': ' + wr.name + '\n';
+                        const palyerName = accWinRates.length > 1 ? ': ' + wr.name : '';
+                        return message + sign + ' ' + winRate + '% з ' + wr.count + palyerName + '\n';
                     }, '```diff\n' + messageHeader + '\n');
-                msg.reply(winratesMsg + '#тайтаке```');
+                msg.channel.send(winratesMsg + '#тайтаке```');
                 this.unlock();
             });
     }
