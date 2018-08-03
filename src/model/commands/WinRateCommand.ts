@@ -29,10 +29,10 @@ export class WinRate extends CommandBase {
     }
 
     public helpText(): string {
-        return 'winrate all? HERO_NAME? without? @MENTION\nякщо не вказати all то порахує лише для того хто то викликав команду;\n'
-            + 'HERO_NAME опційне, рахуватиме ігри на цьому герої;\n'
-            + '@MENTION дискорд згадка з якими гравцями рахувати ігри, можна кілька;\n'
-            + 'without опційне буде рахувати ігри без згаданих гравців.';
+        return 'winrate all? HERO_NAME? @MENTION without? @MENTION\nякщо не вказати all то порахує лише для того хто то викликав команду;\n'
+        + 'HERO_NAME опційне, рахуватиме ігри на цьому герої, якщо є @MENTION то порахує для першого гравця на цьому герої;\n'
+        + '@MENTION рахуватиме ігри з цими гравцями ;\n'
+        + 'without опційне буде рахувати ігри без згаданих гравців вказаних після without.';
     }
 
     private countWinRate(msg: Message, registeredPlayers: Map<number, string>, hero_id?: number, heroName?: string) {
@@ -44,10 +44,6 @@ export class WinRate extends CommandBase {
         let accountIdsToCount: number[];
         let messageHeader = 'Вінрейт ';
 
-        if (heroName) {
-            messageHeader += 'на ' + heroName + ' ';
-        }
-
         if (args.indexOf('all') > -1 || args.length === 0 || with_ids.length === 0) {
             accountIdsToCount = Array.from(registeredPlayers.keys());
         } else if (mentions.length > 0) {
@@ -58,6 +54,13 @@ export class WinRate extends CommandBase {
                 messageHeader += 'без ' + this.getMentionedNamesString(msg, without_ids) + ' ';
             }
             accountIdsToCount = this.getDotaAccountId([with_ids.shift()], registeredPlayers);
+        }
+
+        if (heroName) {
+            if (accountIdsToCount.length) {
+                messageHeader += 'коли ' + this.getMentionedNamesString(msg, [registeredPlayers.get(accountIdsToCount[0])]) + ' ';
+            }
+            messageHeader += 'грав на ' + heroName + ' ';
         }
 
         Observable.forkJoin(
@@ -82,7 +85,7 @@ export class WinRate extends CommandBase {
         const index = include ? 0 : 1;
         const mentions = msgContent.split(' without ')[index];
         if (!!mentions) {
-            return this.getIdsFromMentions(mentions.split(' '));
+            return this.getIdsFromMentions(this.split(mentions));
         }
         return [];
     }

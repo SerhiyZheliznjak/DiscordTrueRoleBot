@@ -15,6 +15,7 @@ export abstract class CommandBase implements IProcessor {
 
     protected lock(): void {
         this.locked = true;
+        setTimeout(() => this.unlock(), 3000);
     }
 
     protected unlock(): void {
@@ -34,7 +35,11 @@ export abstract class CommandBase implements IProcessor {
     }
 
     protected getArgs(content: string): string[] {
-        return content.split(' ').slice(1);
+        return this.split(content).slice(1);
+    }
+
+    protected split(content: string): string[] {
+        return content.split(' ').filter(a => a.length);
     }
 
     protected isRetard(authorId: string): boolean {
