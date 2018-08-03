@@ -44,7 +44,7 @@ export class WinRate extends CommandBase {
         let accountIdsToCount: number[];
         let messageHeader = 'Вінрейт ';
 
-        if (args.indexOf('all') > -1 || args.length === 0 || with_ids.length === 0) {
+        if (this.countingEachOne(args, with_ids)) {
             accountIdsToCount = Array.from(registeredPlayers.keys());
         } else if (mentions.length > 0) {
             if (with_ids.length) {
@@ -60,7 +60,8 @@ export class WinRate extends CommandBase {
             if (accountIdsToCount.length) {
                 messageHeader += 'коли ' + this.getMentionedNamesString(msg, [registeredPlayers.get(accountIdsToCount[0])]) + ' ';
             }
-            messageHeader += 'грав на ' + heroName + ' ';
+            messageHeader += this.countingEachOne(args, with_ids) ? 'всіх на ' : 'грав на ';
+            messageHeader += heroName + ' ';
         }
 
         Observable.forkJoin(
@@ -73,6 +74,10 @@ export class WinRate extends CommandBase {
                 )
             ))
         ).subscribe((accWinRate: AccountWinRate[]) => this.sendMessage(msg, accWinRate, messageHeader));
+    }
+
+    private countingEachOne(args: string[], with_ids: string[]): boolean {
+        return args.indexOf('all') > -1 || args.length === 0 || with_ids.length === 0;
     }
 
     private getMentionedNamesString(msg: Message, mentioned: string[]): string {
@@ -110,7 +115,7 @@ export class WinRate extends CommandBase {
     private sendMessage(msg: Message, accWinRates: AccountWinRate[], messageHeader: string): void {
         Observable.forkJoin(accWinRates.map(awr => this.populateWithName(awr)))
             .subscribe(winrates => {
-                const winratesMsg = winrates.sort((a, b) => a.winRate - b.winRate)
+                const winratesMsg = winrates.sort((a, b) => b.winRate - a.winRate)
                     .reduce((message, wr) => {
                         const sign = wr.winRate > 50 ? '+' : '-';
                         const winRate = isNaN(wr.winRate) ? '-' : wr.winRate;
