@@ -15,7 +15,7 @@ export class RegisterAll extends CommandBase {
                     new Pair(333303976, '407949091163865099'), // Tee Hee
                     new Pair(118975931, '289388465034887178'), // I'm 12 btw GG.BET
                     new Pair(86848474, '408363774257528852'), // whoami
-                    new Pair(314684987, '413792999030652938'), // Малий Аднрюхи (Денис)
+                    new Pair(314684987, '235372240160423936'), // Малий Аднрюхи (Денис)
                     new Pair(36753317, '408172132875501581'), // =3
                 ];
                 myFriends.forEach(friend => {
