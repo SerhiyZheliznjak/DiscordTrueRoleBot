@@ -40,28 +40,31 @@ export class WinRate extends CommandBase {
         const mentions = this.getIdsFromMentions(args);
         const with_ids: string[] = this.getWithOrWithouts(msgContent, registeredPlayers);
         const without_ids: string[] = this.getWithOrWithouts(msgContent, registeredPlayers, false);
+        const countingAll = this.countingEachOne(args, with_ids);
         let accountIdsToCount: number[];
         let messageHeader = 'Вінрейт ';
 
-        if (this.countingEachOne(args, with_ids)) {
+        if (countingAll) {
             accountIdsToCount = Array.from(registeredPlayers.keys());
-        } else if (mentions.length > 0) {
+            messageHeader += 'кожного ';
+        }
+
+        if (mentions.length > 0) {
             if (with_ids.length) {
                 messageHeader += this.getMentionedNamesString(msg, with_ids) + ' ';
+                accountIdsToCount = this.getDotaAccountId([with_ids.shift()], registeredPlayers);
             }
             if (without_ids.length) {
                 messageHeader += 'без ' + this.getMentionedNamesString(msg, without_ids) + ' ';
             }
-            accountIdsToCount = this.getDotaAccountId([with_ids.shift()], registeredPlayers);
         }
 
         if (heroName) {
             if (accountIdsToCount.length) {
-                messageHeader += this.countingEachOne(args, with_ids) ? '' : 'коли ';
+                messageHeader += countingAll ? '' : 'коли ';
                 messageHeader += this.getMentionedNamesString(msg, [registeredPlayers.get(accountIdsToCount[0])]) + ' ';
             }
-            messageHeader += this.countingEachOne(args, with_ids) ? 'кожного на ' : 'грав на ';
-            messageHeader += heroName + ' ';
+            messageHeader += 'на ' + heroName + ' ';
         }
 
         Observable.forkJoin(
