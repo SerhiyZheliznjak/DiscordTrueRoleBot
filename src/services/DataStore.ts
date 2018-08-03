@@ -1,5 +1,5 @@
 import NominationResult from "../model/NominationResult";
-import { MatchJson, ProfileJson, WinLossJson, TeamsJson } from "../dota-api/DotaJsonTypings";
+import { MatchJson, ProfileJson, WinLossJson, TeamJson } from "../dota-api/DotaJsonTypings";
 import StorageService from "./StorageService";
 import { Observable } from "rxjs";
 import DotaApi from "../dota-api/DotaApi";
@@ -114,7 +114,8 @@ export default class DataStore {
         }
     }
 
-    public getTeams(): Observable<TeamsJson[]> {
+    public getTeams(): Observable<TeamJson[]> {
+        const lastYear = new Date().getMilliseconds() - 1000 * 60 * 60 * 24 * 356;
         return this.dotaApi.getTeams();
     }
 }

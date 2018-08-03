@@ -307,7 +307,7 @@ export class HeroJson {
     legs: number;
 }
 
-export class TeamsJson {
+export class TeamJson {
     team_id: number;
     rating: number;
     wins: number;
