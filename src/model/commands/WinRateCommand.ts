@@ -2,7 +2,6 @@ import { CommandBase } from '../Command';
 import { Observable } from 'rxjs';
 import { Message } from 'discord.js';
 import { WinLossJson } from '../../dota-api/DotaJsonTypings';
-import { DiscordUtils } from '../../utils/DiscordUtils';
 
 export class WinRate extends CommandBase {
     public process(msg: Message): void {
