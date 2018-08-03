@@ -6,7 +6,6 @@ import DataStore from "../../services/DataStore";
 import { ProfileJson } from "../../dota-api/DotaJsonTypings";
 import NominationResult from "../NominationResult";
 import { DiscordUtils } from "../../utils/DiscordUtils";
-import Pair from "../Pair";
 
 export class ShowTop extends CommandBase {
     private queue: Map<string, TextChannel[]>;
