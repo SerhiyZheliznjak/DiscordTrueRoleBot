@@ -108,7 +108,7 @@ export default class DataStore {
     public getHeroes(): Observable<Map<string, number>> {
         if (DataStore.heroes.size === 0) {
             return this.dotaApi.getHeroes().map(heroes => heroes.reduce((map, h) =>
-                map.set(h.localized_name.split(/['-]/).join(''), h.id), DataStore.heroes));
+                map.set(h.localized_name.split(/['-\s]/).join(''), h.id), DataStore.heroes));
         } else {
             return Observable.of(DataStore.heroes);
         }
