@@ -29,15 +29,14 @@ export class WinRate extends CommandBase {
 
     public helpText(): string {
         return 'winrate @MENTION? HERO_NAME? without? @MENTION\n'
-        + '@MENTION рахуватиме ігри з цими гравцями, якщо не вказати рахуватиме для всіх;\n'
-        + 'HERO_NAME назва героя. Перший @MENTION - той хто ним грав, якщо нема то для всіх на цьому герої;\n'
-        + 'without опційне буде рахувати ігри без гравців вказаних після without.';
+            + '@MENTION рахуватиме ігри з цими гравцями, якщо не вказати рахуватиме для всіх;\n'
+            + 'HERO_NAME назва героя. Перший @MENTION - той хто ним грав, якщо нема то для всіх на цьому герої;\n'
+            + 'without опційне буде рахувати ігри без гравців вказаних після without.';
     }
 
     private countWinRate(msg: Message, registeredPlayers: Map<number, string>, hero_id?: number, heroName?: string) {
         const msgContent = msg.content.toLowerCase();
         const args = this.getArgs(msgContent);
-        const mentions = this.getIdsFromMentions(args);
         const with_ids: string[] = this.getWithOrWithouts(msgContent, registeredPlayers);
         const without_ids: string[] = this.getWithOrWithouts(msgContent, registeredPlayers, false);
         const countingAll = this.countingEachOne(args, with_ids);
@@ -46,25 +45,24 @@ export class WinRate extends CommandBase {
 
         if (countingAll) {
             accountIdsToCount = Array.from(registeredPlayers.keys());
-            messageHeader += 'кожного ';
         }
 
-        if (mentions.length > 0) {
-            if (with_ids.length) {
-                messageHeader += this.getMentionedNamesString(msg, with_ids) + ' ';
-                accountIdsToCount = this.getDotaAccountId([with_ids.shift()], registeredPlayers);
-            }
-            if (without_ids.length) {
-                messageHeader += 'без ' + this.getMentionedNamesString(msg, without_ids) + ' ';
-            }
+        if (with_ids.length) {
+            messageHeader += this.getMentionedNamesString(msg, with_ids) + ' ';
+            accountIdsToCount = this.getDotaAccountId([with_ids.shift()], registeredPlayers);
         }
 
         if (heroName) {
             if (accountIdsToCount.length) {
                 messageHeader += countingAll ? '' : 'коли ';
-                messageHeader += this.getMentionedNamesString(msg, [registeredPlayers.get(accountIdsToCount[0])]) + ' ';
+                messageHeader += this.getMentionedNamesString(msg, [registeredPlayers.get(accountIdsToCount[0])]);
+                messageHeader += countingAll ? '' : ' ';
             }
             messageHeader += 'на ' + heroName + ' ';
+        }
+
+        if (without_ids.length) {
+            messageHeader += 'без ' + this.getMentionedNamesString(msg, without_ids) + ' ';
         }
 
         Observable.forkJoin(
