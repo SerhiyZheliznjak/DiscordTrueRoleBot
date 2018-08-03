@@ -28,10 +28,10 @@ export class WinRate extends CommandBase {
     }
 
     public helpText(): string {
-        return 'winrate all? HERO_NAME? @MENTION without? @MENTION\nякщо не вказати all то порахує лише для того хто то викликав команду;\n'
-        + 'HERO_NAME опційне, рахуватиме ігри на цьому герої, якщо є @MENTION то порахує для першого гравця на цьому герої;\n'
-        + '@MENTION рахуватиме ігри з цими гравцями ;\n'
-        + 'without опційне буде рахувати ігри без згаданих гравців вказаних після without.';
+        return 'winrate @MENTION? HERO_NAME? without? @MENTION\n'
+        + '@MENTION рахуватиме ігри з цими гравцями, якщо не вказати рахуватиме для всіх;\n'
+        + 'HERO_NAME ім\'я героя. Перший @MENTION - той хто ним грав, якщо нема то для кожого;\n'
+        + 'without опційне буде рахувати ігри без гравців вказаних після without.';
     }
 
     private countWinRate(msg: Message, registeredPlayers: Map<number, string>, hero_id?: number, heroName?: string) {
@@ -77,7 +77,7 @@ export class WinRate extends CommandBase {
     }
 
     private countingEachOne(args: string[], with_ids: string[]): boolean {
-        return args.indexOf('all') > -1 || args.length === 0 || with_ids.length === 0;
+        return args.length === 0 || with_ids.length === 0;
     }
 
     private getMentionedNamesString(msg: Message, mentioned: string[]): string {
