@@ -117,12 +117,14 @@ export class WinRate extends CommandBase {
     private sendMessage(msg: Message, accWinRates: AccountWinRate[], messageHeader: string): void {
         Observable.forkJoin(accWinRates.map(awr => this.populateWithName(awr)))
             .subscribe(winrates => {
+                const maxCountLength = String(Math.max(...winrates.map(wr => wr.count))).length;
                 const winratesMsg = winrates.filter(wr => !isNaN(wr.winRate)).sort((a, b) => b.winRate - a.winRate)
                     .reduce((message, wr) => {
                         const sign = wr.winRate > 50 ? '+' : '-';
                         const palyerName = accWinRates.length > 1 ? ': ' + wr.name : '';
+                        
                         return message + sign + ' ' + DiscordUtils.getPercentString(wr.winRate) + ' з '
-                            + wr.count + palyerName + '\n';
+                            + DiscordUtils.fillWithSpaces(String(wr.count), maxCountLength) + palyerName + '\n';
                     }, '```diff\n' + messageHeader + '\n');
                 msg.channel.send(winratesMsg + '#тайтаке```');
                 this.unlock();
