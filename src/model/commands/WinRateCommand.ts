@@ -116,7 +116,7 @@ export class WinRate extends CommandBase {
     private sendMessage(msg: Message, accWinRates: AccountWinRate[], messageHeader: string): void {
         Observable.forkJoin(accWinRates.map(awr => this.populateWithName(awr)))
             .subscribe(winrates => {
-                const winratesMsg = winrates.sort((a, b) => b.winRate - a.winRate)
+                const winratesMsg = winrates.sort((a, b) => isNaN(a.winRate) && isNaN(b.winRate) ? 1 : b.winRate - a.winRate)
                     .reduce((message, wr) => {
                         const sign = wr.winRate > 50 ? '+' : '-';
                         const winRate = isNaN(wr.winRate) ? '-' : wr.winRate;
