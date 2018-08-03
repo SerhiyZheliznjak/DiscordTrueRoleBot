@@ -7,7 +7,7 @@ import { DiscordUtils } from "../../utils/DiscordUtils";
 
 export class NominationKeysReminder extends CommandBase {
     public process(msg: Message): void {
-        if (this.isLocked(msg)) {
+        if (!this.isLocked(msg)) {
             this.dataStore.hallOfFame.subscribe((hallOfFame: Map<number, NominationResultJson>) => {
                 let keys = '\n';
                 const keyClassNameMap = Nominations.getKeyClassNameMap();

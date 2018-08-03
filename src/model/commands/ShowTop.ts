@@ -21,7 +21,7 @@ export class ShowTop extends CommandBase {
     }
 
     public process(msg: Message): void {
-        if (this.isLocked(msg)) {
+        if (!this.isLocked(msg)) {
             const args = this.parseArgs(msg);
             if (args && args.className) {
                 const pendingChannels = this.queue.get(args.className);
