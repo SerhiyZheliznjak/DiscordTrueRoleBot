@@ -118,21 +118,15 @@ export class WinRate extends CommandBase {
     private sendMessage(msg: Message, accWinRates: AccountWinRate[], messageHeader: string): void {
         Observable.forkJoin(accWinRates.map(awr => this.populateWithName(awr)))
             .subscribe(winrates => {
-                const winratesMsg = winrates.sort((a, b) => this.sortDescending(a, b))
+                const winratesMsg = winrates.filter(wr => !isNaN(wr.winRate)).sort((a, b) => b.winRate - a.winRate)
                     .reduce((message, wr) => {
                         const sign = wr.winRate > 50 ? '+' : '-';
-                        const winRate = isNaN(wr.winRate) ? '-' : wr.winRate;
                         const palyerName = accWinRates.length > 1 ? ': ' + wr.name : '';
-                        return message + sign + ' ' + winRate + '% з ' + wr.count + palyerName + '\n';
+                        return message + sign + ' ' + wr.winRate + '% з ' + wr.count + palyerName + '\n';
                     }, '```diff\n' + messageHeader + '\n');
                 msg.channel.send(winratesMsg + '#тайтаке```');
                 this.unlock();
             });
-    }
-
-    private sortDescending(a: AccountWinRate, b: AccountWinRate): number {
-        const bothNumbers = !isNaN(a.winRate) && !isNaN(b.winRate);
-        return bothNumbers ? b.winRate - a.winRate : 1;
     }
 
     private populateWithName(awr: AccountWinRate): Observable<AccountWinRate> {
