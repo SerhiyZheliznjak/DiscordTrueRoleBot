@@ -30,7 +30,7 @@ export class WinRate extends CommandBase {
     public helpText(): string {
         return 'winrate @MENTION? HERO_NAME? without? @MENTION\n'
         + '@MENTION рахуватиме ігри з цими гравцями, якщо не вказати рахуватиме для всіх;\n'
-        + 'HERO_NAME ім\'я героя. Перший @MENTION - той хто ним грав, якщо нема то для всіх на цьому герої;\n'
+        + 'HERO_NAME назва героя. Перший @MENTION - той хто ним грав, якщо нема то для всіх на цьому герої;\n'
         + 'without опційне буде рахувати ігри без гравців вказаних після without.';
     }
 
