@@ -12,7 +12,7 @@ import NominationService from "./NominationService";
 import { DiscordUtils } from "../utils/DiscordUtils";
 import { WinRate } from "../model/commands/WinRateCommand";
 import { HeroNames } from "../model/commands/HeroNames";
-import { TeamRates } from "../model/commands/TeamRates";
+import { TopTeams } from "../model/commands/TopTeams";
 
 export class CommandsProcessor extends CommandBase {
     private commandMap = new Map<string, CommandBase>();
@@ -75,7 +75,7 @@ export class CommandsProcessor extends CommandBase {
         this.commandMap.set('nominationkeys', new NominationKeysReminder(this.client, this.dataStore));
         this.commandMap.set('winrate', new WinRate(this.client, this.dataStore));
         this.commandMap.set('heronames', new HeroNames(this.client, this.dataStore));
-        this.commandMap.set('teamrates', new TeamRates(this.client, this.dataStore));
+        this.commandMap.set('topteams', new TopTeams(this.client, this.dataStore));
         this.forgiveRetards();
     }
 }
