@@ -2,6 +2,7 @@ import { CommandBase } from '../Command';
 import { Observable } from 'rxjs';
 import { Message } from 'discord.js';
 import { WinLossJson } from '../../dota-api/DotaJsonTypings';
+import { DiscordUtils } from '../../utils/DiscordUtils';
 
 export class WinRate extends CommandBase {
     public process(msg: Message): void {
@@ -120,7 +121,8 @@ export class WinRate extends CommandBase {
                     .reduce((message, wr) => {
                         const sign = wr.winRate > 50 ? '+' : '-';
                         const palyerName = accWinRates.length > 1 ? ': ' + wr.name : '';
-                        return message + sign + ' ' + wr.winRate + '% з ' + wr.count + palyerName + '\n';
+                        return message + sign + ' ' + DiscordUtils.getPercentString(wr.winRate) + ' з '
+                            + wr.count + palyerName + '\n';
                     }, '```diff\n' + messageHeader + '\n');
                 msg.channel.send(winratesMsg + '#тайтаке```');
                 this.unlock();

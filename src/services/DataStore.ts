@@ -1,5 +1,5 @@
 import NominationResult from "../model/NominationResult";
-import { MatchJson, ProfileJson, WinLossJson } from "../dota-api/DotaJsonTypings";
+import { MatchJson, ProfileJson, WinLossJson, TeamsJson } from "../dota-api/DotaJsonTypings";
 import StorageService from "./StorageService";
 import { Observable } from "rxjs";
 import DotaApi from "../dota-api/DotaApi";
@@ -112,5 +112,9 @@ export default class DataStore {
         } else {
             return Observable.of(DataStore.heroes);
         }
+    }
+
+    public getTeams(): Observable<TeamsJson[]> {
+        return this.dotaApi.getTeams();
     }
 }

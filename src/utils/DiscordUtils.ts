@@ -36,4 +36,15 @@ export class DiscordUtils {
     public static formatAsBlock(text: string): string {
         return '```bash\n' + text + '\n```';
     }
+
+    public static getPercentString(n: number): string {
+        let result = '' + n;
+        if (n < 10) {
+            result = ' ' + n;
+        }
+        if (result.split('.').length === 1) {
+            result += '.';
+        }
+        return (result + '00').slice(0, 5) + '%';
+    }
 }

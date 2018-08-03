@@ -306,3 +306,13 @@ export class HeroJson {
     roles: string[];
     legs: number;
 }
+
+export class TeamsJson {
+    team_id: number;
+    rating: number;
+    wins: number;
+    losses: number;
+    last_match_time: number;
+    name: string;
+    tag: string;
+}

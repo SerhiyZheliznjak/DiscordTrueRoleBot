@@ -1,7 +1,7 @@
 import { RxHttpRequest } from 'rx-http-request';
 import { Observable, Subscription, Observer } from 'rxjs';
 import { format } from 'util';
-import { RecentMatchJson, PlayerProfileJson, MatchJson, WinLossJson, HeroJson } from './DotaJsonTypings';
+import { RecentMatchJson, PlayerProfileJson, MatchJson, WinLossJson, HeroJson, TeamsJson } from './DotaJsonTypings';
 
 class QueuedRequest {
   constructor(public url: string, public observers: Array<Observer<any>>, public retryCount: number, public observable: Observable<any>) { }
@@ -76,6 +76,10 @@ export default class DotaApi {
 
   public getHeroes(): Observable<HeroJson[]> {
     return this.queueRequest('https://api.opendota.com/api/heroes');
+  }
+
+  public getTeams(): Observable<TeamsJson[]> {
+    return this.queueRequest('https://api.opendota.com/api/teams');
   }
 
   private hasQueryParameters(...args): boolean {
