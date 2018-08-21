@@ -13,7 +13,7 @@ export class TopTeams extends CommandBase {
         if (!this.isLocked(msg)) {
             this.dataStore.getTeams().subscribe(teams => {
                 const digits = this.getArgs(msg.content.toLowerCase()).find(arg => /\d+/.test(arg));
-                let numberOfTeams = !digits ? this.defaultN : +digits.match(/\d+/)[0];
+                const numberOfTeams = !digits ? this.defaultN : +digits.match(/\d+/)[0];
                 const topTeams = teams.slice(0, numberOfTeams);
                 const maxNameLength = Math.max(...(topTeams.map((t, index) => {
                     const placeText = this.getPlaceText(index);
@@ -23,10 +23,13 @@ export class TopTeams extends CommandBase {
                 if (maxNameLength > this.nameText.length) {
                     this.nameText = DiscordUtils.fillWithSpaces(this.nameText, maxNameLength);
                 }
-                const message = topTeams.reduce((msg, team) => {
+                const message = topTeams.reduce((text, team) => {
                     const winrate = DiscordUtils.getPercentString(Math.round(team.wins / (team.losses + team.wins) * 10000) / 100);
-                    return msg + DiscordUtils.fillWithSpaces(this.getPlaceText(topTeams.indexOf(team)) + team.name, this.nameText.length) + ' | '
-                        + DiscordUtils.fillWithSpaces(String(winrate), this.winrateText.length) + ' | ' + team.losses + team.wins + '\n';
+                    const gamesPlayed = team.losses + team.wins;
+                    return text + DiscordUtils.fillWithSpaces(this.getPlaceText(topTeams.indexOf(team))
+                     + team.name, this.nameText.length) + ' | '
+                     + DiscordUtils.fillWithSpaces(String(winrate), this.winrateText.length) + ' | '
+                     + gamesPlayed + '\n';
                 }, '');
 
                 this.sendMessage(msg, message.split('\n'));
