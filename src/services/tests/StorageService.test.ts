@@ -1,5 +1,5 @@
+import {} from 'jasmine';
 import StorageService from "../../services/StorageService";
-import Constants from "../../Constants";
 
 describe(`StorageService`, () => {
 

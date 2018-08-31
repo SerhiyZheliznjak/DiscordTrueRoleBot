@@ -7,7 +7,7 @@ import PlayerRecentMatches from "../model/PlayerRecentMatches";
 import NominationResultJson from "../model/json/NominationResultJson";
 
 export default class DataStore {
-    public static maxMatches: number;
+    public static matchesCacheSize: number;
     private static matchesCacheMap: Map<number, MatchJson> = new Map();
     private static profilesMap: Map<number, ProfileJson>  = new Map();
     private static registeredPlayersCache: Map<number, string> = new Map();
@@ -44,7 +44,7 @@ export default class DataStore {
     public addMatch(match: MatchJson): void {
         if (!this.matchesCache.get(match.match_id)) {
             this.matchesCache.set(match.match_id, match);
-            if (DataStore.maxMatches) {
+            if (DataStore.matchesCacheSize) {
                 this.matchesCache.delete(this.matchesCache.keys().next().value);
             }
         }

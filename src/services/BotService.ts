@@ -3,32 +3,21 @@ import { Subscription } from 'rxjs';
 import DataStore from './DataStore';
 import NominationService from './NominationService';
 import NominationResult from '../model/NominationResult';
-import StorageService from './StorageService';
-import Nominations from '../model/Nominations';
-import Nomination from '../model/Nomination';
-import { CommandBase } from '../model/Command';
 import { CommandsProcessor } from './CommandsProcessor';
 import { CreatorCommand } from '../model/commands/CreatorCommand';
 import { DiscordUtils } from '../utils/DiscordUtils';
 
 export default class BotService {
-    private nominationKeysMap: Map<string, string>;
     private claimedNominationsSubscription: Subscription;
     private chanel;
-    private processors: Map<string, CommandBase>;
     private commandsProcessor: CommandsProcessor;
 
     constructor(
         private client: Client,
         private dataStore: DataStore = new DataStore(),
-        private nominationService: NominationService = new NominationService(),
-        private storageService: StorageService = new StorageService()
+        private nominationService: NominationService = new NominationService()
     ) {
         this.chanel = this.client.channels.find('type', 'text');
-        this.nominationKeysMap = Nominations.all.reduce((map: Map<string, string>, nomination: Nomination) => {
-            map.set(nomination.constructor.name.toLowerCase(), nomination.getName());
-            return map;
-        }, new Map());
         this.commandsProcessor = new CommandsProcessor(this.client, this.dataStore, this.nominationService);
         this.commandsProcessor.addCommand('restart', new CreatorCommand(this.client, this.dataStore, msg => this.restart(msg)));
     }

@@ -30,7 +30,7 @@ export default class NominationService {
   }
 
   public startNominating(playersMap: Map<number, string>): Observable<NominationResult[]> {
-    DataStore.maxMatches = playersMap.size * 20;
+    DataStore.matchesCacheSize = playersMap.size * 20;
     this.dotaIds = this.getDotaIds(playersMap);
     this.subscription = Observable.interval(Constants.WATCH_INTERVAL).subscribe(this.recentGamesObserver);
     this.recentGamesObserver.next(0);

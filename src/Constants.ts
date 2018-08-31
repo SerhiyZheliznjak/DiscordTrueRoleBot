@@ -12,9 +12,8 @@ export default class Constants {
     public static get WON(): string { return 'ЗАТАЩИВ'; }
     public static get LOST(): string { return 'ТІМА ДНО'; }
     public static get AM_HP(): number { return 640; }
-    public static get WINNING_MATCH_ID(): string { return '686'; }
     public static get FORGIVE_RETARDS_INTERVAL(): number { return 1000 * 60 * 60 * 24; }
-    public static get NOMINATION_DUE_INTERVAL(): number { return 1000 * 60 * 60 * 24 * 7 * 2; } // 2 weeks
-    public static get MATCH_DUE_TIME_SEC(): number { return 60 * 60 * 24 * 7 * 2; } // 2 weeks
-    public static get WATCH_INTERVAL(): number { return 1000 * 60 * 60 * 24; }
+    public static get NOMINATION_DUE_INTERVAL(): number { return parseInt(process.env.NOMINATION_DUE_INTERVAL); } // 2 weeks
+    public static get MATCH_DUE_TIME_SEC(): number { return parseInt(process.env.MATCH_DUE_TIME_SEC); }
+    public static get WATCH_INTERVAL(): number { return parseInt(process.env.WATCH_INTERVAL); }
 }
