@@ -1,10 +1,9 @@
 import Nomination from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
-import Pair from "../Pair";
 import { PlayerJson } from "../../dota-api/DotaJsonTypings";
 
 export class ThisTimeItWillWork extends Nomination {
-    constructor(protected points: Array<Pair<number, number | string>> = []) {
+    constructor(protected points: Array<[number, number | string]> = []) {
         super(points);
         this.name = 'Шяс піде';
         this.minScore = 5;

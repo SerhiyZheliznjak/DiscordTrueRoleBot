@@ -1,10 +1,9 @@
 import Nomination from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
 import Constants from "../../Constants";
-import Pair from "../Pair";
 
 export class BestKDA extends Nomination {
-    constructor(protected points: Array<Pair<number, number | string>> = []) {
+    constructor(protected points: Array<[number, number | string]> = []) {
         super(points);
         this.name = 'А шо то в вас? KDA?';
         this.minScore = 1;
@@ -12,12 +11,12 @@ export class BestKDA extends Nomination {
     }
 
     public getScore(): number {
-        const kdaArr = this.getPoints().map(p => this.countKDA(p.p2 + ''));
+        const kdaArr = this.getPoints().map(p => this.countKDA(p[1] + ''));
         return Math.max(...kdaArr);
     }
 
     public scoreToString(): string {
-        return this.getPoints().map(p => p.p2 + '').reduce((max, next) => {
+        return this.getPoints().map(p => p[1] + '').reduce((max, next) => {
             if (this.countKDA(max) < this.countKDA(next)) {
                 return next;
             }

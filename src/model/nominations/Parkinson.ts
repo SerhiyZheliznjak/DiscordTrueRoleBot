@@ -1,10 +1,8 @@
 import Nomination from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
-import Constants from "../../Constants";
-import Pair from "../Pair";
 
 export class Parkinson extends Nomination {
-    constructor(protected points: Array<Pair<number, number | string>> = []) {
+    constructor(protected points: Array<[number, number | string]> = []) {
         super(points);
         this.name = 'Паркінсон';
         this.minScore = 100;
@@ -17,7 +15,7 @@ export class Parkinson extends Nomination {
     }
 
     public getScore() {
-        const apmArr = this.getPoints().map(p => parseInt(p.p2 + ''));
+        const apmArr = this.getPoints().map(p => parseInt(p[1] + ''));
         return Math.max(...apmArr);
     }
 

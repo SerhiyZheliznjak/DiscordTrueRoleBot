@@ -1,6 +1,5 @@
 import { CommandBase } from "../Command";
-import { Message, Client } from "discord.js";
-import DataStore from "../../services/DataStore";
+import { Message } from "discord.js";
 import Nominations from "../Nominations";
 import NominationResultJson from "../json/NominationResultJson";
 import { DiscordUtils } from "../../utils/DiscordUtils";

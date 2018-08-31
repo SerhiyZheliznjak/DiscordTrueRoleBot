@@ -1,9 +1,8 @@
 import Nomination from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
-import Pair from "../Pair";
 
 export class ChickeSoupLover extends Nomination {
-    constructor(protected points: Array<Pair<number, number | string>> = []) {
+    constructor(protected points: Array<[number, number | string]> = []) {
         super(points);
         this.name = 'Збирає на росіл';
         this.minScore = 3;

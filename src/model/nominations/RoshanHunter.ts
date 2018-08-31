@@ -1,9 +1,8 @@
 import Nomination from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
-import Pair from "../Pair";
 
 export class RoshanHunter extends Nomination {
-    constructor(protected points: Array<Pair<number, number | string>> = []) {
+    constructor(protected points: Array<[number, number | string]> = []) {
         super(points);
         this.name = 'Рошан-хуян';
         this.minScore = 3;

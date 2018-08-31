@@ -1,6 +1,5 @@
 import { CommandBase } from "../Command";
-import DataStore from "../../services/DataStore";
-import { Client, Message } from "discord.js";
+import { Message } from "discord.js";
 import { DiscordUtils } from "../../utils/DiscordUtils";
 
 export class WatchList extends CommandBase {

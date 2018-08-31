@@ -1,11 +1,8 @@
 import Nomination from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
-import Constants from "../../Constants";
-import Pair from "../Pair";
-import { MatchJson } from "../../dota-api/DotaJsonTypings";
 
 export class RapunzelSyndrome extends Nomination {
-    constructor(protected points: Array<Pair<number, number | string>> = []) {
+    constructor(protected points: Array<[number, number | string]> = []) {
         super(points);
         this.name = 'Синдром Рапунзель';
         this.minScore = 1;

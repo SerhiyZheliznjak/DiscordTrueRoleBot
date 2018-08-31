@@ -1,4 +1,3 @@
-import Pair from "./Pair";
 import { MatchJson } from "../dota-api/DotaJsonTypings";
 
 export default class Nomination {
@@ -7,7 +6,7 @@ export default class Nomination {
     protected msg: string;
 
     constructor(
-        protected points: Array<Pair<number, string | number>> = [],
+        protected points: Array<[number, string | number]> = [],
         public timeClaimed: number = new Date().getTime()
     ) { }
 
@@ -26,17 +25,17 @@ export default class Nomination {
         this.addPoint(match.match_id, this.scorePoint(match, player_slot));
     }
     public addPoint(match_id: number, point: string | number) {
-        this.points.push(new Pair(match_id, point));
+        this.points.push([match_id, point]);
         while (this.points.length > 20) {
             this.points.shift();
         }
     }
-    public getPoints(): Array<Pair<number, string | number>> {
+    public getPoints(): Array<[number, string | number]> {
         return this.points;
     }
     public getScore(): number {
         return this.points.reduce((r, p) => {
-            return p != null && p.p2 != null ? r + parseInt(p.p2 + '') : r;
+            return p != null && p[0] != null ? r + parseInt(p[1] + '') : r;
         }, 0);
     }
 

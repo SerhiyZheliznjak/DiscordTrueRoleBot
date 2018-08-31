@@ -2,10 +2,9 @@ import Nomination from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
 import Constants from "../../Constants";
 import { format } from 'util';
-import Pair from "../Pair";
 
 export class OnePunchMan extends Nomination {
-    constructor(protected points: Array<Pair<number, number | string>> = []) {
+    constructor(protected points: Array<[number, number | string]> = []) {
         super(points);
         this.name = 'Вірастюк';
         this.minScore = Constants.AM_HP;
@@ -25,7 +24,7 @@ export class OnePunchMan extends Nomination {
     }
 
     public getScore() {
-        const dmgArr = this.getPoints().map(p => parseInt(p.p2 + ''));
+        const dmgArr = this.getPoints().map(p => parseInt(p[1] + ''));
         return Math.max(...dmgArr);
     }
     public getMessage() {

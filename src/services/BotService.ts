@@ -1,17 +1,12 @@
 import { Message, Client, RichEmbed } from 'discord.js';
-import { Observable, Subscription, Observer } from 'rxjs';
+import { Subscription } from 'rxjs';
 import DataStore from './DataStore';
 import NominationService from './NominationService';
-import { ProfileJson } from '../dota-api/DotaJsonTypings';
 import NominationResult from '../model/NominationResult';
 import StorageService from './StorageService';
-import Constants from '../Constants';
-import Pair from '../model/Pair';
-import NominationResultJson from '../model/json/NominationResultJson';
 import Nominations from '../model/Nominations';
 import Nomination from '../model/Nomination';
 import { CommandBase } from '../model/Command';
-import { ShowTop } from '../model/commands/ShowTop';
 import { CommandsProcessor } from './CommandsProcessor';
 import { CreatorCommand } from '../model/commands/CreatorCommand';
 import { DiscordUtils } from '../utils/DiscordUtils';

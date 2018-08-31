@@ -1,10 +1,8 @@
 import Nomination from "../Nomination";
-import { DotaParser } from "../../services/DotaParser";
-import Pair from "../Pair";
 import { MatchJson } from "../../dota-api/DotaJsonTypings";
 
 export class Nenza extends Nomination {
-    constructor(protected points: Array<Pair<number, number | string>> = []) {
+    constructor(protected points: Array<[number, number | string]> = []) {
         super(points);
         this.name = 'Ненза';
         this.minScore = 1;

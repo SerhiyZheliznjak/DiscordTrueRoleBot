@@ -1,5 +1,4 @@
 import { Client } from 'discord.js';
-
 import BotService from './services/BotService';
 
 const client: Client = new Client();

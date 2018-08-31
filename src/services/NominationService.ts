@@ -2,7 +2,6 @@ import { Observable, Subscription, Observer } from 'rxjs';
 import DataStore from './DataStore';
 import Nominations from '../model/Nominations';
 import ScoreBoard from '../model/ScoreBoard';
-import Nomination from '../model/Nomination';
 import DotaApi from '../dota-api/DotaApi';
 import NominationResult from '../model/NominationResult';
 import Constants from '../Constants';

@@ -1,9 +1,8 @@
 import Nomination from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
-import Pair from "../Pair";
 
 export class Pacifist extends Nomination {
-    constructor(protected points: Array<Pair<number, number | string>> = []) {
+    constructor(protected points: Array<[number, number | string]> = []) {
         super(points);
         this.name = 'Пацифіст';
         this.minScore = 60;
@@ -11,7 +10,7 @@ export class Pacifist extends Nomination {
     }
 
     public getScore(): number {
-        const pointsSum = this.getPoints().reduce((sum: number, p) => sum + (+p.p2 * 100), 0);
+        const pointsSum = this.getPoints().reduce((sum: number, p) => sum + (+p[1] * 100), 0);
         return Math.round(pointsSum / this.getPoints().length);
     }
 

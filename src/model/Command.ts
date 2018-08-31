@@ -1,5 +1,4 @@
 import { Message, Client } from 'discord.js';
-import Constants from '../Constants';
 import DataStore from '../services/DataStore';
 
 export abstract class CommandBase implements IProcessor {

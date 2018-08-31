@@ -1,9 +1,8 @@
 import Nomination from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
-import Pair from "../Pair";
 
 export class DenyGod extends Nomination {
-    constructor(protected points: Array<Pair<number, number | string>> = []) {
+    constructor(protected points: Array<[number, number | string]> = []) {
         super(points);
         this.name = 'Заперечувач';
         this.minScore = 10;
@@ -15,7 +14,7 @@ export class DenyGod extends Nomination {
     }
 
     public getScore() {
-        const denyArr = this.getPoints().map(p => parseInt(p.p2 + ''));
+        const denyArr = this.getPoints().map(p => parseInt(p[1] + ''));
         return Math.max(...denyArr);
     }
 

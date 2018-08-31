@@ -3,7 +3,6 @@ import Nomination from "../model/Nomination";
 import Nominations from "../model/Nominations";
 import { DotaParser } from "./DotaParser";
 import NominationResult from "../model/NominationResult";
-import Constants from "../Constants";
 
 export default class ScoreBoardService {
     constructor() { }

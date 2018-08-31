@@ -1,10 +1,6 @@
 import { CommandBase } from "../Command";
 import { Message, Client } from "discord.js";
-import { Observable } from "rxjs";
-import NominationService from "../../services/NominationService";
 import DataStore from "../../services/DataStore";
-import { ProfileJson } from "../../dota-api/DotaJsonTypings";
-import NominationResult from "../NominationResult";
 
 export class CreatorCommand extends CommandBase {
     constructor(

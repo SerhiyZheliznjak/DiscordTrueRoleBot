@@ -1,11 +1,6 @@
 import PlayerRecentMatchesJson from "../model/json/PlayerRecentMatchesJson";
 import NominationResult from "../model/NominationResult";
 import NominationResultJson from "../model/json/NominationResultJson";
-import NominationFactory from "../services/NominationFactory";
-import Nomination from "../model/Nomination";
-import { RecentMatchJson } from "../dota-api/DotaJsonTypings";
-import Constants from "../Constants";
-import Pair from "../model/Pair";
 import RegisteredPlayerJson from "../model/json/RegisteredPlayerJson";
 import PlayerRecentMatches from "../model/PlayerRecentMatches";
 

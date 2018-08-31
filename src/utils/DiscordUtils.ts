@@ -1,28 +1,27 @@
-import { RichEmbed, MessageEmbedField } from "discord.js";
+import { RichEmbed } from "discord.js";
 import { Observable } from "rxjs";
 import NominationResult from "../model/NominationResult";
 import DataStore from "../services/DataStore";
-import Pair from "../model/Pair";
 import { ProfileJson } from "../dota-api/DotaJsonTypings";
 
 export class DiscordUtils {
     public static generateMessages(claimedNominations: NominationResult[], dataStore: DataStore): Observable<RichEmbed> {
         return Observable.from(claimedNominations)
-            .flatMap(cn => DiscordUtils.getNomiPlayerPair(cn, dataStore))
-            .map(pair => {
+            .flatMap(cn => DiscordUtils.getNomiPlayerTuple(cn, dataStore))
+            .map(tuple => {
                 const richEmbed = new RichEmbed();
-                richEmbed.setAuthor(pair.p1.nomination.getName(), pair.p2.avatarmedium);
-                richEmbed.setTitle(pair.p2.personaname);
-                richEmbed.setDescription(pair.p1.nomination.getMessage());
-                richEmbed.setThumbnail(pair.p1.nomination.getThumbURL());
-                richEmbed.setFooter(pair.p1.nomination.getScoreText());
-                richEmbed.setURL(pair.p2.profileurl);
+                richEmbed.setAuthor(tuple[0].nomination.getName(), tuple[1].avatarmedium);
+                richEmbed.setTitle(tuple[1].personaname);
+                richEmbed.setDescription(tuple[0].nomination.getMessage());
+                richEmbed.setThumbnail(tuple[0].nomination.getThumbURL());
+                richEmbed.setFooter(tuple[0].nomination.getScoreText());
+                richEmbed.setURL(tuple[1].profileurl);
                 return richEmbed;
             });
     }
 
-    public static getNomiPlayerPair(nomiRes: NominationResult, dataStore: DataStore): Observable<Pair<NominationResult, ProfileJson>> {
-        return dataStore.getProfile(nomiRes.account_id).map(profile => new Pair(nomiRes, profile));
+    public static getNomiPlayerTuple(nomiRes: NominationResult, dataStore: DataStore): Observable<[NominationResult, ProfileJson]> {
+        return dataStore.getProfile(nomiRes.account_id).map(profile => [nomiRes, profile] as [NominationResult, ProfileJson]);
     }
 
     // public static fillWithSpaces(text: string, desiredLength: number): string {

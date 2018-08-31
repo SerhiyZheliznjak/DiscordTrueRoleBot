@@ -1,6 +1,5 @@
 import { CommandBase } from "../Command";
-import { Message, Client } from "discord.js";
-import DataStore from "../../services/DataStore";
+import { Message } from "discord.js";
 
 export class Register extends CommandBase {
     public process(msg: Message): void {

@@ -1,6 +1,5 @@
 import PlayerRecentMatches from "../model/PlayerRecentMatches";
 import PlayerFullMatches from "../model/PlayerFullMatches";
-import { Observable } from "rxjs";
 import { RecentMatchJson } from "../dota-api/DotaJsonTypings";
 import Constants from "../Constants";
 import NominationResult from "../model/NominationResult";
