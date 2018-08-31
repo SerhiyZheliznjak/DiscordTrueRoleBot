@@ -1,6 +1,5 @@
 import Nomination from "../Nomination";
 import { DotaParser } from "../../services/DotaParser";
-import Constants from "../../Constants";
 
 export class JungleOppressor extends Nomination {
     constructor(protected points: Array<[number, number | string]> = []) {
@@ -32,7 +31,7 @@ export class JungleOppressor extends Nomination {
         let objectiveDamage = 0;
         for (const target in player.damage) {
             if (player.damage.hasOwnProperty(target)) {
-                if (target.indexOf(Constants.JUNGLE_TARGETS_IDENTIFIER) === 0) {
+                if (target.indexOf('npc_dota_neutral') === 0) {
                     jungleDamaged += player.damage[target];
                 } else {
                     objectiveDamage += player.damage[target];

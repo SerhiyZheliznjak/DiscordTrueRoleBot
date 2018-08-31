@@ -27,7 +27,7 @@ export class Donor extends Nomination {
         if (!objectives) {
             return 0;
         }
-        const fbObjective = objectives.find(obj => obj.type === Constants.OBJECTIVE_FB);
+        const fbObjective = objectives.find(obj => obj.type === 'CHAT_MESSAGE_FIRSTBLOOD');
         return !!fbObjective ? fbObjective.key === player_slot ? 1 : 0 : 0;
     }
 }
