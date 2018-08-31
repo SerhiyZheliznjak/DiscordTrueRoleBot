@@ -25,9 +25,9 @@ export class DiscordUtils {
         return dataStore.getProfile(nomiRes.account_id).map(profile => new Pair(nomiRes, profile));
     }
 
-    public static fillWithSpaces(text: string, desiredLength: number): string {
-        return desiredLength - text.length > 0 ? text + ' '.repeat(desiredLength - text.length) : text;
-    }
+    // public static fillWithSpaces(text: string, desiredLength: number): string {
+    //     return desiredLength - text.length > 0 ? text + ' '.repeat(desiredLength - text.length) : text;
+    // }
 
     public static getLongestLength(arr: string[]): number {
         return Math.max(...arr.map(s => s.length));

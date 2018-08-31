@@ -14,7 +14,7 @@ export class NominationKeysReminder extends CommandBase {
                 const alignLength = DiscordUtils.getLongestLength([...keyClassNameMap].map(k => k[1]));
                 for (const key of hallOfFame.keys()) {
                     const className = keyClassNameMap.get(key);
-                    keys += DiscordUtils.fillWithSpaces(className, alignLength) + ': ' + hallOfFame.get(key).nominationName + '\n';
+                    keys += className.padEnd(alignLength) + ': ' + hallOfFame.get(key).nominationName + '\n';
                 }
                 msg.reply(DiscordUtils.formatAsBlock(keys));
             });

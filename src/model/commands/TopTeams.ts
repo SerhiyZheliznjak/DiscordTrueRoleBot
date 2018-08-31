@@ -21,14 +21,13 @@ export class TopTeams extends CommandBase {
                 })));
 
                 if (maxNameLength > this.nameText.length) {
-                    this.nameText = DiscordUtils.fillWithSpaces(this.nameText, maxNameLength);
+                    this.nameText = this.nameText.padEnd(maxNameLength);
                 }
                 const message = topTeams.reduce((text, team) => {
                     const winrate = DiscordUtils.getPercentString(Math.round(team.wins / (team.losses + team.wins) * 10000) / 100);
                     const gamesPlayed = team.losses + team.wins;
-                    return text + DiscordUtils.fillWithSpaces(this.getPlaceText(topTeams.indexOf(team))
-                     + team.name, this.nameText.length) + ' | '
-                     + DiscordUtils.fillWithSpaces(String(winrate), this.winrateText.length) + ' | '
+                    return text + (this.getPlaceText(topTeams.indexOf(team)) + team.name).padEnd(this.nameText.length) + ' | '
+                     + String(winrate).padEnd(this.winrateText.length) + ' | '
                      + gamesPlayed + '\n';
                 }, '');
 
@@ -38,6 +37,10 @@ export class TopTeams extends CommandBase {
                 }
             });
         }
+    }
+
+    public helpText(): string {
+        return 'Повертає топ N професійних команд, N = ' + this.defaultN + ' за замовчуванням';
     }
 
     private sendMessage(msg: Message, message: string[]): void {
@@ -73,9 +76,5 @@ export class TopTeams extends CommandBase {
 
     private getPlaceText(index: number): string {
         return index + 1 + '. ';
-    }
-
-    public helpText(): string {
-        return 'Повертає топ N професійних команд, N = ' + this.defaultN + ' за замовчуванням';
     }
 }

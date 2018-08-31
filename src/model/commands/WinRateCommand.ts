@@ -124,7 +124,7 @@ export class WinRate extends CommandBase {
                         const palyerName = accWinRates.length > 1 ? ': ' + wr.name : '';
 
                         return message + sign + ' ' + DiscordUtils.getPercentString(wr.winRate) + ' з '
-                            + DiscordUtils.fillWithSpaces(String(wr.count), maxCountLength) + palyerName + '\n';
+                            + String(wr.count).padEnd(maxCountLength) + palyerName + '\n';
                     }, '```diff\n' + messageHeader + '\n');
                 msg.channel.send(winratesMsg + '#тайтаке```');
                 this.unlock();

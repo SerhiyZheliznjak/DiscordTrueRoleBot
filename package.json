@@ -11,23 +11,23 @@
   "author": "Serhiy Zheliznyak",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^11.3.0",
-    "mongodb": "^3.0.3",
-    "npm": "^5.8.0",
+    "discord.js": "^11.4.2",
+    "mongodb": "^3.1.4",
+    "npm": "^5.10.0",
     "rx-http-request": "^1.2.0",
-    "rxjs": "^5.5.6"
+    "rxjs": "^5.5.12"
   },
   "devDependencies": {
-    "@types/jasmine": "^2.8.6",
-    "@types/mongodb": "^3.0.5",
-    "@types/node": "^9.4.6",
+    "@types/jasmine": "^2.8.8",
+    "@types/mongodb": "^3.1.4",
+    "@types/node": "^9.6.31",
     "eslint-config-google": "^0.9.1",
-    "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-promise": "^3.8.0",
     "jasmine-ts": "^0.2.1",
-    "nodemon": "^1.15.1",
-    "tslint": "^5.9.1",
-    "typescript": "^3.0.1",
+    "nodemon": "^1.18.4",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.3",
     "typescript-eslint-parser": "^14.0.0"
   },
   "keywords": [
