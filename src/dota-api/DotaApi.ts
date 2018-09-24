@@ -2,6 +2,7 @@ import { RxHttpRequest } from 'rx-http-request';
 import { Observable, Subscription, Observer } from 'rxjs';
 import { format } from 'util';
 import { RecentMatchJson, PlayerProfileJson, MatchJson, WinLossJson, HeroJson, TeamJson } from './DotaJsonTypings';
+import Constants from '../Constants';
 
 class QueuedRequest {
   constructor(public url: string, public observers: Array<Observer<any>>, public retryCount: number, public observable: Observable<any>) { }
@@ -16,16 +17,17 @@ export default class DotaApi {
   }
 
   public static getRecentMatchesUrl(account_id: number): string {
-    return format('https://api.opendota.com/api/players/%s/recentMatches', account_id);
+    return format('https://api.opendota.com/api/players/%s/matches?limit=20&date=%s&sort=start_time',
+     account_id, Constants.MATCH_DUE_TIME_DAYS);
   }
 
   constructor(private rxHttpRequest: RxHttpRequest = RxHttpRequest) { }
 
-  public queueRequest(url: string): Observable<any> {
+  public queueRequest<T>(url: string): Observable<T> {
     let observable;
     const queued = this.isQueued(url);
     if (queued === undefined) {
-      observable = Observable.create((observer: Observer<any>) => {
+      observable = Observable.create((observer: Observer<T>) => {
         const isQueued = this.isQueued(url);
         if (!isQueued) {
           DotaApi.queue.push(new QueuedRequest(url, [observer], 3, observable));

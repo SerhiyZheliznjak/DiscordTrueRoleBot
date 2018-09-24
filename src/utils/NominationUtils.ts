@@ -1,22 +1,16 @@
 import PlayerRecentMatches from "../model/PlayerRecentMatches";
 import PlayerFullMatches from "../model/PlayerFullMatches";
-import { RecentMatchJson } from "../dota-api/DotaJsonTypings";
 import Constants from "../Constants";
 import NominationResult from "../model/NominationResult";
 import NominationResultJson from "../model/json/NominationResultJson";
 
 export default class NominationUtils {
-    public isFreshMatch(recentMatch: RecentMatchJson): boolean {
-        const nowInSeconds = new Date().getTime() / 1000;
-        return nowInSeconds - recentMatch.start_time < Constants.MATCH_DUE_TIME_SEC;
-    }
-
     public hasNewMatches(freshMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): boolean {
         if (this.noMatches(storedMatches)) {
             return !this.noMatches(freshMatches);
         } else {
             if (!this.noMatches(freshMatches)) {
-                return this.freshMatchesNotStored(freshMatches, storedMatches);
+                return freshMatches.recentMatchesIds[0] === storedMatches.recentMatchesIds[0] ? false : true;
             }
         }
         return false;
@@ -53,11 +47,6 @@ export default class NominationUtils {
             pfm.matches.push(match);
         }
         return pfm;
-    }
-
-    private freshMatchesNotStored(freshMatches: PlayerRecentMatches, storedMatches: PlayerRecentMatches): boolean {
-        const notStored = freshMatches.recentMatchesIds.filter(match_id => storedMatches.recentMatchesIds.indexOf(match_id) < 0);
-        return notStored.length > 0;
     }
 
     private noMatches(playerMatches: PlayerRecentMatches): boolean {

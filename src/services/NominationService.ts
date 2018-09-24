@@ -50,7 +50,7 @@ export default class NominationService {
     } else {
       console.log('getting new scoreboard');
       return Observable.from(this.dotaIds)
-        .flatMap((account_id: number) => this.getFreshRecentMatchesForPlayer(account_id))
+        .flatMap((account_id: number) => this.getRecentMatchesForPlayer(account_id))
         .flatMap((playerWithNewMatches: PlayerRecentMatches) => this.mapToPlayerWithFullMatches(playerWithNewMatches))
         .reduce((arr: PlayerFullMatches[], pfm: PlayerFullMatches) => [...arr, pfm], []).map(playersMatches => {
           this.scoreBoard = new ScoreBoard();
@@ -87,10 +87,9 @@ export default class NominationService {
       );
   }
 
-  public getFreshRecentMatchesForPlayer(account_id: number): Observable<PlayerRecentMatches> {
+  public getRecentMatchesForPlayer(account_id: number): Observable<PlayerRecentMatches> {
     return this.dotaApi.getRecentMatches(account_id).map(recentMatches => {
-      const freshMatches = recentMatches.filter(rm => this.nominationUtils.isFreshMatch(rm)).map(m => m.match_id);
-      return new PlayerRecentMatches(account_id, freshMatches);
+      return new PlayerRecentMatches(account_id, recentMatches.map(m => m.match_id));
     });
   }
 
@@ -108,6 +107,7 @@ export default class NominationService {
   }
 
   public nextCheck(dotaIds: number[]): void {
+    console.log(new Date().toString().split(' GMT')[0], ': Checking...');
     this.getPlayerFullMatches(dotaIds)
       .subscribe((playersMatches: PlayerFullMatches[]) => {
         this.dataStore.hallOfFame.subscribe(hallOfFame => {
@@ -122,7 +122,7 @@ export default class NominationService {
   private getPlayerFullMatches(dotaIds: number[]): Observable<PlayerFullMatches[]> {
     return Observable.from(dotaIds)
       .flatMap((account_id: number) =>
-        Observable.zip(this.getFreshRecentMatchesForPlayer(account_id), this.dataStore.getRecentMatchesForPlayer(account_id)))
+        Observable.zip(this.getRecentMatchesForPlayer(account_id), this.dataStore.getRecentMatchesForPlayer(account_id)))
       .map((playerMatches: PlayerRecentMatches[]) => this.mapRecentMatchesToNew(playerMatches[0], playerMatches[1]))
       .flatMap((playerWithNewMatches: PlayerRecentMatches) => this.mapToPlayerWithFullMatches(playerWithNewMatches))
       .reduce((arr: PlayerFullMatches[], pfm: PlayerFullMatches) => [...arr, pfm], []);

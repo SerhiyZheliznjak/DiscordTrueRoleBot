@@ -20,13 +20,21 @@ export class DiscordUtils {
             });
     }
 
-    public static getNomiPlayerTuple(nomiRes: NominationResult, dataStore: DataStore): Observable<[NominationResult, ProfileJson]> {
-        return dataStore.getProfile(nomiRes.account_id).map(profile => [nomiRes, profile] as [NominationResult, ProfileJson]);
+    public static failSafe(p: ProfileJson, account_id: number): ProfileJson {
+        if (p) {
+            return p;
+        } else {
+            const stub = new ProfileJson();
+            stub.personaname = account_id + '';
+            return stub;
+        }
     }
 
-    // public static fillWithSpaces(text: string, desiredLength: number): string {
-    //     return desiredLength - text.length > 0 ? text + ' '.repeat(desiredLength - text.length) : text;
-    // }
+    public static getNomiPlayerTuple(nomiRes: NominationResult, dataStore: DataStore): Observable<[NominationResult, ProfileJson]> {
+        return dataStore.getProfile(nomiRes.account_id).map(
+            profile => [nomiRes, this.failSafe(profile, nomiRes.account_id)] as [NominationResult, ProfileJson]
+        );
+    }
 
     public static getLongestLength(arr: string[]): number {
         return Math.max(...arr.map(s => s.length));

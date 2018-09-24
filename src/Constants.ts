@@ -10,6 +10,6 @@ export default class Constants {
     public static get AM_HP(): number { return 640; }
     public static get FORGIVE_RETARDS_INTERVAL(): number { return 1000 * 60 * 60 * 24; }
     public static get NOMINATION_DUE_INTERVAL(): number { return parseInt(process.env.NOMINATION_DUE_INTERVAL); }
-    public static get MATCH_DUE_TIME_SEC(): number { return parseInt(process.env.MATCH_DUE_TIME_SEC); }
+    public static get MATCH_DUE_TIME_DAYS(): number { return parseInt(process.env.MATCH_DUE_TIME_DAYS); }
     public static get WATCH_INTERVAL(): number { return parseInt(process.env.WATCH_INTERVAL); }
 }

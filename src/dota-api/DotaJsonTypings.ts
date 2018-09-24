@@ -284,12 +284,14 @@ export class RecentMatchJson {
     deaths: number;
     assists: number;
     skill: number;
-    lane: number;
-    lane_role: number;
-    is_roaming: boolean;
-    cluster: number;
-    leaver_status: number;
     party_size: number;
+    heroes: {
+        player_slot: {
+            account_id: number;
+            hero_id: number;
+            player_slot: number;
+        };
+    };
 }
 
 export class WinLossJson {

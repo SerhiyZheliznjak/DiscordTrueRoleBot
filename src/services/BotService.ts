@@ -29,8 +29,8 @@ export default class BotService {
     public startNominating() {
         this.dataStore.registeredPlayers.subscribe(playersMap => {
             this.claimedNominationsSubscription = this.nominationService.startNominating(playersMap)
-                .subscribe((newNomintionsClaimed: NominationResult[]) => {
-                    DiscordUtils.generateMessages(newNomintionsClaimed, this.dataStore).subscribe((richEmbed: RichEmbed) => {
+                .subscribe((newNominationsClaimed: NominationResult[]) => {
+                    DiscordUtils.generateMessages(newNominationsClaimed, this.dataStore).subscribe((richEmbed: RichEmbed) => {
                         this.chanel.send('', richEmbed);
                     });
                 });
