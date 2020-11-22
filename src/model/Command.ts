@@ -1,12 +1,13 @@
 import { Message, Client } from 'discord.js';
-import DataStore from '../services/DataStore';
+//import DataStore from '../services/DataStore';
 
 export abstract class CommandBase implements IProcessor {
 
     protected static retardMap = new Map();
     protected locked = false;
 
-    constructor(protected client: Client, protected dataStore: DataStore) { }
+   // constructor(protected client: Client, protected dataStore: DataStore) { }
+    constructor(protected client: Client) { }
 
     public abstract process(message: Message): void;
 
