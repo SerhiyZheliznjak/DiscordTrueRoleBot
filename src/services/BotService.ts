@@ -1,6 +1,6 @@
 import { Message, Client, RichEmbed } from 'discord.js';
 import { Subscription } from 'rxjs';
-import DataStore from './DataStore';
+// import DataStore from './DataStore';
 import NominationService from './NominationService';
 import NominationResult from '../model/NominationResult';
 import { CommandsProcessor } from './CommandsProcessor';
@@ -14,12 +14,12 @@ export default class BotService {
 
     constructor(
         private client: Client,
-        private dataStore: DataStore = new DataStore(),
-        private nominationService: NominationService = new NominationService()
+        // private dataStore: DataStore = new DataStore(),
+        // private nominationService: NominationService = new NominationService()
     ) {
         this.chanel = this.client.channels.find('type', 'text');
         this.commandsProcessor = new CommandsProcessor(this.client, this.dataStore, this.nominationService);
-        this.commandsProcessor.addCommand('restart', new CreatorCommand(this.client, this.dataStore, msg => this.restart(msg)));
+        // this.commandsProcessor.addCommand('restart', new CreatorCommand(this.client, this.dataStore, msg => this.restart(msg)));
     }
 
     public processMesage(msg: Message): void {
