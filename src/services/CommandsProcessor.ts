@@ -4,7 +4,7 @@ import { Client, Message } from "discord.js";
 import { Register } from "../model/commands/Register";
 import { Observable } from "rxjs";
 import Constants from "../Constants";
-import DataStore from "./DataStore";
+// import DataStore from "./DataStore";
 import { RegisterAll } from "../model/commands/RegisterAll";
 import { WatchList } from "../model/commands/WatchList";
 import { NominationKeysReminder } from "../model/commands/NominationKeysReminder";
@@ -17,8 +17,13 @@ import { TopTeams } from "../model/commands/TopTeams";
 export class CommandsProcessor extends CommandBase {
     private commandMap = new Map<string, CommandBase>();
 
-    constructor(client: Client, dataStore: DataStore, private nominationService: NominationService) {
-        super(client, dataStore);
+    //constructor(client: Client, dataStore: DataStore, private nominationService: NominationService) {
+    //    super(client, dataStore);
+    //    this.init();
+    //}
+    
+     constructor(client: Client, private nominationService: NominationService) {
+        super(client);
         this.init();
     }
 
